@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "orders")
 public class Order {
+    //also we need to know where to deliver(add deliveryAddress,not null)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,7 +18,7 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "courier_id")
     private User courier;
-    @Column
+    @Column(unique = true)
     private String trackingId;
     @Column
     private Double totalPrice;
@@ -62,8 +63,18 @@ public class Order {
         this.totalPrice = totalPrice;
     }
 
+    public String getTrackingId() {
+        return trackingId;
+    }
+
+    public void setTrackingId(String trackingId) {
+        this.trackingId = trackingId;
+    }
+
     public enum Status {
-        ASSIGNED,
+        PENDING,
+        CANCELLED,
+        PROCESSING,
         SHIPPED,
         DELIVERED
     }

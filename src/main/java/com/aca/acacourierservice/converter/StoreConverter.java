@@ -1,5 +1,8 @@
 package com.aca.acacourierservice.converter;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class StoreConverter implements Converter{
     @Override
     public Object convertToEntity(Object model, Object entity) {
