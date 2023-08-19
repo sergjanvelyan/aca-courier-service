@@ -3,9 +3,10 @@ package com.aca.acacourierservice.service;
 import com.aca.acacourierservice.converter.StoreConverter;
 import com.aca.acacourierservice.entity.PickupPoint;
 import com.aca.acacourierservice.entity.Store;
-import com.aca.acacourierservice.exception.StoreServiceException;
+import com.aca.acacourierservice.exception.CourierServiceException;
 import com.aca.acacourierservice.model.StoreJson;
 import com.aca.acacourierservice.repository.StoreRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,12 +27,13 @@ public class StoreService {
     public Store getStoreById(long storeId) {
         Optional<Store> storeOptional = storeRepository.findById(storeId);
         if (storeOptional.isEmpty()) {
-            throw new StoreServiceException("There is no store with id " + storeId);
+            throw new CourierServiceException("There is no store with id " + storeId);
         }
         return storeOptional.get();
     }
 
     //Set ROLE_ADMIN access on this method
+    @Transactional
     public long addStore(StoreJson storeJson) {
         Store store = storeConverter.convertToEntity(storeJson, new Store());
 
@@ -39,6 +41,7 @@ public class StoreService {
         return store.getId();
     }
 
+    @Transactional
     public void updateStore(long id, StoreJson storeJson) {
         Store store = getStoreById(id);
         store = storeConverter.convertToEntity(storeJson, store);
@@ -47,6 +50,7 @@ public class StoreService {
 
     //Set ROLE_STORE_ADMIN access on this method
     //Change pickupPoints generic type to PickupPointJson after writing converters for it
+    @Transactional
     public void addPickupPoints(long id, List<PickupPoint> pickupPoints) {
         Store store = getStoreById(id);
         store.setPickupPoints(pickupPoints);
