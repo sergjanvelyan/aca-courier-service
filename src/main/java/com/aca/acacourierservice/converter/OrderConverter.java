@@ -7,12 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OrderConverter implements Converter<Order, OrderJson>{
+public class OrderConverter implements Converter<Order, OrderJson> {
 
     // we need field UserService userService,
     // or maybe lather CourierService courierService
     // to get courier by id
     private final StoreService storeService;
+
     @Autowired
     public OrderConverter(StoreService storeService) {
         this.storeService = storeService;
@@ -38,7 +39,8 @@ public class OrderConverter implements Converter<Order, OrderJson>{
     }
 
     @Override
-    public OrderJson convertToModel(Order entity, OrderJson model) {
+    public OrderJson convertToModel(Order entity) {
+        OrderJson model = new OrderJson();
         model.setStoreId(entity.getStore().getId());
         model.setTrackingId(entity.getTrackingId());
         model.setTotalPrice(entity.getTotalPrice());

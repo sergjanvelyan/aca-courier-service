@@ -18,7 +18,7 @@ public class UserConverter implements Converter<User, UserJson>{
     }
 
     @Override
-    public UserJson convertToModel(User entity, UserJson model) {
+    public UserJson convertToModel(User entity) {
         return null;
     }
 }

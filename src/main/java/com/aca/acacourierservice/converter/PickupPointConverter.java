@@ -15,7 +15,7 @@ public class PickupPointConverter implements Converter{
     }
 
     @Override
-    public Object convertToModel(Object entity, Object model) {
+    public Object convertToModel(Object entity) {
         return null;
     }
 }

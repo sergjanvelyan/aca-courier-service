@@ -35,7 +35,7 @@ public class StoreService {
     //Set ROLE_ADMIN access on this method
     @Transactional
     public long addStore(StoreJson storeJson) {
-        Store store = storeConverter.convertToEntity(storeJson, new Store());
+        Store store = storeConverter.convertToEntity(storeJson);
 
         storeRepository.save(store);
         return store.getId();
