@@ -10,6 +10,11 @@ public class PickupPointConverter implements Converter{
     }
 
     @Override
+    public Object convertToEntity(Object model) {
+        return null;
+    }
+
+    @Override
     public Object convertToModel(Object entity, Object model) {
         return null;
     }

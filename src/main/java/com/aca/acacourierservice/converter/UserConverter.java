@@ -1,16 +1,24 @@
 package com.aca.acacourierservice.converter;
 
+import com.aca.acacourierservice.entity.User;
+import com.aca.acacourierservice.model.UserJson;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserConverter implements Converter{
+public class UserConverter implements Converter<User, UserJson>{
+
     @Override
-    public Object convertToEntity(Object model, Object entity) {
+    public User convertToEntity(UserJson model, User entity) {
         return null;
     }
 
     @Override
-    public Object convertToModel(Object entity, Object model) {
+    public User convertToEntity(UserJson model) {
+        return null;
+    }
+
+    @Override
+    public UserJson convertToModel(User entity, UserJson model) {
         return null;
     }
 }

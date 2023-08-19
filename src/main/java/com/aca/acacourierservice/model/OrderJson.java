@@ -13,7 +13,6 @@ public class OrderJson {
     public String getTrackingId() {
         return trackingId;
     }
-
     public void setTrackingId(String trackingId) {
         this.trackingId = trackingId;
     }

@@ -23,7 +23,7 @@ public class OrderService{
     @Transactional
      public Order addOrder(OrderJson orderJson){
         //here we can do some additional work before adding order in database
-        Order order = orderConverter.convertToEntity(orderJson,new Order());
+        Order order = orderConverter.convertToEntity(orderJson);
         return orderRepository.save(order);
      }
     @Transactional
