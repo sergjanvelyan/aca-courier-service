@@ -3,7 +3,7 @@ package com.aca.acacourierservice.converter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class User implements Converter{
+public class UserConverter implements Converter{
     @Override
     public Object convertToEntity(Object model, Object entity) {
         return null;
