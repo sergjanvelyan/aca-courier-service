@@ -9,9 +9,11 @@ public class PickupPoint {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    private String name;
+    private String city;
     @Column(nullable = false)
-    private String address;
+    private String street;
+    @Column(nullable = false)
+    private String building;
     @ManyToOne
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
@@ -24,20 +26,28 @@ public class PickupPoint {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getCity() {
+        return city;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCity(String name) {
+        this.city = name;
     }
 
-    public String getAddress() {
-        return address;
+    public String getStreet() {
+        return street;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setStreet(String address) {
+        this.street = address;
+    }
+
+    public String getBuilding() {
+        return building;
+    }
+
+    public void setBuilding(String building) {
+        this.building = building;
     }
 
     public Store getStore() {
