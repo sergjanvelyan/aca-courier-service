@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "orders")
 public class Order {
-    //also we need to know where to deliver(add deliveryAddress,not null)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,9 +34,9 @@ public class Order {
     @Column(unique = true)
     private String trackingId;
     @Column(nullable = false)
-    private Double deliveryPrice;
+    private double deliveryPrice;
     @Column(nullable = false)
-    private Double totalPrice;
+    private double totalPrice;
     @Column(nullable = false)
     private double weight;
     @Column(nullable = false)
