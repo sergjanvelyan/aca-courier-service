@@ -9,16 +9,27 @@ public class UserConverter implements Converter<User, UserJson>{
 
     @Override
     public User convertToEntity(UserJson model, User entity) {
-        return null;
+        entity.setEmail(model.getEmail());
+        entity.setRole(model.getRole());
+        entity.setPassword(model.getPassword());
+        return entity;
     }
 
     @Override
     public User convertToEntity(UserJson model) {
-        return null;
+        User entity = new User();
+        entity.setEmail(model.getEmail());
+        entity.setRole(model.getRole());
+        entity.setPassword(model.getPassword());
+        return entity;
     }
 
     @Override
     public UserJson convertToModel(User entity) {
-        return null;
+        UserJson model = new UserJson();
+        model.setEmail(entity.getEmail());
+        model.setRole(entity.getRole());
+        model.setPassword(entity.getPassword());
+        return model;
     }
 }
