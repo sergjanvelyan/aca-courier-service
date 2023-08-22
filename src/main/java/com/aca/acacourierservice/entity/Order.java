@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
     @Column(nullable = false)
     private String orderId;
     @Column(nullable = false)
@@ -38,16 +38,16 @@ public class Order {
     @Column(nullable = false)
     private double totalPrice;
     @Column(nullable = false)
-    private double weight;
+    private double weightKg;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Size size;
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -139,28 +139,28 @@ public class Order {
         this.trackingId = trackingId;
     }
 
-    public Double getDeliveryPrice() {
+    public double getDeliveryPrice() {
         return deliveryPrice;
     }
 
-    public void setDeliveryPrice(Double deliveryPrice) {
+    public void setDeliveryPrice(double deliveryPrice) {
         this.deliveryPrice = deliveryPrice;
     }
 
-    public Double getTotalPrice() {
+    public double getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(Double totalPrice) {
+    public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
     }
 
-    public double getWeight() {
-        return weight;
+    public double getWeightKg() {
+        return weightKg;
     }
 
-    public void setWeight(double weight) {
-        this.weight = weight;
+    public void setWeightKg(double weightKg) {
+        this.weightKg = weightKg;
     }
 
     public Size getSize() {
