@@ -2,6 +2,9 @@ package com.aca.acacourierservice.entity;
 
 import jakarta.persistence.*;
 
+import java.util.Date;
+import java.util.List;
+
 @Entity
 @Table(name = "orders")
 public class Order {
@@ -42,6 +45,12 @@ public class Order {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Size size;
+    @Column(nullable = false)
+    private Date orderConfirmedTime;
+    @Column(nullable = false)
+    private Date orderDeliveredTime;
+    @OneToMany(mappedBy = "order",cascade = CascadeType.ALL)
+    private List<StatusUpdateTime> statusUpdateTimeList;
 
     public long getId() {
         return id;
@@ -169,6 +178,30 @@ public class Order {
 
     public void setSize(Size size) {
         this.size = size;
+    }
+
+    public Date getOrderConfirmedTime() {
+        return orderConfirmedTime;
+    }
+
+    public void setOrderConfirmedTime(Date orderConfirmedTime) {
+        this.orderConfirmedTime = orderConfirmedTime;
+    }
+
+    public Date getOrderDeliveredTime() {
+        return orderDeliveredTime;
+    }
+
+    public void setOrderDeliveredTime(Date orderDeliveredTime) {
+        this.orderDeliveredTime = orderDeliveredTime;
+    }
+
+    public List<StatusUpdateTime> getStatusUpdateTimeList() {
+        return statusUpdateTimeList;
+    }
+
+    public void setStatusUpdateTimeList(List<StatusUpdateTime> statusUpdateTimeList) {
+        this.statusUpdateTimeList = statusUpdateTimeList;
     }
 
     public enum Status {
