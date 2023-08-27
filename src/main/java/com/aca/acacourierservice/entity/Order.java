@@ -2,12 +2,15 @@ package com.aca.acacourierservice.entity;
 
 import jakarta.persistence.*;
 
+import java.util.Date;
+import java.util.List;
+
 @Entity
 @Table(name = "orders")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
     @Column(nullable = false)
     private String orderId;
     @Column(nullable = false)
@@ -38,16 +41,22 @@ public class Order {
     @Column(nullable = false)
     private double totalPrice;
     @Column(nullable = false)
-    private double weight;
+    private double weightKg;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Size size;
+    @Column(nullable = false)
+    private Date orderConfirmedTime;
+    @Column(nullable = false)
+    private Date orderDeliveredTime;
+    @OneToMany(mappedBy = "order",cascade = CascadeType.ALL)
+    private List<StatusUpdateTime> statusUpdateTimeList;
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -139,28 +148,28 @@ public class Order {
         this.trackingId = trackingId;
     }
 
-    public Double getDeliveryPrice() {
+    public double getDeliveryPrice() {
         return deliveryPrice;
     }
 
-    public void setDeliveryPrice(Double deliveryPrice) {
+    public void setDeliveryPrice(double deliveryPrice) {
         this.deliveryPrice = deliveryPrice;
     }
 
-    public Double getTotalPrice() {
+    public double getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(Double totalPrice) {
+    public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
     }
 
-    public double getWeight() {
-        return weight;
+    public double getWeightKg() {
+        return weightKg;
     }
 
-    public void setWeight(double weight) {
-        this.weight = weight;
+    public void setWeightKg(double weightKg) {
+        this.weightKg = weightKg;
     }
 
     public Size getSize() {
@@ -169,6 +178,30 @@ public class Order {
 
     public void setSize(Size size) {
         this.size = size;
+    }
+
+    public Date getOrderConfirmedTime() {
+        return orderConfirmedTime;
+    }
+
+    public void setOrderConfirmedTime(Date orderConfirmedTime) {
+        this.orderConfirmedTime = orderConfirmedTime;
+    }
+
+    public Date getOrderDeliveredTime() {
+        return orderDeliveredTime;
+    }
+
+    public void setOrderDeliveredTime(Date orderDeliveredTime) {
+        this.orderDeliveredTime = orderDeliveredTime;
+    }
+
+    public List<StatusUpdateTime> getStatusUpdateTimeList() {
+        return statusUpdateTimeList;
+    }
+
+    public void setStatusUpdateTimeList(List<StatusUpdateTime> statusUpdateTimeList) {
+        this.statusUpdateTimeList = statusUpdateTimeList;
     }
 
     public enum Status {
