@@ -7,6 +7,7 @@ import com.aca.acacourierservice.model.PickupPointJson;
 import com.aca.acacourierservice.model.StoreJson;
 import com.aca.acacourierservice.repository.StoreRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.Optional;
 public class StoreService {
     private final StoreRepository storeRepository;
     private final StoreConverter storeConverter;
-
+    @Autowired
     public StoreService(StoreRepository storeRepository, StoreConverter storeConverter) {
         this.storeRepository = storeRepository;
         this.storeConverter = storeConverter;
