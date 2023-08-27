@@ -18,7 +18,7 @@ public class PickupPointConverter implements Converter<PickupPoint, PickupPointJ
 
     @Override
     public PickupPoint convertToEntity(PickupPointJson model, PickupPoint entity) {
-      //  entity.setStore(storeService.getStorById(model.getStoreId()));
+        entity.setStore(storeService.getStoreById(model.getStoreId()));
         entity.setCity(model.getCity());
         entity.setCountry(model.getCountry());
         entity.setAddress(model.getAddress());

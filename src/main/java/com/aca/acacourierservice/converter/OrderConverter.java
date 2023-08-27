@@ -2,16 +2,25 @@ package com.aca.acacourierservice.converter;
 
 import com.aca.acacourierservice.entity.Order;
 import com.aca.acacourierservice.model.OrderJson;
+import com.aca.acacourierservice.service.StoreService;
+import com.aca.acacourierservice.service.UserService;
 import org.springframework.stereotype.Component;
 
 @Component
 public class OrderConverter implements Converter<Order, OrderJson> {
+    private final StoreService storeService;
+    private final UserService userService;
+
+    public OrderConverter(StoreService storeService, UserService userService) {
+        this.storeService = storeService;
+        this.userService = userService;
+    }
+
     @Override
     public Order convertToEntity(OrderJson model, Order entity) {
         entity.setOrderId(model.getOrderId());
         entity.setTrackingId(model.getTrackingId());
-        //TODO: Uncomment this after implementing storeService.getStoreById(long id) method
-        //entity.setStore(storeService.getStoreById(model.getStoreId));
+        entity.setStore(storeService.getStoreById(model.getStoreId()));
         entity.setFullName(model.getFullName());
         entity.setCountry(model.getCountry());
         entity.setCity(model.getCity());
@@ -20,8 +29,7 @@ public class OrderConverter implements Converter<Order, OrderJson> {
         entity.setZipCode(model.getZipCode());
         entity.setWeightKg(model.getWeightKg());
         entity.setSize(model.getSize());
-        //TODO: Uncomment this after implementing userService.getUserById(long id) method
-        //entity.setCourier(userService.getUserById(model.getCourierId));
+        entity.setCourier(userService.getUserById(model.getCourierId()));
         entity.setDeliveryPrice(model.getDeliveryPrice());
         entity.setTotalPrice(model.getTotalPrice());
         entity.setStatus(model.getStatus());

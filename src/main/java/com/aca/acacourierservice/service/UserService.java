@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -32,6 +33,14 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found: " + username));
         GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().name());
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), Arrays.asList(authority));
+    }
+
+    public User getUserById(long id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isEmpty()) {
+            throw new CourierServiceException("There is no user with id" + id);
+        }
+        return userOptional.get();
     }
 
     @Transactional
