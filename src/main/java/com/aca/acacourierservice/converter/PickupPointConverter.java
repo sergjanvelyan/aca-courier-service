@@ -23,7 +23,7 @@ public class PickupPointConverter implements Converter<PickupPoint, PickupPointJ
         entity.setCountry(model.getCountry());
         entity.setAddress(model.getAddress());
         entity.setPhoneNumber(model.getPhoneNumber());
-        entity.setZipcode(model.getZipcode());
+        entity.setZipCode(model.getZipCode());
 
         return entity;
     }
@@ -42,7 +42,7 @@ public class PickupPointConverter implements Converter<PickupPoint, PickupPointJ
         model.setCountry(entity.getCountry());
         model.setAddress(entity.getAddress());
         model.setPhoneNumber(entity.getPhoneNumber());
-        model.setZipcode(entity.getZipcode());
+        model.setZipCode(entity.getZipCode());
 
         return model;
     }

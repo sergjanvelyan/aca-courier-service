@@ -15,7 +15,7 @@ public class PickupPoint {
     @Column(nullable = false)
     private String country;
     @Column(nullable = false)
-    private long zipcode;
+    private long zipCode;
     @Column(nullable = false)
     private String address;
     @Column(nullable = false)
@@ -48,12 +48,12 @@ public class PickupPoint {
         this.country = country;
     }
 
-    public long getZipcode() {
-        return zipcode;
+    public long getZipCode() {
+        return zipCode;
     }
 
-    public void setZipcode(long zipcode) {
-        this.zipcode = zipcode;
+    public void setZipCode(long zipCode) {
+        this.zipCode = zipCode;
     }
 
     public String getAddress() {
