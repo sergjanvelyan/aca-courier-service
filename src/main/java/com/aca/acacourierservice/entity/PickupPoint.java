@@ -24,6 +24,22 @@ public class PickupPoint {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
     public String getCountry() {
         return country;
     }
@@ -40,36 +56,20 @@ public class PickupPoint {
         this.zipcode = zipcode;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String name) {
-        this.city = name;
-    }
-
-    public String getStreet() {
+    public String getAddress() {
         return address;
     }
 
-    public void setStreet(String address) {
+    public void setAddress(String address) {
         this.address = address;
     }
 
-    public String getBuilding() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setBuilding(String building) {
-        this.phoneNumber = building;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public Store getStore() {
@@ -80,5 +80,7 @@ public class PickupPoint {
         this.store = store;
     }
 }
+
+
 
 

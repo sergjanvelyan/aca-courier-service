@@ -2,20 +2,48 @@ package com.aca.acacourierservice.converter;
 
 import com.aca.acacourierservice.entity.PickupPoint;
 import com.aca.acacourierservice.model.PickupPointJson;
+import com.aca.acacourierservice.service.StoreService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PickupPointConverter implements Converter<PickupPoint, PickupPointJson>{
+public class PickupPointConverter implements Converter<PickupPoint, PickupPointJson> {
+
+    private final StoreService storeService;
+
+    @Autowired
+    public PickupPointConverter(StoreService storeService) {
+        this.storeService = storeService;
+    }
+
     @Override
     public PickupPoint convertToEntity(PickupPointJson model, PickupPoint entity) {
-        return null;
+      //  entity.setStore(storeService.getStorById(model.getStoreId()));
+        entity.setCity(model.getCity());
+        entity.setCountry(model.getCountry());
+        entity.setAddress(model.getAddress());
+        entity.setPhoneNumber(model.getPhoneNumber());
+        entity.setZipcode(model.getZipcode());
+
+        return entity;
     }
+
     @Override
     public PickupPoint convertToEntity(PickupPointJson model) {
-        return null;
+        PickupPoint entity = new PickupPoint();
+        return convertToEntity(model,entity);
     }
-    @Override
+
+   @Override
     public PickupPointJson convertToModel(PickupPoint entity) {
-        return null;
+        PickupPointJson model = new PickupPointJson();
+        model.setStoreId(entity.getStore().getId());
+        model.setCity(entity.getCity());
+        model.setCountry(entity.getCountry());
+        model.setAddress(entity.getAddress());
+        model.setPhoneNumber(entity.getPhoneNumber());
+        model.setZipcode(entity.getZipcode());
+
+        return model;
     }
 }
