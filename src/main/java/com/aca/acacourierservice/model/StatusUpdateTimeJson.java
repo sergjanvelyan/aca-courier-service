@@ -1,20 +1,21 @@
 package com.aca.acacourierservice.model;
 
 import com.aca.acacourierservice.entity.Order;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 
 public class StatusUpdateTimeJson {
-    private Date updateTime;
+    private LocalDateTime updateTime;
     private Order.Status updatedFrom;
     private Order.Status updatedTo;
     private String additionalInfo;
     private long orderId;
 
-    public Date getUpdateTime() {
+    public LocalDateTime getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(Date updateTime) {
+    public void setUpdateTime(LocalDateTime updateTime) {
         this.updateTime = updateTime;
     }
 
