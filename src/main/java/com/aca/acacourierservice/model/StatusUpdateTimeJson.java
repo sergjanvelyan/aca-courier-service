@@ -1,8 +1,6 @@
 package com.aca.acacourierservice.model;
 
 import com.aca.acacourierservice.entity.Order;
-import jakarta.persistence.*;
-
 import java.util.Date;
 
 public class StatusUpdateTimeJson {
@@ -10,7 +8,7 @@ public class StatusUpdateTimeJson {
     private Order.Status updatedFrom;
     private Order.Status updatedTo;
     private String additionalInfo;
-    private Order order;
+    private long orderId;
 
     public Date getUpdateTime() {
         return updateTime;
@@ -44,11 +42,11 @@ public class StatusUpdateTimeJson {
         this.additionalInfo = additionalInfo;
     }
 
-    public Order getOrder() {
-        return order;
+    public long getOrderId() {
+        return orderId;
     }
 
-    public void setOrder(Order order) {
-        this.order = order;
+    public void setOrderId(long orderId) {
+        this.orderId = orderId;
     }
 }
