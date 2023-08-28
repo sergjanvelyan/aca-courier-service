@@ -7,6 +7,7 @@ import com.aca.acacourierservice.model.PickupPointJson;
 import com.aca.acacourierservice.model.StoreJson;
 import com.aca.acacourierservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class StoreConverter implements Converter<Store, StoreJson> {
     private final PickupPointConverter pickupPointConverter;
     private final UserRepository userRepository;
     @Autowired
-    public StoreConverter(PickupPointConverter pickupPointConverter, UserRepository userRepository) {
+    public StoreConverter(@Lazy PickupPointConverter pickupPointConverter, UserRepository userRepository) {
         this.pickupPointConverter = pickupPointConverter;
         this.userRepository = userRepository;
     }
