@@ -13,11 +13,10 @@ import com.aca.acacourierservice.repository.StoreRepository;
 import com.aca.acacourierservice.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -25,10 +24,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class StatusUpdateTimeServiceTest {
     @Mock
     private StatusUpdateTimeRepository statusUpdateTimeRepository;
@@ -94,8 +94,7 @@ public class StatusUpdateTimeServiceTest {
         ArgumentCaptor<StatusUpdateTime> statusUpdateTimeArgumentCaptor = ArgumentCaptor.forClass(StatusUpdateTime.class);
         verify(statusUpdateTimeRepository).save(statusUpdateTimeArgumentCaptor.capture());
         StatusUpdateTime addedStatusUpdateTime = statusUpdateTimeArgumentCaptor.getValue();
-        assertEquals(1,addedStatusUpdateTime.getOrder().getId());
-        assertNull(addedStatusUpdateTime.getAdditionalInfo());
+        assertThat(addedStatusUpdateTime).isEqualTo(statusUpdateTime);
     }
     @Test
     public void testGetStatusUpdateTimeListByOrderId(){
@@ -159,4 +158,4 @@ public class StatusUpdateTimeServiceTest {
         RuntimeException exception = assertThrows(CourierServiceException.class, () -> statusUpdateTimeService.getStatusUpdateTimeListByOrderId(orderId));
         assertTrue(exception.getMessage().contains("There is no status update history for order(id="+orderId+")"));
     }
-}
+ }

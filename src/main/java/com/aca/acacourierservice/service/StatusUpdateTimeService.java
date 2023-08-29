@@ -16,7 +16,7 @@ public class StatusUpdateTimeService {
     private final StatusUpdateTimeRepository statusUpdateTimeRepository;
     private final StatusUpdateTimeConverter statusUpdateTimeConverter;
     @Autowired
-    public StatusUpdateTimeService(StatusUpdateTimeRepository statusUpdateTimeRepository, StatusUpdateTimeConverter statusUpdateTimeConverter) {
+     public StatusUpdateTimeService(StatusUpdateTimeRepository statusUpdateTimeRepository, StatusUpdateTimeConverter statusUpdateTimeConverter) {
         this.statusUpdateTimeRepository = statusUpdateTimeRepository;
         this.statusUpdateTimeConverter = statusUpdateTimeConverter;
     }

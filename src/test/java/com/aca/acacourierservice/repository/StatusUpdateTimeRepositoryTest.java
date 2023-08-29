@@ -6,8 +6,6 @@ import com.aca.acacourierservice.entity.Store;
 import com.aca.acacourierservice.entity.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +30,15 @@ public class StatusUpdateTimeRepositoryTest {
     private StoreRepository storeRepository;
     @Autowired
     private OrderRepository orderRepository;
-    @BeforeEach
-    public void setUp(){
+    @AfterEach
+    public void destroy(){
+        statusUpdateTimeRepository.deleteAll();
+        orderRepository.deleteAll();
+        storeRepository.deleteAll();
+        userRepository.deleteAll();
+    }
+    @Test
+    public void testFindAllByOrderId(){
         User storeAdmin = new User();
         storeAdmin.setId(1L);
         storeAdmin.setEmail("storeAdmin@gmail.com");
@@ -81,21 +86,11 @@ public class StatusUpdateTimeRepositoryTest {
         secondStatusUpdateTime.setUpdateTime(LocalDateTime.of(2023, Month.AUGUST,28,22,23,23));
         secondStatusUpdateTime.setAdditionalInfo("Ok");
         statusUpdateTimeRepository.save(secondStatusUpdateTime);
-    }
-    @AfterEach
-    public void destroy(){
-        statusUpdateTimeRepository.deleteAll();
-        orderRepository.deleteAll();
-        storeRepository.deleteAll();
-        userRepository.deleteAll();
-    }
-    @Test
-    public void testFindAllByOrderId(){
+
         List<StatusUpdateTime> statusUpdateTimes = statusUpdateTimeRepository.findAllByOrderId(1L);
         Assertions.assertThat(statusUpdateTimes.size()).isEqualTo(2);
         Assertions.assertThat(statusUpdateTimes.get(1).getUpdatedFrom()).isEqualTo(statusUpdateTimes.get(0).getUpdatedTo());
     }
-
     @Test
     public void testFindAllByInvalidOrderId(){
         List<StatusUpdateTime> statusUpdateTimes = statusUpdateTimeRepository.findAllByOrderId(8);
