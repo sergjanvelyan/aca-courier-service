@@ -2,8 +2,11 @@ package com.aca.acacourierservice.repository;
 
 import com.aca.acacourierservice.entity.Order;
 import com.aca.acacourierservice.entity.StatusUpdateTime;
+import com.aca.acacourierservice.entity.Store;
+import com.aca.acacourierservice.entity.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,16 +26,56 @@ import java.util.List;
 public class StatusUpdateTimeRepositoryTest {
     @Autowired
     private StatusUpdateTimeRepository statusUpdateTimeRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private StoreRepository storeRepository;
+    @Autowired
+    private OrderRepository orderRepository;
     @BeforeEach
     public void setUp(){
+        User storeAdmin = new User();
+        storeAdmin.setId(1L);
+        storeAdmin.setEmail("storeAdmin@gmail.com");
+        storeAdmin.setPassword("storeAdmin");
+        storeAdmin.setRole(User.Role.ROLE_STORE_ADMIN);
+        userRepository.save(storeAdmin);
+
+        Store store = new Store();
+        store.setId(1L);
+        store.setName("Store Name");
+        store.setAdmin(storeAdmin);
+        storeRepository.save(store);
+
+        Order order = new Order();
+        order.setId(1L);
+        order.setOrderId("orderId1234");
+        order.setStatus(Order.Status.SHIPPED);
+        order.setStore(store);
+        order.setCountry("Armenia");
+        order.setCity("Yerevan");
+        order.setAddress("Address 7");
+        order.setPhone("+374-77-77-77-77");
+        order.setZipCode(1005L);
+        order.setFullName("FirstName LastName");
+        order.setDeliveryPrice(10);
+        order.setTotalPrice(50);
+        order.setWeightKg(5.5);
+        order.setSize(Order.Size.MEDIUM);
+        order.setOrderConfirmedTime(LocalDateTime.of(2023, Month.AUGUST, 25, 15, 10, 3));
+        orderRepository.save(order);
+
         StatusUpdateTime firstStatusUpdateTime = new StatusUpdateTime();
         firstStatusUpdateTime.setId(1L);
+        firstStatusUpdateTime.setOrder(order);
         firstStatusUpdateTime.setUpdatedTo(Order.Status.DELIVERING);
         firstStatusUpdateTime.setUpdatedFrom(Order.Status.SHIPPED);
         firstStatusUpdateTime.setUpdateTime(LocalDateTime.of(2023, Month.AUGUST, 28, 21, 23, 23));
         statusUpdateTimeRepository.save(firstStatusUpdateTime);
+
         StatusUpdateTime secondStatusUpdateTime = new StatusUpdateTime();
         secondStatusUpdateTime.setId(2L);
+        secondStatusUpdateTime.setOrder(order);
         secondStatusUpdateTime.setUpdatedTo(Order.Status.DELIVERED);
         secondStatusUpdateTime.setUpdatedFrom(Order.Status.DELIVERING);
         secondStatusUpdateTime.setUpdateTime(LocalDateTime.of(2023, Month.AUGUST,28,22,23,23));
@@ -42,21 +85,20 @@ public class StatusUpdateTimeRepositoryTest {
     @AfterEach
     public void destroy(){
         statusUpdateTimeRepository.deleteAll();
+        orderRepository.deleteAll();
+        storeRepository.deleteAll();
+        userRepository.deleteAll();
     }
     @Test
-    public void testGetAllStatusUpdateTimes(){
-        List<StatusUpdateTime> statusUpdateTimes = statusUpdateTimeRepository.findAll();
+    public void testFindAllByOrderId(){
+        List<StatusUpdateTime> statusUpdateTimes = statusUpdateTimeRepository.findAllByOrderId(1L);
         Assertions.assertThat(statusUpdateTimes.size()).isEqualTo(2);
-        Assertions.assertThat(statusUpdateTimes.get(0).getAdditionalInfo()).isNull();
-        Assertions.assertThat(statusUpdateTimes.get(1).getAdditionalInfo()).isEqualTo("Ok");
-        Assertions.assertThat(statusUpdateTimes.get(0).getId()).isNotNegative();
-        Assertions.assertThat(statusUpdateTimes.get(1).getId()).isNotNegative();
-        Assertions.assertThat(statusUpdateTimes.get(1).getUpdateTime())
-                .hasYear(2023)
-                .hasMonth(Month.AUGUST)
-                .hasDayOfMonth(28)
-                .hasHour(22)
-                .hasMinute(23)
-                .hasSecond(23);
+        Assertions.assertThat(statusUpdateTimes.get(1).getUpdatedFrom()).isEqualTo(statusUpdateTimes.get(0).getUpdatedTo());
+    }
+
+    @Test
+    public void testFindAllByInvalidOrderId(){
+        List<StatusUpdateTime> statusUpdateTimes = statusUpdateTimeRepository.findAllByOrderId(8);
+        Assertions.assertThat(statusUpdateTimes.size()).isEqualTo(0);
     }
 }

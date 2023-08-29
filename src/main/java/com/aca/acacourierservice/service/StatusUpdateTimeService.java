@@ -23,6 +23,7 @@ public class StatusUpdateTimeService {
     @Transactional
     public long addStatusUpdateTime(StatusUpdateTimeJson statusUpdateTimeJson){
         StatusUpdateTime statusUpdateTime = statusUpdateTimeConverter.convertToEntity(statusUpdateTimeJson);
+        statusUpdateTimeRepository.save(statusUpdateTime);
         return statusUpdateTime.getId();
     }
     public List<StatusUpdateTime> getStatusUpdateTimeListByOrderId(long orderId){

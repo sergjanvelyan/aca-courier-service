@@ -2,6 +2,7 @@ package com.aca.acacourierservice.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -46,9 +47,9 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private Size size;
     @Column(nullable = false)
-    private Date orderConfirmedTime;
-    @Column(nullable = false)
-    private Date orderDeliveredTime;
+    private LocalDateTime orderConfirmedTime;
+    @Column
+    private LocalDateTime orderDeliveredTime;
     @OneToMany(mappedBy = "order",cascade = CascadeType.ALL)
     private List<StatusUpdateTime> statusUpdateTimeList;
 
@@ -180,19 +181,19 @@ public class Order {
         this.size = size;
     }
 
-    public Date getOrderConfirmedTime() {
+    public LocalDateTime getOrderConfirmedTime() {
         return orderConfirmedTime;
     }
 
-    public void setOrderConfirmedTime(Date orderConfirmedTime) {
+    public void setOrderConfirmedTime(LocalDateTime orderConfirmedTime) {
         this.orderConfirmedTime = orderConfirmedTime;
     }
 
-    public Date getOrderDeliveredTime() {
+    public LocalDateTime getOrderDeliveredTime() {
         return orderDeliveredTime;
     }
 
-    public void setOrderDeliveredTime(Date orderDeliveredTime) {
+    public void setOrderDeliveredTime(LocalDateTime orderDeliveredTime) {
         this.orderDeliveredTime = orderDeliveredTime;
     }
 
