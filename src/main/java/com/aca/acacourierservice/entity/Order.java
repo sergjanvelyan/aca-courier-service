@@ -3,7 +3,6 @@ package com.aca.acacourierservice.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -206,6 +205,7 @@ public class Order {
     }
 
     public enum Status {
+        NEW,
         SHIPPED,
         CANCELLED,
         DELIVERING,
