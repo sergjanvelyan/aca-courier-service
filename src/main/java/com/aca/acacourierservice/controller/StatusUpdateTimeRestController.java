@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @RestController
 @RequestMapping(value = "/order-status-update-time")
 public class StatusUpdateTimeRestController {
@@ -33,7 +32,7 @@ public class StatusUpdateTimeRestController {
     }
     @GetMapping(value = "/history/orderId/{orderId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public StatusUpdateTimeListJson getTeacherList(@PathVariable long orderId){
+    public StatusUpdateTimeListJson getStatusUpdateTimeList(@PathVariable long orderId){
         List<StatusUpdateTime> statusUpdateTimeList = statusUpdateTimeService.getStatusUpdateTimeListByOrderId(orderId);
         StatusUpdateTimeListJson statusUpdateTimeListJson = new StatusUpdateTimeListJson();
         statusUpdateTimeListJson.setTotalCount(statusUpdateTimeList.size());
