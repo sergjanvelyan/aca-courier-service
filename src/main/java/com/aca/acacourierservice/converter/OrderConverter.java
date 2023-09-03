@@ -5,6 +5,7 @@ import com.aca.acacourierservice.model.OrderJson;
 import com.aca.acacourierservice.service.StoreService;
 import com.aca.acacourierservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,7 +14,7 @@ public class OrderConverter implements Converter<Order, OrderJson> {
     private final UserService userService;
 
     @Autowired
-    public OrderConverter(StoreService storeService, UserService userService) {
+    public OrderConverter(@Lazy StoreService storeService, @Lazy UserService userService) {
         this.storeService = storeService;
         this.userService = userService;
     }
