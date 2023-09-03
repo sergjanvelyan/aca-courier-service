@@ -4,6 +4,7 @@ import com.aca.acacourierservice.entity.PickupPoint;
 import com.aca.acacourierservice.model.PickupPointJson;
 import com.aca.acacourierservice.service.StoreService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,7 +13,7 @@ public class PickupPointConverter implements Converter<PickupPoint, PickupPointJ
     private final StoreService storeService;
 
     @Autowired
-    public PickupPointConverter(StoreService storeService) {
+    public PickupPointConverter(@Lazy StoreService storeService) {
         this.storeService = storeService;
     }
 
