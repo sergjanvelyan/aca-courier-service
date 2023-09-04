@@ -23,10 +23,10 @@ public class OrderService{
         this.orderConverter = orderConverter;
     }
     @Transactional
-     public Order addOrder(OrderJson orderJson){
+     public long addOrder(OrderJson orderJson){
         //TODO: Here we can do some additional work before adding order in database
         Order order = orderConverter.convertToEntity(orderJson);
-        return orderRepository.save(order);
+        return orderRepository.save(order).getId();
      }
     @Transactional
     public OrderJson updateOrder(long id,OrderJson orderJson){
@@ -53,6 +53,9 @@ public class OrderService{
             throw new CourierServiceException("There is no order with trackingId("+trackingId+")");
         }
         return orderOptional.get();
+    }
+    public Page<Order> getUnassignedOrders(int page,int size){
+        return orderRepository.findAllByCourierEmpty(PageRequest.of(page,size));
     }
     public Page<Order> getOrdersByStoreId(long storeId,int page,int size){
         return orderRepository.findAllByStoreId(storeId,PageRequest.of(page, size));

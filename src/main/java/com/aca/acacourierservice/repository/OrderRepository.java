@@ -15,4 +15,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Page <Order> findAllByFullName (String customerFullName, Pageable pageable);
     Page <Order> findAllByStatus (Order.Status status, Pageable pageable);
     Page <Order> findAllByStoreIdAndStatus (long storeId,Order.Status status, Pageable pageable);
+    Page <Order> findAllByCourierEmpty(Pageable pageable);
 }
