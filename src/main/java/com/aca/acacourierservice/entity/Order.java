@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "orders")
@@ -31,11 +32,11 @@ public class Order {
     @Column(nullable = false)
     private String phone;
     @Column(nullable = false)
-    private long zipCode;
+    private String zipCode;
     @Column(nullable = false)
     private String fullName;
     @Column(unique = true)
-    private String trackingId;
+    private String trackingNumber;
     @Column(nullable = false)
     private double deliveryPrice;
     @Column(nullable = false)
@@ -51,6 +52,12 @@ public class Order {
     private LocalDateTime orderDeliveredTime;
     @OneToMany(mappedBy = "order",cascade = CascadeType.ALL)
     private List<StatusUpdateTime> statusUpdateTimeList;
+    @PrePersist
+    public void generateTrackingNumber(){
+        if(this.trackingNumber==null || this.trackingNumber.isEmpty()){
+            this.trackingNumber= UUID.randomUUID().toString();
+        }
+    }
 
     public long getId() {
         return id;
@@ -124,11 +131,11 @@ public class Order {
         this.phone = phone;
     }
 
-    public long getZipCode() {
+    public String getZipCode() {
         return zipCode;
     }
 
-    public void setZipCode(long zipCode) {
+    public void setZipCode(String zipCode) {
         this.zipCode = zipCode;
     }
 
@@ -140,12 +147,12 @@ public class Order {
         this.fullName = fullName;
     }
 
-    public String getTrackingId() {
-        return trackingId;
+    public String getTrackingNumber() {
+        return trackingNumber;
     }
 
-    public void setTrackingId(String trackingId) {
-        this.trackingId = trackingId;
+    public void setTrackingNumber(String trackingNumber) {
+        this.trackingNumber = trackingNumber;
     }
 
     public double getDeliveryPrice() {

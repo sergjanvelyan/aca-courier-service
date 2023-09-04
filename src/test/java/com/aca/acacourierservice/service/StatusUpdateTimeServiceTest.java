@@ -66,7 +66,7 @@ public class StatusUpdateTimeServiceTest {
         order.setCity("Yerevan");
         order.setAddress("Address 7");
         order.setPhone("+374-77-77-77-77");
-        order.setZipCode(1005L);
+        order.setZipCode("0654");
         order.setFullName("FirstName LastName");
         order.setDeliveryPrice(10);
         order.setTotalPrice(50);
@@ -120,7 +120,7 @@ public class StatusUpdateTimeServiceTest {
         order.setCity("Yerevan");
         order.setAddress("Address 7");
         order.setPhone("+374-77-77-77-77");
-        order.setZipCode(1005L);
+        order.setZipCode("3085");
         order.setFullName("FirstName LastName");
         order.setDeliveryPrice(10);
         order.setTotalPrice(50);
