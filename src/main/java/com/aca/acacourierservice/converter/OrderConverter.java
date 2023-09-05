@@ -2,11 +2,16 @@ package com.aca.acacourierservice.converter;
 
 import com.aca.acacourierservice.entity.Order;
 import com.aca.acacourierservice.model.OrderJson;
+import com.aca.acacourierservice.model.OrderListJson;
 import com.aca.acacourierservice.service.StoreService;
 import com.aca.acacourierservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class OrderConverter implements Converter<Order, OrderJson> {
@@ -69,5 +74,15 @@ public class OrderConverter implements Converter<Order, OrderJson> {
         model.setOrderConfirmedTime(entity.getOrderConfirmedTime());
         model.setOrderDeliveredTime(entity.getOrderDeliveredTime());
         return model;
+    }
+    public OrderListJson convertToListModel(Page<Order> orders){
+        OrderListJson orderListJson = new OrderListJson();
+        orderListJson.setTotalCount(orders.getTotalElements());
+        List<OrderJson> ordersJson = new ArrayList<>();
+        for (Order order:orders){
+            ordersJson.add(convertToModel(order));
+        }
+        orderListJson.setOrderListJson(ordersJson);
+        return orderListJson;
     }
 }
