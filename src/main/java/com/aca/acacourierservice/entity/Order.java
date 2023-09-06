@@ -35,7 +35,7 @@ public class Order {
     private String zipCode;
     @Column(nullable = false)
     private String fullName;
-    @Column(unique = true)
+    @Column
     private String trackingNumber;
     @Column(nullable = false)
     private double deliveryPrice;

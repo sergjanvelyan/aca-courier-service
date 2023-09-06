@@ -78,7 +78,7 @@ public class OrderRestController {
 
     //  /list/mine GET (Courier)
     @GetMapping(value = "/list/mine")
-    public ResponseEntity<?> getCourierOrders(@RequestParam int page,@RequestParam int size){
+    public ResponseEntity<?> getCourierOrders(@RequestParam int page, @RequestParam int size){
         //TODO: there is additional work to do
         long courierId = 1L;
         Page<Order> courierOrders = orderService.getOrdersByCourierId(courierId,page,size);
@@ -110,6 +110,6 @@ public class OrderRestController {
         }catch (CourierServiceException e){
             return new ResponseEntity<>(e.getMessage(),HttpStatus.OK);
         }
-        return new ResponseEntity<>("Order(id="+orderId+")+ assigned to me",HttpStatus.OK);
+        return new ResponseEntity<>("Order(id="+orderId+")+ assigned to you",HttpStatus.OK);
     }
 }

@@ -85,7 +85,7 @@ public class OrderService{
         return orderRepository.findAllByCourierId(courierId,PageRequest.of(page, size));
     }
     public Page<Order> getUnassignedOrders(int page,int size){
-        return orderRepository.findAllByCourierEmpty(PageRequest.of(page,size));
+        return orderRepository.findAllByCourierIsNull(PageRequest.of(page,size));
     }
     public Page<Order> getOrdersByStoreId(long storeId,int page,int size){
         return orderRepository.findAllByStoreId(storeId,PageRequest.of(page, size));
