@@ -53,7 +53,7 @@ public class StoreController {
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Status> registerStore(@RequestBody StoreJson storeJson) {
         User admin = storeJson.getAdmin();
-        userService.saveUser(userConverter.convertToModel(admin));
+        userService.saveUser(admin);
         try {
             long id = storeService.addStore(storeJson);
             return new ResponseEntity<>(new StatusWithId("created", id), HttpStatus.CREATED);
@@ -74,8 +74,8 @@ public class StoreController {
         return new ResponseEntity<>(new Status("updated"), HttpStatus.OK);
     }
 
-    @PutMapping(value = "/store/admin/update", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Status> updateStoreAdmin(@RequestBody UserJson admin, @RequestBody long storeId) {
+    @PutMapping(value = "/{storeId}/admin/update", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Status> updateStoreAdmin(@RequestBody UserJson admin, @PathVariable long storeId) {
         Store store = storeService.getStoreById(storeId);
         User adminEntity = store.getAdmin();
         try {

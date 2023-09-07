@@ -42,9 +42,11 @@ public class StoreService {
     @Transactional
     public long addStore(StoreJson storeJson) {
         Store store = storeConverter.convertToEntity(storeJson);
-        for (PickupPoint pickupPoint : store.getPickupPoints()) {
-            pickupPoint.setStore(store);
-            pickupPointRepository.save(pickupPoint);
+        if (store.getPickupPoints() != null) {
+            for (PickupPoint pickupPoint : store.getPickupPoints()) {
+                pickupPoint.setStore(store);
+                pickupPointRepository.save(pickupPoint);
+            }
         }
         storeRepository.save(store);
         return store.getId();
@@ -53,7 +55,21 @@ public class StoreService {
     @Transactional
     public void updateStore(long id, StoreJson storeJson) {
         Store store = getStoreById(id);
-        store = storeConverter.convertToEntity(storeJson, store);
+        if (storeJson.getName() != null) {
+            store.setName(storeJson.getName());
+        }
+        if (storeJson.getStoreUrl() != null) {
+            store.setStoreUrl(storeJson.getStoreUrl());
+        }
+        if (storeJson.getPhoneNumber() != null) {
+            store.setPhoneNumber(storeJson.getPhoneNumber());
+        }
+        if (storeJson.getAdmin() != null) {
+            store.setAdmin(storeJson.getAdmin());
+        }
+        if (storeJson.getPickupPoints() != null) {
+            store.setPickupPoints(storeJson.getPickupPoints());
+        }
         storeRepository.save(store);
     }
 

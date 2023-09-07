@@ -50,6 +50,11 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
+    public UserJson saveUser(User entity) {
+        return userConverter.convertToModel(userRepository.save(entity));
+    }
+
+    @Transactional
     public void updateUser(UserJson model, long userId) {
         User entity = getUserById(userId);
         entity = userConverter.convertToEntity(model, entity);
