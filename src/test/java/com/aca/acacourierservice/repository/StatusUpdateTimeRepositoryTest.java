@@ -40,20 +40,18 @@ public class StatusUpdateTimeRepositoryTest {
     @Test
     public void testFindAllByOrderId(){
         User storeAdmin = new User();
-        storeAdmin.setId(1L);
         storeAdmin.setEmail("storeAdmin@gmail.com");
         storeAdmin.setPassword("storeAdmin");
         storeAdmin.setRole(User.Role.ROLE_STORE_ADMIN);
-        userRepository.save(storeAdmin);
+        storeAdmin.setId(userRepository.save(storeAdmin).getId());
 
         Store store = new Store();
         store.setId(1L);
         store.setName("Store Name");
         store.setAdmin(storeAdmin);
-        storeRepository.save(store);
+        store.setId(storeRepository.save(store).getId());
 
         Order order = new Order();
-        order.setId(1L);
         order.setOrderId("orderId1234");
         order.setStatus(Order.Status.SHIPPED);
         order.setStore(store);
@@ -61,14 +59,14 @@ public class StatusUpdateTimeRepositoryTest {
         order.setCity("Yerevan");
         order.setAddress("Address 7");
         order.setPhone("+374-77-77-77-77");
-        order.setZipCode(1005L);
+        order.setZipCode("0015");
         order.setFullName("FirstName LastName");
         order.setDeliveryPrice(10);
         order.setTotalPrice(50);
         order.setWeightKg(5.5);
         order.setSize(Order.Size.MEDIUM);
         order.setOrderConfirmedTime(LocalDateTime.of(2023, Month.AUGUST, 25, 15, 10, 3));
-        orderRepository.save(order);
+        order.setId(orderRepository.save(order).getId());
 
         StatusUpdateTime firstStatusUpdateTime = new StatusUpdateTime();
         firstStatusUpdateTime.setId(1L);
@@ -76,7 +74,7 @@ public class StatusUpdateTimeRepositoryTest {
         firstStatusUpdateTime.setUpdatedTo(Order.Status.DELIVERING);
         firstStatusUpdateTime.setUpdatedFrom(Order.Status.SHIPPED);
         firstStatusUpdateTime.setUpdateTime(LocalDateTime.of(2023, Month.AUGUST, 28, 21, 23, 23));
-        statusUpdateTimeRepository.save(firstStatusUpdateTime);
+        firstStatusUpdateTime.setId(statusUpdateTimeRepository.save(firstStatusUpdateTime).getId());
 
         StatusUpdateTime secondStatusUpdateTime = new StatusUpdateTime();
         secondStatusUpdateTime.setId(2L);
@@ -85,9 +83,9 @@ public class StatusUpdateTimeRepositoryTest {
         secondStatusUpdateTime.setUpdatedFrom(Order.Status.DELIVERING);
         secondStatusUpdateTime.setUpdateTime(LocalDateTime.of(2023, Month.AUGUST,28,22,23,23));
         secondStatusUpdateTime.setAdditionalInfo("Ok");
-        statusUpdateTimeRepository.save(secondStatusUpdateTime);
+        secondStatusUpdateTime.setId(statusUpdateTimeRepository.save(secondStatusUpdateTime).getId());
 
-        List<StatusUpdateTime> statusUpdateTimes = statusUpdateTimeRepository.findAllByOrderId(1L);
+        List<StatusUpdateTime> statusUpdateTimes = statusUpdateTimeRepository.findAllByOrderId(order.getId());
         Assertions.assertThat(statusUpdateTimes.size()).isEqualTo(2);
         Assertions.assertThat(statusUpdateTimes.get(1).getUpdatedFrom()).isEqualTo(statusUpdateTimes.get(0).getUpdatedTo());
     }

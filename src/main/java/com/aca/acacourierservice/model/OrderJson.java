@@ -1,22 +1,26 @@
 package com.aca.acacourierservice.model;
 
 import com.aca.acacourierservice.entity.Order;
+import java.time.LocalDateTime;
+
 public class OrderJson {
     private String orderId;
-    private String trackingId;
+    private String trackingNumber;
     private long storeId;
     private String fullName;
     private String country;
     private String city;
     private String address;
     private String phone;
-    private long zipCode;
+    private String zipCode;
     private double weightKg;
     private Order.Size size;
     private long courierId;
     private double deliveryPrice;
     private double totalPrice;
     private Order.Status status;
+    private LocalDateTime orderConfirmedTime;
+    private LocalDateTime orderDeliveredTime;
 
     public String getOrderId() {
         return orderId;
@@ -26,12 +30,12 @@ public class OrderJson {
         this.orderId = orderId;
     }
 
-    public String getTrackingId() {
-        return trackingId;
+    public String getTrackingNumber() {
+        return trackingNumber;
     }
 
-    public void setTrackingId(String trackingId) {
-        this.trackingId = trackingId;
+    public void setTrackingNumber(String trackingNumber) {
+        this.trackingNumber = trackingNumber;
     }
 
     public long getStoreId() {
@@ -82,11 +86,11 @@ public class OrderJson {
         this.phone = phone;
     }
 
-    public long getZipCode() {
+    public String getZipCode() {
         return zipCode;
     }
 
-    public void setZipCode(long zipCode) {
+    public void setZipCode(String zipCode) {
         this.zipCode = zipCode;
     }
 
@@ -136,5 +140,21 @@ public class OrderJson {
 
     public void setStatus(Order.Status status) {
         this.status = status;
+    }
+
+    public LocalDateTime getOrderConfirmedTime() {
+        return orderConfirmedTime;
+    }
+
+    public void setOrderConfirmedTime(LocalDateTime orderConfirmedTime) {
+        this.orderConfirmedTime = orderConfirmedTime;
+    }
+
+    public LocalDateTime getOrderDeliveredTime() {
+        return orderDeliveredTime;
+    }
+
+    public void setOrderDeliveredTime(LocalDateTime orderDeliveredTime) {
+        this.orderDeliveredTime = orderDeliveredTime;
     }
 }
