@@ -1,11 +1,14 @@
 package com.aca.acacourierservice.model;
 
+import com.aca.acacourierservice.entity.PickupPoint;
+import com.aca.acacourierservice.entity.User;
+
 import java.util.List;
 
 public class StoreJson {
     private String name;
-    private long adminId;
-    private List<PickupPointJson> pickupPoints;
+    private User admin;
+    private List<PickupPoint> pickupPoints;
     private String storeUrl;
     private String phoneNumber;
     private String apiKey;
@@ -19,19 +22,19 @@ public class StoreJson {
         this.name = name;
     }
 
-    public long getAdminId() {
-        return adminId;
+    public User getAdmin() {
+        return admin;
     }
 
-    public void setAdminId(long adminId) {
-        this.adminId = adminId;
+    public void setAdmin(User admin) {
+        this.admin = admin;
     }
 
-    public List<PickupPointJson> getPickupPoints() {
+    public List<PickupPoint> getPickupPoints() {
         return pickupPoints;
     }
 
-    public void setPickupPoints(List<PickupPointJson> pickupPoints) {
+    public void setPickupPoints(List<PickupPoint> pickupPoints) {
         this.pickupPoints = pickupPoints;
     }
 

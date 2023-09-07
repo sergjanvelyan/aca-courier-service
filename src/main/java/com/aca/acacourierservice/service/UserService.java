@@ -50,6 +50,13 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
+    public void updateUser(UserJson model, long userId) {
+        User entity = getUserById(userId);
+        entity = userConverter.convertToEntity(model, entity);
+        userRepository.save(entity);
+    }
+
+    @Transactional
     public void deleteUserById(long id) {
         if (!userRepository.existsById(id)) {
             throw new CourierServiceException("There is no user with id " + id);

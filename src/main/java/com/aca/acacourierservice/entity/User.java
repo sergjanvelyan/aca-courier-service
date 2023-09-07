@@ -2,7 +2,7 @@ package com.aca.acacourierservice.entity;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "users")
@@ -25,7 +25,7 @@ public class User {
     private String fullName;
     @Column
     @Temporal(TemporalType.DATE)
-    private Date birthdate;
+    private LocalDate birthdate;
 
     public Long getId() {
         return id;
@@ -83,11 +83,11 @@ public class User {
         this.fullName = fullName;
     }
 
-    public Date getBirthdate() {
+    public LocalDate getBirthdate() {
         return birthdate;
     }
 
-    public void setBirthdate(Date birthdate) {
+    public void setBirthdate(LocalDate birthdate) {
         this.birthdate = birthdate;
     }
 

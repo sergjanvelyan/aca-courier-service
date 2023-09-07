@@ -2,7 +2,7 @@ package com.aca.acacourierservice.model;
 
 import com.aca.acacourierservice.entity.User;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class UserJson {
     private String email;
@@ -11,7 +11,7 @@ public class UserJson {
     private String address;
     private String phoneNumber;
     private String fullName;
-    private Date birthDate;
+    private LocalDate birthDate;
 
     public String getEmail() {
         return email;
@@ -61,11 +61,11 @@ public class UserJson {
         this.fullName = fullName;
     }
 
-    public Date getBirthDate() {
+    public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(Date birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 }
