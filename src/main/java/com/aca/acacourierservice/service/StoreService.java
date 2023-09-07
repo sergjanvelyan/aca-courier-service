@@ -90,4 +90,12 @@ public class StoreService {
         }
         return stores;
     }
+
+    @Transactional
+    public void deleteStoreById(long id) {
+        if (!storeRepository.existsById(id)) {
+            throw new CourierServiceException("There is no store with id " + id);
+        }
+        storeRepository.deleteById(id);
+    }
 }

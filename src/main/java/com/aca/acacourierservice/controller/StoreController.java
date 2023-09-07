@@ -2,13 +2,16 @@ package com.aca.acacourierservice.controller;
 
 import com.aca.acacourierservice.converter.StoreConverter;
 import com.aca.acacourierservice.converter.UserConverter;
+import com.aca.acacourierservice.entity.Order;
 import com.aca.acacourierservice.entity.Store;
 import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.exception.CourierServiceException;
 import com.aca.acacourierservice.model.*;
+import com.aca.acacourierservice.service.OrderService;
 import com.aca.acacourierservice.service.StoreService;
 import com.aca.acacourierservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +26,15 @@ public class StoreController {
     private final StoreConverter storeConverter;
     private final UserService userService;
     private final UserConverter userConverter;
+    private final OrderService orderService;
 
     @Autowired
-    public StoreController(StoreService storeService, StoreConverter storeConverter, UserService userService, UserConverter userConverter) {
+    public StoreController(StoreService storeService, StoreConverter storeConverter, UserService userService, UserConverter userConverter, OrderService orderService) {
         this.storeService = storeService;
         this.storeConverter = storeConverter;
         this.userService = userService;
         this.userConverter = userConverter;
+        this.orderService = orderService;
     }
 
     @GetMapping(value = "/{storeId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -86,5 +91,31 @@ public class StoreController {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(new Status("updated"), HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/{storeId}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Status> deleteStore(@PathVariable long storeId) {
+        try {
+            storeService.deleteStoreById(storeId);
+        } catch (CourierServiceException e) {
+            return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(new Status("updated"), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{storeId}/order/list", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> listOrders(@PathVariable long storeId, @RequestBody PageInfo pageInfo) {
+        Page<Order> orderPage;
+        try {
+            orderPage = orderService.getOrdersByStoreId(storeId, pageInfo.getPage(), pageInfo.getCount());
+        } catch (CourierServiceException e) {
+            return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        List<Order> orders = orderPage.toList();
+        return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 }
