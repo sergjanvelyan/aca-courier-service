@@ -21,7 +21,7 @@ public class PickupPoint {
     @Column(nullable = false)
     private String phoneNumber;
     @ManyToOne
-    @JoinColumn(name = "store_id", nullable = false)
+    @JoinColumn(name = "store_id")
     private Store store;
 
     public long getId() {
