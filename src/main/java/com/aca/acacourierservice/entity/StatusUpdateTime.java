@@ -2,14 +2,14 @@ package com.aca.acacourierservice.entity;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 public class StatusUpdateTime {
     @Id
     private long id;
     @Column(nullable = false)
-    private Date updateTime;
+    private LocalDateTime updateTime;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Order.Status updatedFrom;
@@ -30,11 +30,11 @@ public class StatusUpdateTime {
         this.id = id;
     }
 
-    public Date getUpdateTime() {
+    public LocalDateTime getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(Date updateTime) {
+    public void setUpdateTime(LocalDateTime updateTime) {
         this.updateTime = updateTime;
     }
 
