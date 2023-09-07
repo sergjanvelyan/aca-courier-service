@@ -32,10 +32,10 @@ public class PickupPointConverter implements Converter<PickupPoint, PickupPointJ
     @Override
     public PickupPoint convertToEntity(PickupPointJson model) {
         PickupPoint entity = new PickupPoint();
-        return convertToEntity(model,entity);
+        return convertToEntity(model, entity);
     }
 
-   @Override
+    @Override
     public PickupPointJson convertToModel(PickupPoint entity) {
         PickupPointJson model = new PickupPointJson();
         model.setStoreId(entity.getStore().getId());
