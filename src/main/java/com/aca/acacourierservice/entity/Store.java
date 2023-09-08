@@ -1,7 +1,6 @@
 package com.aca.acacourierservice.entity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -29,7 +28,6 @@ public class Store {
     private String apiKey;
     @Column(unique = true)
     private String apiSecret;
-    @Column(columnDefinition="tinyint(1) default 1")
     private Boolean deleted = false;
 
     public Long getId() {

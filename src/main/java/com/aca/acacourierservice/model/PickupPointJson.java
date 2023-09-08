@@ -37,7 +37,7 @@ public class PickupPointJson {
         return zipCode;
     }
 
-    public void setZipCode(long zipcode) {
+    public void setZipCode(long zipCode) {
         this.zipCode = zipCode;
     }
 
