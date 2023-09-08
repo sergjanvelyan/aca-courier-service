@@ -3,9 +3,7 @@ package com.aca.acacourierservice.controller;
 import com.aca.acacourierservice.converter.OrderConverter;
 import com.aca.acacourierservice.entity.Order;
 import com.aca.acacourierservice.exception.CourierServiceException;
-import com.aca.acacourierservice.model.OrderJson;
-import com.aca.acacourierservice.model.OrderListJson;
-import com.aca.acacourierservice.model.Status;
+import com.aca.acacourierservice.model.*;
 import com.aca.acacourierservice.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -45,8 +43,8 @@ public class OrderRestController {
 
     //  /list/unassigned GET (Courier, admin)
     @GetMapping(value = "/list/unassigned")
-    public ResponseEntity<?> getUnassignedOrders(@RequestParam int page,@RequestParam int size){
-        Page<Order> orders =orderService.getUnassignedOrders(page, size);
+    public ResponseEntity<?> getUnassignedOrders(@RequestBody PageInfo pageInfo){
+        Page<Order> orders =orderService.getUnassignedOrders(pageInfo.getPage(), pageInfo.getCount());
         if(orders.isEmpty()){
             return new ResponseEntity<>("There is no unassigned orders",HttpStatus.OK);
         }
@@ -56,8 +54,8 @@ public class OrderRestController {
 
     //  /list GET (admin)
     @GetMapping(value = "/list")
-    public ResponseEntity<?> getOrders(@RequestParam int page,@RequestParam int size){
-        Page<Order> orders = orderService.getOrders(page, size);
+    public ResponseEntity<?> getOrders(@RequestBody PageInfo pageInfo){
+        Page<Order> orders = orderService.getOrders(pageInfo.getPage(), pageInfo.getCount());
         if(orders.isEmpty()){
             return new ResponseEntity<>("There is no orders",HttpStatus.NO_CONTENT);
         }
@@ -67,9 +65,9 @@ public class OrderRestController {
 
     //  /updateStatus/ PUT {Courier, Admin}
     @PutMapping(value = "/{orderId}/updateStatus")
-    public ResponseEntity<?>  updateOrderStatus(@PathVariable long orderId,@RequestParam Order.Status status,@RequestParam String additionalInfo){
+    public ResponseEntity<?>  updateOrderStatus(@PathVariable long orderId, @RequestBody StatusInfoJson statusInfoJson){
         try{
-            orderService.updateOrderStatus(orderId,status,additionalInfo);
+            orderService.updateOrderStatus(orderId,statusInfoJson.getStatus(),statusInfoJson.getAdditionalInfo());
             return new ResponseEntity<>("Status updated",HttpStatus.OK);
         }catch (CourierServiceException e){
             return new ResponseEntity<>(e.getMessage(),HttpStatus.NO_CONTENT);
@@ -78,10 +76,10 @@ public class OrderRestController {
 
     //  /list/mine GET (Courier)
     @GetMapping(value = "/list/mine")
-    public ResponseEntity<?> getCourierOrders(@RequestParam int page, @RequestParam int size){
+    public ResponseEntity<?> getCourierOrders(@RequestBody PageInfo pageInfo){
         //TODO: there is additional work to do
         long courierId = 1L;
-        Page<Order> courierOrders = orderService.getOrdersByCourierId(courierId,page,size);
+        Page<Order> courierOrders = orderService.getOrdersByCourierId(courierId,pageInfo.getPage(), pageInfo.getCount());
         if(courierOrders.isEmpty()){
             return new ResponseEntity<>("There is no orders assigned to you",HttpStatus.OK);
         }
@@ -92,6 +90,7 @@ public class OrderRestController {
     //  /{orderId}/assignCourier PUT (Admin)
     @PutMapping(value = "/{orderId}/assignCourier")
     public ResponseEntity<?>  assignCourierToOrder(@PathVariable long orderId,@RequestParam long courierId){
+        //TODO: implement courier selection logic
         try{
             orderService.assignCourierToOrder(orderId,courierId);
         }catch (CourierServiceException e){
