@@ -2,6 +2,7 @@ package com.aca.acacourierservice.model;
 
 import com.aca.acacourierservice.entity.Order;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class OrderJson {
     private String orderId;
@@ -21,6 +22,15 @@ public class OrderJson {
     private Order.Status status;
     private LocalDateTime orderConfirmedTime;
     private LocalDateTime orderDeliveredTime;
+    private List<StatusUpdateTimeJson> statusUpdateHistory;
+
+    public List<StatusUpdateTimeJson> getStatusUpdateHistory() {
+        return statusUpdateHistory;
+    }
+
+    public void setStatusUpdateHistory(List<StatusUpdateTimeJson> statusUpdateHistory) {
+        this.statusUpdateHistory = statusUpdateHistory;
+    }
 
     public String getOrderId() {
         return orderId;

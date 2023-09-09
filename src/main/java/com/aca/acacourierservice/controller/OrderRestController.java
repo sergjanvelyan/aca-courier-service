@@ -27,7 +27,7 @@ public class OrderRestController {
     @PostMapping(value = "/create")
     public Status createOrder(@RequestBody OrderJson orderJson){
         long id = orderService.addOrder(orderJson);
-        return new Status("Created order id="+id);
+        return new Status("Created order id="+id+":");
     }
 
     //  /{orderId} GET (Courier, ADMIN, SToreAdmin )
@@ -46,7 +46,7 @@ public class OrderRestController {
     public ResponseEntity<?> getUnassignedOrders(@RequestBody PageInfo pageInfo){
         Page<Order> orders =orderService.getUnassignedOrders(pageInfo.getPage(), pageInfo.getCount());
         if(orders.isEmpty()){
-            return new ResponseEntity<>("There is no unassigned orders",HttpStatus.OK);
+            return new ResponseEntity<>("There is no unassigned orders:",HttpStatus.OK);
         }
         OrderListJson orderListJson = orderConverter.convertToListModel(orders);
         return new ResponseEntity<>(orderListJson,HttpStatus.OK);
@@ -57,7 +57,7 @@ public class OrderRestController {
     public ResponseEntity<?> getOrders(@RequestBody PageInfo pageInfo){
         Page<Order> orders = orderService.getOrders(pageInfo.getPage(), pageInfo.getCount());
         if(orders.isEmpty()){
-            return new ResponseEntity<>("There is no orders",HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>("There is no orders:",HttpStatus.NO_CONTENT);
         }
         OrderListJson orderListJson = orderConverter.convertToListModel(orders);
         return new ResponseEntity<>(orderListJson,HttpStatus.OK);
@@ -68,7 +68,7 @@ public class OrderRestController {
     public ResponseEntity<?>  updateOrderStatus(@PathVariable long orderId, @RequestBody StatusInfoJson statusInfoJson){
         try{
             orderService.updateOrderStatus(orderId,statusInfoJson.getStatus(),statusInfoJson.getAdditionalInfo());
-            return new ResponseEntity<>("Status updated",HttpStatus.OK);
+            return new ResponseEntity<>("Order(id="+orderId+") status updated:",HttpStatus.OK);
         }catch (CourierServiceException e){
             return new ResponseEntity<>(e.getMessage(),HttpStatus.NO_CONTENT);
         }
@@ -81,7 +81,7 @@ public class OrderRestController {
         long courierId = 1L;
         Page<Order> courierOrders = orderService.getOrdersByCourierId(courierId,pageInfo.getPage(), pageInfo.getCount());
         if(courierOrders.isEmpty()){
-            return new ResponseEntity<>("There is no orders assigned to you",HttpStatus.OK);
+            return new ResponseEntity<>("There is no orders assigned to you:",HttpStatus.OK);
         }
         OrderListJson orderListJson = orderConverter.convertToListModel(courierOrders);
         return new ResponseEntity<>(orderListJson,HttpStatus.OK);
@@ -96,7 +96,7 @@ public class OrderRestController {
         }catch (CourierServiceException e){
             return new ResponseEntity<>(e.getMessage(),HttpStatus.OK);
         }
-        return new ResponseEntity<>("Order(id="+orderId+")+ assigned to courier(id="+courierId+")",HttpStatus.OK);
+        return new ResponseEntity<>("Order(id="+orderId+")+ assigned to courier(id="+courierId+"):",HttpStatus.OK);
     }
 
     //  /{orderId}/assignToMe PUT (courier)
@@ -109,6 +109,6 @@ public class OrderRestController {
         }catch (CourierServiceException e){
             return new ResponseEntity<>(e.getMessage(),HttpStatus.OK);
         }
-        return new ResponseEntity<>("Order(id="+orderId+")+ assigned to you",HttpStatus.OK);
+        return new ResponseEntity<>("Order(id="+orderId+")+ assigned to you:",HttpStatus.OK);
     }
 }

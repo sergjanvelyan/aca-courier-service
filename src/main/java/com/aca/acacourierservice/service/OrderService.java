@@ -34,9 +34,17 @@ public class OrderService{
      public long addOrder(OrderJson orderJson){
         //TODO: Here we can do some additional work before adding order in database
         Order order = orderConverter.convertToEntity(orderJson);
+        order.setStatus(Order.Status.NEW);
         order.setOrderConfirmedTime(LocalDateTime.now(ZoneId.of("Asia/Yerevan")));
-        orderRepository.save(order);
-        return order.getId();
+        long id = orderRepository.save(order).getId();
+        StatusUpdateTimeJson statusUpdateTimeJson = new StatusUpdateTimeJson();
+        statusUpdateTimeJson.setOrderId(id);
+        statusUpdateTimeJson.setUpdatedFrom(order.getStatus());
+        statusUpdateTimeJson.setUpdatedTo(Order.Status.NEW);
+        statusUpdateTimeJson.setUpdateTime(LocalDateTime.now(ZoneId.of("Asia/Yerevan")));
+        statusUpdateTimeJson.setAdditionalInfo("Created new order");
+        statusUpdateTimeService.addStatusUpdateTime(statusUpdateTimeJson);
+        return id;
      }
     @Transactional
     public void updateOrderStatus(long id,Order.Status status,String additionalInfo) throws CourierServiceException {

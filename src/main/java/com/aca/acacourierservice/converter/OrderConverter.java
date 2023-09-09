@@ -1,8 +1,10 @@
 package com.aca.acacourierservice.converter;
 
 import com.aca.acacourierservice.entity.Order;
+import com.aca.acacourierservice.entity.StatusUpdateTime;
 import com.aca.acacourierservice.model.OrderJson;
 import com.aca.acacourierservice.model.OrderListJson;
+import com.aca.acacourierservice.model.StatusUpdateTimeJson;
 import com.aca.acacourierservice.service.StoreService;
 import com.aca.acacourierservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +20,13 @@ public class OrderConverter implements Converter<Order, OrderJson> {
     //TODO: remove field injections
     private final StoreService storeService;
     private final UserService userService;
+    private final StatusUpdateTimeConverter statusUpdateTimeConverter;
 
     @Autowired
-    public OrderConverter(@Lazy StoreService storeService, @Lazy UserService userService) {
+    public OrderConverter(@Lazy StoreService storeService, @Lazy UserService userService, StatusUpdateTimeConverter statusUpdateTimeConverter) {
         this.storeService = storeService;
         this.userService = userService;
+        this.statusUpdateTimeConverter = statusUpdateTimeConverter;
     }
 
     @Override
@@ -73,6 +77,12 @@ public class OrderConverter implements Converter<Order, OrderJson> {
         model.setStatus(entity.getStatus());
         model.setOrderConfirmedTime(entity.getOrderConfirmedTime());
         model.setOrderDeliveredTime(entity.getOrderDeliveredTime());
+        List<StatusUpdateTime> statusUpdateTimeList = entity.getStatusUpdateTimeList();
+        List<StatusUpdateTimeJson> statusUpdateTimeJsonList = new ArrayList<>();
+        for (StatusUpdateTime statusUpdateTime:statusUpdateTimeList) {
+            statusUpdateTimeJsonList.add(statusUpdateTimeConverter.convertToModel(statusUpdateTime));
+        }
+        model.setStatusUpdateHistory(statusUpdateTimeJsonList);
         return model;
     }
     public OrderListJson convertToListModel(Page<Order> orders){
