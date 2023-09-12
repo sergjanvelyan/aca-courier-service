@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -32,6 +33,7 @@ public class OrderRestController {
 
     //  /{orderId} GET (Courier, ADMIN, SToreAdmin )
     @GetMapping("/{orderId}")
+    @Secured({"ROLE_ADMIN","ROLE_STORE_ADMIN","ROLE_COURIER"})
     public ResponseEntity<?> getOrder(@PathVariable long orderId){
         try{
             OrderJson orderJson = orderConverter.convertToModel(orderService.getOrderById(orderId));
@@ -43,6 +45,7 @@ public class OrderRestController {
 
     //  /list/unassigned GET (Courier, admin)
     @GetMapping(value = "/list/unassigned")
+    @Secured({"ROLE_ADMIN","ROLE_COURIER"})
     public ResponseEntity<?> getUnassignedOrders(@RequestBody PageInfo pageInfo){
         Page<Order> orders =orderService.getUnassignedOrders(pageInfo.getPage(), pageInfo.getCount());
         if(orders.isEmpty()){
@@ -54,6 +57,7 @@ public class OrderRestController {
 
     //  /list GET (admin)
     @GetMapping(value = "/list")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<?> getOrders(@RequestBody PageInfo pageInfo){
         Page<Order> orders = orderService.getOrders(pageInfo.getPage(), pageInfo.getCount());
         if(orders.isEmpty()){
@@ -65,6 +69,7 @@ public class OrderRestController {
 
     //  /updateStatus/ PUT {Courier, Admin}
     @PutMapping(value = "/{orderId}/updateStatus")
+    @Secured({"ROLE_ADMIN","ROLE_COURIER"})
     public ResponseEntity<?>  updateOrderStatus(@PathVariable long orderId, @RequestBody StatusInfoJson statusInfoJson){
         try{
             orderService.updateOrderStatus(orderId,statusInfoJson.getStatus(),statusInfoJson.getAdditionalInfo());
@@ -76,6 +81,7 @@ public class OrderRestController {
 
     //  /list/mine GET (Courier)
     @GetMapping(value = "/list/mine")
+    @Secured("ROLE_COURIER")
     public ResponseEntity<?> getCourierOrders(@RequestBody PageInfo pageInfo){
         //TODO: there is additional work to do
         long courierId = 1L;
@@ -89,6 +95,7 @@ public class OrderRestController {
 
     //  /{orderId}/assignCourier PUT (Admin)
     @PutMapping(value = "/{orderId}/assignCourier")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<?>  assignCourierToOrder(@PathVariable long orderId,@RequestParam long courierId){
         //TODO: implement courier selection logic
         try{
@@ -96,11 +103,12 @@ public class OrderRestController {
         }catch (CourierServiceException e){
             return new ResponseEntity<>(e.getMessage(),HttpStatus.OK);
         }
-        return new ResponseEntity<>("Order(id="+orderId+")+ assigned to courier(id="+courierId+"):",HttpStatus.OK);
+        return new ResponseEntity<>("Order(id="+orderId+") assigned to courier(id="+courierId+"):",HttpStatus.OK);
     }
 
     //  /{orderId}/assignToMe PUT (courier)
     @PutMapping(value = "/{orderId}/assignToMe")
+    @Secured("ROLE_COURIER")
     public ResponseEntity<?>  assignOrder(@PathVariable long orderId){
         //TODO: there is additional work to do
         long courierId = 1L;

@@ -11,7 +11,7 @@ public class StatusUpdateTime {
     private long id;
     @Column(nullable = false)
     private LocalDateTime updateTime;
-    @Column(nullable = false)
+    @Column
     @Enumerated(EnumType.STRING)
     private Order.Status updatedFrom;
     @Column(nullable = false)

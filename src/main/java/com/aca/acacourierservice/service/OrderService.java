@@ -39,9 +39,8 @@ public class OrderService{
         long id = orderRepository.save(order).getId();
         StatusUpdateTimeJson statusUpdateTimeJson = new StatusUpdateTimeJson();
         statusUpdateTimeJson.setOrderId(id);
-        statusUpdateTimeJson.setUpdatedFrom(order.getStatus());
         statusUpdateTimeJson.setUpdatedTo(Order.Status.NEW);
-        statusUpdateTimeJson.setUpdateTime(LocalDateTime.now(ZoneId.of("Asia/Yerevan")));
+        statusUpdateTimeJson.setUpdateTime(order.getOrderConfirmedTime());
         statusUpdateTimeJson.setAdditionalInfo("Created new order");
         statusUpdateTimeService.addStatusUpdateTime(statusUpdateTimeJson);
         return id;
