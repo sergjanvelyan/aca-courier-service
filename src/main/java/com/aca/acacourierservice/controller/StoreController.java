@@ -1,7 +1,6 @@
 package com.aca.acacourierservice.controller;
 
 import com.aca.acacourierservice.converter.StoreConverter;
-import com.aca.acacourierservice.converter.UserConverter;
 import com.aca.acacourierservice.entity.Order;
 import com.aca.acacourierservice.entity.Store;
 import com.aca.acacourierservice.entity.User;
@@ -15,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,18 +25,17 @@ public class StoreController {
     private final StoreService storeService;
     private final StoreConverter storeConverter;
     private final UserService userService;
-    private final UserConverter userConverter;
     private final OrderService orderService;
 
     @Autowired
-    public StoreController(StoreService storeService, StoreConverter storeConverter, UserService userService, UserConverter userConverter, OrderService orderService) {
+    public StoreController(StoreService storeService, StoreConverter storeConverter, UserService userService, OrderService orderService) {
         this.storeService = storeService;
         this.storeConverter = storeConverter;
         this.userService = userService;
-        this.userConverter = userConverter;
         this.orderService = orderService;
     }
 
+    @Secured("ROLE_ADMIN")
     @GetMapping(value = "/{storeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getStore(@PathVariable long storeId) {
         Store store;
@@ -50,11 +49,13 @@ public class StoreController {
         return new ResponseEntity<>(storeConverter.convertToModel(store), HttpStatus.OK);
     }
 
+    @Secured("ROLE_ADMIN")
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public List<StoreJson> listStores(@RequestBody PageInfo pageInfo) {
         return storeService.listStoresByPage(pageInfo.getPage(), pageInfo.getCount());
     }
 
+    @Secured("ROLE_ADMIN")
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Status> registerStore(@RequestBody StoreJson storeJson) {
         User admin = storeJson.getAdmin();
@@ -67,6 +68,7 @@ public class StoreController {
         }
     }
 
+    @Secured("ROLE_ADMIN")
     @PutMapping(value = "/{storeId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Status> updateStore(@RequestBody StoreJson storeJson, @PathVariable long storeId) {
         try {
@@ -79,6 +81,7 @@ public class StoreController {
         return new ResponseEntity<>(new Status("updated"), HttpStatus.OK);
     }
 
+    @Secured("ROLE_ADMIN")
     @PutMapping(value = "/{storeId}/admin/update", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Status> updateStoreAdmin(@RequestBody UserJson admin, @PathVariable long storeId) {
         Store store = storeService.getStoreById(storeId);
@@ -93,6 +96,7 @@ public class StoreController {
         return new ResponseEntity<>(new Status("updated"), HttpStatus.OK);
     }
 
+    @Secured("ROLE_ADMIN")
     @DeleteMapping(value = "/{storeId}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Status> deleteStore(@PathVariable long storeId) {
         try {
@@ -105,6 +109,7 @@ public class StoreController {
         return new ResponseEntity<>(new Status("updated"), HttpStatus.OK);
     }
 
+    @Secured("ROLE_STORE_ADMIN")
     @GetMapping(value = "/{storeId}/order/list", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> listOrders(@PathVariable long storeId, @RequestBody PageInfo pageInfo) {
         Page<Order> orderPage;
