@@ -5,10 +5,7 @@ import com.aca.acacourierservice.entity.StatusUpdateTime;
 import com.aca.acacourierservice.model.OrderJson;
 import com.aca.acacourierservice.model.OrderListJson;
 import com.aca.acacourierservice.model.StatusUpdateTimeJson;
-import com.aca.acacourierservice.service.StoreService;
-import com.aca.acacourierservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -17,15 +14,10 @@ import java.util.List;
 
 @Component
 public class OrderConverter implements Converter<Order, OrderJson> {
-    //TODO: remove field injections
-    private final StoreService storeService;
-    private final UserService userService;
     private final StatusUpdateTimeConverter statusUpdateTimeConverter;
 
     @Autowired
-    public OrderConverter(@Lazy StoreService storeService, @Lazy UserService userService, StatusUpdateTimeConverter statusUpdateTimeConverter) {
-        this.storeService = storeService;
-        this.userService = userService;
+    public OrderConverter(StatusUpdateTimeConverter statusUpdateTimeConverter) {
         this.statusUpdateTimeConverter = statusUpdateTimeConverter;
     }
 
@@ -33,8 +25,6 @@ public class OrderConverter implements Converter<Order, OrderJson> {
     public Order convertToEntity(OrderJson model, Order entity) {
         entity.setOrderId(model.getOrderId());
         entity.setTrackingNumber(model.getTrackingNumber());
-        //TODO: remove next line
-        entity.setStore(storeService.getStoreById(model.getStoreId()));
         entity.setFullName(model.getFullName());
         entity.setCountry(model.getCountry());
         entity.setCity(model.getCity());
@@ -43,8 +33,6 @@ public class OrderConverter implements Converter<Order, OrderJson> {
         entity.setZipCode(model.getZipCode());
         entity.setWeightKg(model.getWeightKg());
         entity.setSize(model.getSize());
-        //TODO: remove next line
-        entity.setCourier(userService.getUserById(model.getCourierId()));
         entity.setDeliveryPrice(model.getDeliveryPrice());
         entity.setTotalPrice(model.getTotalPrice());
         entity.setStatus(model.getStatus());
@@ -71,7 +59,9 @@ public class OrderConverter implements Converter<Order, OrderJson> {
         model.setZipCode(entity.getZipCode());
         model.setWeightKg(entity.getWeightKg());
         model.setSize(entity.getSize());
-        model.setCourierId(entity.getCourier().getId());
+        if(entity.getCourier()!=null){
+            model.setCourierId(entity.getCourier().getId());
+        }
         model.setDeliveryPrice(entity.getDeliveryPrice());
         model.setTotalPrice(entity.getTotalPrice());
         model.setStatus(entity.getStatus());

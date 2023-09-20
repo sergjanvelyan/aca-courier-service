@@ -28,7 +28,7 @@ public class UserService {
     public User getUserById(long id) {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
-            throw new CourierServiceException("There is no user with id" + id);
+            throw new CourierServiceException("There is no user with id=" + id);
         }
         return userOptional.get();
     }
@@ -57,7 +57,7 @@ public class UserService {
     @Transactional
     public void deleteUserById(long id) {
         if (!userRepository.existsById(id)) {
-            throw new CourierServiceException("There is no user with id " + id);
+            throw new CourierServiceException("There is no user with id=" + id);
         }
         userRepository.deleteById(id);
     }

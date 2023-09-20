@@ -9,6 +9,7 @@ import com.aca.acacourierservice.model.StatusUpdateTimeJson;
 import com.aca.acacourierservice.repository.OrderRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -23,17 +24,20 @@ public class OrderService{
     private final OrderConverter orderConverter;
     private final StatusUpdateTimeService statusUpdateTimeService;
     private final UserService userService;
+    private final StoreService storeService;
     @Autowired
-    public OrderService(OrderRepository orderRepository, OrderConverter orderConverter, StatusUpdateTimeService statusUpdateTimeService, UserService userService) {
+    public OrderService(OrderRepository orderRepository, OrderConverter orderConverter, @Lazy StatusUpdateTimeService statusUpdateTimeService, UserService userService, StoreService storeService) {
         this.orderRepository = orderRepository;
         this.orderConverter = orderConverter;
         this.statusUpdateTimeService = statusUpdateTimeService;
         this.userService = userService;
+        this.storeService = storeService;
     }
     @Transactional
      public long addOrder(OrderJson orderJson){
         //TODO: Here we can do some additional work before adding order in database
         Order order = orderConverter.convertToEntity(orderJson);
+        order.setStore(storeService.getStoreById(orderJson.getStoreId()));
         order.setStatus(Order.Status.NEW);
         order.setOrderConfirmedTime(LocalDateTime.now(ZoneId.of("Asia/Yerevan")));
         long id = orderRepository.save(order).getId();

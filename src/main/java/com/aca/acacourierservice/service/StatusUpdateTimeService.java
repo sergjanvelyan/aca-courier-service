@@ -15,14 +15,17 @@ import java.util.List;
 public class StatusUpdateTimeService {
     private final StatusUpdateTimeRepository statusUpdateTimeRepository;
     private final StatusUpdateTimeConverter statusUpdateTimeConverter;
+    private final OrderService orderService;
     @Autowired
-     public StatusUpdateTimeService(StatusUpdateTimeRepository statusUpdateTimeRepository, StatusUpdateTimeConverter statusUpdateTimeConverter) {
+     public StatusUpdateTimeService(StatusUpdateTimeRepository statusUpdateTimeRepository, StatusUpdateTimeConverter statusUpdateTimeConverter, OrderService orderService) {
         this.statusUpdateTimeRepository = statusUpdateTimeRepository;
         this.statusUpdateTimeConverter = statusUpdateTimeConverter;
+        this.orderService = orderService;
     }
     @Transactional
     public long addStatusUpdateTime(StatusUpdateTimeJson statusUpdateTimeJson){
         StatusUpdateTime statusUpdateTime = statusUpdateTimeConverter.convertToEntity(statusUpdateTimeJson);
+        statusUpdateTime.setOrder(orderService.getOrderById(statusUpdateTimeJson.getOrderId()));
         statusUpdateTimeRepository.save(statusUpdateTime);
         return statusUpdateTime.getId();
     }

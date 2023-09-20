@@ -25,12 +25,14 @@ import org.springframework.security.web.SecurityFilterChain;
         jsr250Enabled = true)
 public class SecurityConfiguration {
 
-    @Autowired
-    private AuthenticationConfiguration authConfiguration;
+    private final AuthenticationConfiguration authConfiguration;
 
+    private final UserDetailsService userDetailsService;
     @Autowired
-    @Qualifier("userDetailsServiceImpl")
-    private UserDetailsService userDetailsService;
+    public SecurityConfiguration(AuthenticationConfiguration authConfiguration, @Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService) {
+        this.authConfiguration = authConfiguration;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {

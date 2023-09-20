@@ -24,14 +24,12 @@ public class OrderRestController {
         this.orderConverter = orderConverter;
     }
 
-    //  /create POST (ALL)
     @PostMapping(value = "/create")
     public Status createOrder(@RequestBody OrderJson orderJson){
         long id = orderService.addOrder(orderJson);
         return new Status("Created order id="+id+":");
     }
 
-    //  /{orderId} GET (Courier, ADMIN, SToreAdmin )
     @GetMapping("/{orderId}")
     @Secured({"ROLE_ADMIN","ROLE_STORE_ADMIN","ROLE_COURIER"})
     public ResponseEntity<?> getOrder(@PathVariable long orderId){
@@ -43,7 +41,6 @@ public class OrderRestController {
         }
     }
 
-    //  /list/unassigned GET (Courier, admin)
     @GetMapping(value = "/list/unassigned")
     @Secured({"ROLE_ADMIN","ROLE_COURIER"})
     public ResponseEntity<?> getUnassignedOrders(@RequestBody PageInfo pageInfo){
@@ -55,7 +52,6 @@ public class OrderRestController {
         return new ResponseEntity<>(orderListJson,HttpStatus.OK);
     }
 
-    //  /list GET (admin)
     @GetMapping(value = "/list")
     @Secured("ROLE_ADMIN")
     public ResponseEntity<?> getOrders(@RequestBody PageInfo pageInfo){
@@ -67,7 +63,6 @@ public class OrderRestController {
         return new ResponseEntity<>(orderListJson,HttpStatus.OK);
     }
 
-    //  /updateStatus/ PUT {Courier, Admin}
     @PutMapping(value = "/{orderId}/updateStatus")
     @Secured({"ROLE_ADMIN","ROLE_COURIER"})
     public ResponseEntity<?>  updateOrderStatus(@PathVariable long orderId, @RequestBody StatusInfoJson statusInfoJson){
@@ -79,7 +74,6 @@ public class OrderRestController {
         }
     }
 
-    //  /list/mine GET (Courier)
     @GetMapping(value = "/list/mine")
     @Secured("ROLE_COURIER")
     public ResponseEntity<?> getCourierOrders(@RequestBody PageInfo pageInfo){
@@ -93,7 +87,6 @@ public class OrderRestController {
         return new ResponseEntity<>(orderListJson,HttpStatus.OK);
     }
 
-    //  /{orderId}/assignCourier PUT (Admin)
     @PutMapping(value = "/{orderId}/assignCourier")
     @Secured("ROLE_ADMIN")
     public ResponseEntity<?>  assignCourierToOrder(@PathVariable long orderId,@RequestParam long courierId){
@@ -106,7 +99,6 @@ public class OrderRestController {
         return new ResponseEntity<>("Order(id="+orderId+") assigned to courier(id="+courierId+"):",HttpStatus.OK);
     }
 
-    //  /{orderId}/assignToMe PUT (courier)
     @PutMapping(value = "/{orderId}/assignToMe")
     @Secured("ROLE_COURIER")
     public ResponseEntity<?>  assignOrder(@PathVariable long orderId){
