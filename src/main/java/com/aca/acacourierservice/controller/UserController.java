@@ -44,22 +44,34 @@ public class UserController {
     }
     @GetMapping(value="/profile/get")
     @Secured({"ROLE_ADMIN", "ROLE_STORE_ADMIN", "ROLE_COURIER"})
-    public ResponseEntity<UserJson> getUserProfile(){
-        //TODO:implement logic
-        UserJson userJson = new UserJson();
-        return new ResponseEntity<>(userJson,HttpStatus.OK);
+    public ResponseEntity<?> getUserProfile(){
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            UserJson userJson = userConverter.convertToModel(userService.getUserByEmail(username));
+            userJson.setPassword("Password hidden");
+            return new ResponseEntity<>(userJson,HttpStatus.OK);
+        }catch (CourierServiceException e){
+            return new ResponseEntity<>("Not found",HttpStatus.NOT_FOUND);
+        }
     }
     @PutMapping(value ="/profile/update" )
     @Secured({"ROLE_ADMIN", "ROLE_STORE_ADMIN", "ROLE_COURIER"})
-    public ResponseEntity<Status> updateUserProfile(@RequestBody UserJson userJson){
-        //TODO:implement logic
-        return new ResponseEntity<>(new Status("Profile updated"),HttpStatus.OK);
+    public ResponseEntity<?> updateUserProfile(@RequestBody UserJson userJson){
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            userService.updateUser(userJson,username);
+            return new ResponseEntity<>("Profile updated",HttpStatus.OK);
+        }catch (CourierServiceException e){
+            return new ResponseEntity<>("Not found",HttpStatus.NOT_FOUND);
+        }
     }
     @PostMapping("/courier/register")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<Status> register(@RequestBody UserJson userJson) {
+    public ResponseEntity<?> register(@RequestBody UserJson userJson) {
         userService.saveUser(userJson);
-        return new ResponseEntity<>(new Status("Registered"),HttpStatus.OK);
+        return new ResponseEntity<>("Registered",HttpStatus.OK);
     }
     @GetMapping(value="/courier/{courierId}")
     @Secured("ROLE_ADMIN")

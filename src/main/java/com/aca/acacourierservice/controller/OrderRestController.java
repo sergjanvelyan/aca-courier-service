@@ -2,14 +2,18 @@ package com.aca.acacourierservice.controller;
 
 import com.aca.acacourierservice.converter.OrderConverter;
 import com.aca.acacourierservice.entity.Order;
+import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.exception.CourierServiceException;
 import com.aca.acacourierservice.model.*;
 import com.aca.acacourierservice.service.OrderService;
+import com.aca.acacourierservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -18,10 +22,12 @@ import org.springframework.web.bind.annotation.*;
 public class OrderRestController {
     private final OrderService orderService;
     private final OrderConverter orderConverter;
+    private final UserService userService;
     @Autowired
-    public OrderRestController(OrderService orderService, OrderConverter orderConverter) {
+    public OrderRestController(OrderService orderService, OrderConverter orderConverter, UserService userService) {
         this.orderService = orderService;
         this.orderConverter = orderConverter;
+        this.userService = userService;
     }
 
     @PostMapping(value = "/create")
@@ -77,14 +83,20 @@ public class OrderRestController {
     @GetMapping(value = "/list/mine")
     @Secured("ROLE_COURIER")
     public ResponseEntity<?> getCourierOrders(@RequestBody PageInfo pageInfo){
-        //TODO: there is additional work to do
-        long courierId = 1L;
-        Page<Order> courierOrders = orderService.getOrdersByCourierId(courierId,pageInfo.getPage(), pageInfo.getCount());
-        if(courierOrders.isEmpty()){
-            return new ResponseEntity<>("There is no orders assigned to you:",HttpStatus.NO_CONTENT);
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            User courier = userService.getUserByEmail(username);
+            long courierId = courier.getId();
+            Page<Order> courierOrders = orderService.getOrdersByCourierId(courierId,pageInfo.getPage(), pageInfo.getCount());
+            if(courierOrders.isEmpty()){
+                return new ResponseEntity<>("There is no orders assigned to you:",HttpStatus.NO_CONTENT);
+            }
+            OrderListJson orderListJson = orderConverter.convertToListModel(courierOrders);
+            return new ResponseEntity<>(orderListJson,HttpStatus.OK);
+        }catch (CourierServiceException e){
+            return new ResponseEntity<>("Not found",HttpStatus.NOT_FOUND);
         }
-        OrderListJson orderListJson = orderConverter.convertToListModel(courierOrders);
-        return new ResponseEntity<>(orderListJson,HttpStatus.OK);
     }
 
     @PutMapping(value = "/{orderId}/assignCourier")
@@ -102,13 +114,15 @@ public class OrderRestController {
     @PutMapping(value = "/{orderId}/assignToMe")
     @Secured("ROLE_COURIER")
     public ResponseEntity<?>  assignOrder(@PathVariable long orderId){
-        //TODO: there is additional work to do
-        long courierId = 1L;
         try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            User courier = userService.getUserByEmail(username);
+            long courierId = courier.getId();
             orderService.assignCourierToOrder(orderId,courierId);
+            return new ResponseEntity<>("Order(id="+orderId+")+ assigned to you:",HttpStatus.OK);
         }catch (CourierServiceException e){
             return new ResponseEntity<>(e.getMessage(),HttpStatus.OK);
         }
-        return new ResponseEntity<>("Order(id="+orderId+")+ assigned to you:",HttpStatus.OK);
     }
 }

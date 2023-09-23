@@ -34,7 +34,13 @@ public class UserService {
         }
         return userOptional.get();
     }
-
+    public User getUserByEmail(String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            throw new CourierServiceException("There is no user with email '"+email+"'");
+        }
+        return userOptional.get();
+    }
     @Transactional
     public UserJson saveUser(UserJson model) {
         User user = userConverter.convertToEntity(model);
@@ -51,6 +57,13 @@ public class UserService {
     @Transactional
     public void updateUser(UserJson model, long userId) {
         User entity = getUserById(userId);
+        entity.setPassword(passwordEncoder.encode(entity.getPassword()));
+        entity = userConverter.convertToEntity(model, entity);
+        userRepository.save(entity);
+    }
+    @Transactional
+    public void updateUser(UserJson model, String email) {
+        User entity = getUserByEmail(email);
         entity.setPassword(passwordEncoder.encode(entity.getPassword()));
         entity = userConverter.convertToEntity(model, entity);
         userRepository.save(entity);
