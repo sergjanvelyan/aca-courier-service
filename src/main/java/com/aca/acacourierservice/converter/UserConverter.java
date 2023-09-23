@@ -2,7 +2,12 @@ package com.aca.acacourierservice.converter;
 
 import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.model.UserJson;
+import com.aca.acacourierservice.model.UserListJson;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class UserConverter implements Converter<User, UserJson>{
@@ -33,5 +38,15 @@ public class UserConverter implements Converter<User, UserJson>{
         model.setFullName(entity.getFullName());
         model.setPhoneNumber(entity.getPhoneNumber());
         return model;
+    }
+    public UserListJson convertToListModel(Page<User> users){
+        UserListJson userListJson = new UserListJson();
+        userListJson.setTotalCount(users.getTotalElements());
+        List<UserJson> usersJson = new ArrayList<>();
+        for (User user:users){
+            usersJson.add(convertToModel(user));
+        }
+        userListJson.setUserListJson(usersJson);
+        return userListJson;
     }
 }

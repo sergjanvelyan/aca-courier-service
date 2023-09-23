@@ -1,10 +1,15 @@
 package com.aca.acacourierservice.controller;
 
+import com.aca.acacourierservice.converter.UserConverter;
 import com.aca.acacourierservice.entity.User;
+import com.aca.acacourierservice.exception.CourierServiceException;
+import com.aca.acacourierservice.model.PageInfo;
 import com.aca.acacourierservice.model.Status;
 import com.aca.acacourierservice.model.UserJson;
 import com.aca.acacourierservice.model.UserListJson;
 import com.aca.acacourierservice.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +23,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class UserController {
     private final UserService userService;
+    private final UserConverter userConverter;
     private final AuthenticationManager authenticationManager;
-
-    public UserController(UserService userService, AuthenticationManager authenticationManager) {
+    @Autowired
+    public UserController(UserService userService, UserConverter userConverter, AuthenticationManager authenticationManager) {
         this.userService = userService;
+        this.userConverter = userConverter;
         this.authenticationManager = authenticationManager;
     }
 
@@ -35,7 +42,6 @@ public class UserController {
         }
         return ResponseEntity.ok(new Status("Login successful"));
     }
-    //   /profile/get GET (Courier, storeAdmin, admin)
     @GetMapping(value="/profile/get")
     @Secured({"ROLE_ADMIN", "ROLE_STORE_ADMIN", "ROLE_COURIER"})
     public ResponseEntity<UserJson> getUserProfile(){
@@ -43,46 +49,67 @@ public class UserController {
         UserJson userJson = new UserJson();
         return new ResponseEntity<>(userJson,HttpStatus.OK);
     }
-    //   /profile/update PUT ( Courier, storeAdmin, admin )
     @PutMapping(value ="/profile/update" )
     @Secured({"ROLE_ADMIN", "ROLE_STORE_ADMIN", "ROLE_COURIER"})
     public ResponseEntity<Status> updateUserProfile(@RequestBody UserJson userJson){
         //TODO:implement logic
         return new ResponseEntity<>(new Status("Profile updated"),HttpStatus.OK);
     }
-    //   /courier/register POST (admin)
     @PostMapping("/courier/register")
     @Secured("ROLE_ADMIN")
     public ResponseEntity<Status> register(@RequestBody UserJson userJson) {
         userService.saveUser(userJson);
         return new ResponseEntity<>(new Status("Registered"),HttpStatus.OK);
     }
-    //   /courier/{courierId} GET (admin)
     @GetMapping(value="/courier/{courierId}")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<UserJson> getCourier(@PathVariable String courierId){
-        //TODO:implement logic
-        UserJson userJson = new UserJson();
-        return new ResponseEntity<>(userJson,HttpStatus.OK);
+    public ResponseEntity<?> getCourier(@PathVariable Long courierId){
+        try{
+            UserJson userJson = userConverter.convertToModel(userService.getUserById(courierId));
+            userJson.setPassword("Password hidden");
+            if(!userJson.getRole().equals(User.Role.ROLE_COURIER)){
+                throw new CourierServiceException();
+            }
+            return new ResponseEntity<>(userJson,HttpStatus.OK);
+        } catch (CourierServiceException e){
+            return new ResponseEntity<>("There is no courier with id="+courierId,HttpStatus.BAD_REQUEST);
+        }
     }
-    //   /courier/list GET (admin)
     @GetMapping(value="/courier/list")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<UserListJson> getCourierList(){
-        //TODO:implement logic
-        UserListJson userListJson = new UserListJson();
+    public ResponseEntity<?> getCourierList(@RequestBody PageInfo pageInfo){
+        Page<User> couriers = userService.getCouriers(pageInfo.getPage(), pageInfo.getCount());
+        if(couriers.isEmpty()){
+            return new ResponseEntity<>("There is no couriers:",HttpStatus.NO_CONTENT);
+        }
+        UserListJson userListJson = userConverter.convertToListModel(couriers);
         return new ResponseEntity<>(userListJson,HttpStatus.OK);
     }
-    //   /courier/update PUT (admin)
     @PutMapping(value ="/courier/{courierId}")
-    public ResponseEntity<Status> updateCourier(@RequestBody UserJson userJson,@PathVariable long courierId){
-        //TODO:implement logic
-        return new ResponseEntity<>(new Status("Courier updated"),HttpStatus.OK);
+    @Secured("ROLE_ADMIN")
+    public ResponseEntity<?> updateCourier(@RequestBody UserJson courierJson,@PathVariable long courierId){
+        try{
+            User courier = userService.getUserById(courierId);
+            if (!courier.getRole().equals(User.Role.ROLE_COURIER)){
+                throw new CourierServiceException();
+            }
+            userService.updateUser(courierJson,courier);
+            return new ResponseEntity<>("Courier updated",HttpStatus.OK);
+        }catch (CourierServiceException e){
+            return new ResponseEntity<>("There is no courier with id="+courierId,HttpStatus.BAD_REQUEST);
+        }
     }
-    //   /courier/{delete} DELETE (admin)
     @DeleteMapping(value ="/courier/{courierId}")
-    public ResponseEntity<Status> deleteCourier(@PathVariable long courierId){
-        //TODO:implement logic
-        return new ResponseEntity<>(new Status("Courier updated"),HttpStatus.OK);
+    @Secured("ROLE_ADMIN")
+    public ResponseEntity<?> deleteCourier(@PathVariable long courierId){
+        try {
+            if(!userService.getUserById(courierId).getRole().equals(User.Role.ROLE_COURIER)){
+                throw new CourierServiceException();
+            }
+            userService.deleteExistingUserById(courierId);
+            return new ResponseEntity<>("Courier deleted",HttpStatus.OK);
+        }catch (CourierServiceException e){
+            return new ResponseEntity<>("There is no courier with id="+courierId,HttpStatus.BAD_REQUEST);
+        }
     }
 }

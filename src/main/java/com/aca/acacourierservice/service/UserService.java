@@ -7,6 +7,8 @@ import com.aca.acacourierservice.model.UserJson;
 import com.aca.acacourierservice.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +30,7 @@ public class UserService {
     public User getUserById(long id) {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
-            throw new CourierServiceException("There is no user with id=" + id);
+            throw new CourierServiceException("There is no user with id="+id);
         }
         return userOptional.get();
     }
@@ -53,12 +55,25 @@ public class UserService {
         entity = userConverter.convertToEntity(model, entity);
         userRepository.save(entity);
     }
+    @Transactional
+    public void updateUser(UserJson model, User entity) {
+        entity.setPassword(passwordEncoder.encode(entity.getPassword()));
+        entity = userConverter.convertToEntity(model, entity);
+        userRepository.save(entity);
+    }
 
     @Transactional
     public void deleteUserById(long id) {
         if (!userRepository.existsById(id)) {
-            throw new CourierServiceException("There is no user with id=" + id);
+            throw new CourierServiceException("There is no user with id="+id);
         }
         userRepository.deleteById(id);
+    }
+    @Transactional
+    public void deleteExistingUserById(long id) {
+        userRepository.deleteById(id);
+    }
+    public Page<User> getCouriers(int page,int size){
+        return userRepository.findAllByRole(User.Role.ROLE_COURIER, PageRequest.of(page,size));
     }
 }
