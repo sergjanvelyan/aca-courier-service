@@ -70,6 +70,7 @@ public class UserController {
     @PostMapping("/courier/register")
     @Secured("ROLE_ADMIN")
     public ResponseEntity<?> register(@RequestBody UserJson userJson) {
+        userJson.setRole(User.Role.ROLE_COURIER);
         userService.saveUser(userJson);
         return new ResponseEntity<>("Registered",HttpStatus.OK);
     }
@@ -106,6 +107,7 @@ public class UserController {
                 throw new CourierServiceException();
             }
             userService.updateUser(courierJson,courier);
+            //TODO: check courier role
             return new ResponseEntity<>("Courier updated",HttpStatus.OK);
         }catch (CourierServiceException e){
             return new ResponseEntity<>("There is no courier with id="+courierId,HttpStatus.BAD_REQUEST);

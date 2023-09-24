@@ -1,12 +1,15 @@
 package com.aca.acacourierservice.controller;
 
+import com.aca.acacourierservice.aspect.ValidateApiKeySecret;
 import com.aca.acacourierservice.converter.OrderConverter;
 import com.aca.acacourierservice.entity.Order;
 import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.exception.CourierServiceException;
+import com.aca.acacourierservice.exception.InvalidStoreCredentialsException;
 import com.aca.acacourierservice.model.*;
 import com.aca.acacourierservice.service.OrderService;
 import com.aca.acacourierservice.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -29,9 +32,15 @@ public class OrderRestController {
         this.orderConverter = orderConverter;
         this.userService = userService;
     }
+    @ExceptionHandler
+    public ResponseEntity<String> exceptionHandler(InvalidStoreCredentialsException exception){
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.UNAUTHORIZED);
+    }
 
     @PostMapping(value = "/create")
-    public Status createOrder(@RequestBody OrderJson orderJson){
+    @ValidateApiKeySecret
+    public Status createOrder(@RequestBody OrderJson orderJson,HttpServletRequest request){
+        orderJson.setStoreId((Long) request.getAttribute("storeId"));
         long id = orderService.addOrder(orderJson);
         return new Status("Created order id="+id+":");
     }
@@ -120,7 +129,7 @@ public class OrderRestController {
             User courier = userService.getUserByEmail(username);
             long courierId = courier.getId();
             orderService.assignCourierToOrder(orderId,courierId);
-            return new ResponseEntity<>("Order(id="+orderId+")+ assigned to you:",HttpStatus.OK);
+            return new ResponseEntity<>("Order(id="+orderId+") assigned to you:",HttpStatus.OK);
         }catch (CourierServiceException e){
             return new ResponseEntity<>(e.getMessage(),HttpStatus.OK);
         }

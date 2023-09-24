@@ -64,14 +64,14 @@ public class UserService {
     @Transactional
     public void updateUser(UserJson model, String email) {
         User entity = getUserByEmail(email);
-        entity.setPassword(passwordEncoder.encode(entity.getPassword()));
         entity = userConverter.convertToEntity(model, entity);
+        entity.setPassword(passwordEncoder.encode(model.getPassword()));
         userRepository.save(entity);
     }
     @Transactional
     public void updateUser(UserJson model, User entity) {
-        entity.setPassword(passwordEncoder.encode(entity.getPassword()));
         entity = userConverter.convertToEntity(model, entity);
+        entity.setPassword(passwordEncoder.encode(model.getPassword()));
         userRepository.save(entity);
     }
 

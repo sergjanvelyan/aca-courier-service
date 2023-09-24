@@ -98,4 +98,11 @@ public class StoreService {
         }
         storeRepository.deleteById(id);
     }
+    public Store getStoreByApiKey(String apiKey){
+        Optional<Store> storeOptional = storeRepository.findByApiKey(apiKey);
+        if (storeOptional.isEmpty()) {
+            throw new CourierServiceException("There is no store with apiKey " + apiKey);
+        }
+        return storeOptional.get();
+    }
 }
