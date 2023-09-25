@@ -35,7 +35,7 @@ public class PickupPointService {
         return pickupPointJsonList;
     }
 
-    public PickupPoint getPickupPointById(long id) {
+    public PickupPoint getPickupPointById(long id) throws CourierServiceException {
         Optional<PickupPoint> pickupPointOptional = pickupPointRepository.findById(id);
         if (pickupPointOptional.isEmpty()) {
             throw new CourierServiceException("There is no pickup point with id(" + id + ")");
@@ -43,7 +43,7 @@ public class PickupPointService {
         return pickupPointOptional.get();
     }
 
-    public PickupPoint modifyPickupPoint(long id, PickupPointJson pickupPointJson) {
+    public PickupPoint modifyPickupPoint(long id, PickupPointJson pickupPointJson) throws CourierServiceException {
         Optional<PickupPoint> pickupPointOptional = pickupPointRepository.findById(id);
         if (pickupPointOptional.isEmpty()) {
             throw new CourierServiceException("There is no pickup point with id(" + id + ")");
@@ -62,7 +62,7 @@ public class PickupPointService {
     }
 
     @Transactional
-    public void deletePickupPoint(long id) {
+    public void deletePickupPoint(long id) throws CourierServiceException {
         if (!pickupPointRepository.existsById(id)) {
             throw new CourierServiceException("There is no pickup point with id(" + id + ")");
         }

@@ -15,9 +15,8 @@ public class UserConverter implements Converter<User, UserJson>{
     public User convertToEntity(UserJson model, User entity) {
         entity.setEmail(model.getEmail());
         entity.setRole(model.getRole());
-        entity.setPassword(model.getPassword());
         entity.setAddress(model.getAddress());
-        entity.setBirthdate(model.getBirthDate());
+        entity.setBirthDate(model.getBirthDate());
         entity.setFullName(model.getFullName());
         entity.setPhoneNumber(model.getPhoneNumber());
         return entity;
@@ -34,7 +33,7 @@ public class UserConverter implements Converter<User, UserJson>{
         model.setRole(entity.getRole());
         model.setPassword(entity.getPassword());
         model.setAddress(entity.getAddress());
-        model.setBirthDate(entity.getBirthdate());
+        model.setBirthDate(entity.getBirthDate());
         model.setFullName(entity.getFullName());
         model.setPhoneNumber(entity.getPhoneNumber());
         return model;
@@ -44,7 +43,9 @@ public class UserConverter implements Converter<User, UserJson>{
         userListJson.setTotalCount(users.getTotalElements());
         List<UserJson> usersJson = new ArrayList<>();
         for (User user:users){
-            usersJson.add(convertToModel(user));
+            UserJson userJson = convertToModel(user);
+            userJson.setPassword("Password hidden");
+            usersJson.add(userJson);
         }
         userListJson.setUserListJson(usersJson);
         return userListJson;

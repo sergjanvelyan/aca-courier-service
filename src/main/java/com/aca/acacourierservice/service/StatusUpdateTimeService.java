@@ -29,7 +29,7 @@ public class StatusUpdateTimeService {
         statusUpdateTimeRepository.save(statusUpdateTime);
         return statusUpdateTime.getId();
     }
-    public List<StatusUpdateTime> getStatusUpdateTimeListByOrderId(long orderId){
+    public List<StatusUpdateTime> getStatusUpdateTimeListByOrderId(long orderId) throws CourierServiceException {
         List<StatusUpdateTime> statusUpdateTimeList = statusUpdateTimeRepository.findAllByOrderId(orderId);
         if(statusUpdateTimeList.isEmpty()){
             throw new CourierServiceException("There is no status update history for order(id="+orderId+")");

@@ -4,7 +4,6 @@ import com.aca.acacourierservice.converter.UserConverter;
 import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.exception.CourierServiceException;
 import com.aca.acacourierservice.model.PageInfo;
-import com.aca.acacourierservice.model.Status;
 import com.aca.acacourierservice.model.UserJson;
 import com.aca.acacourierservice.model.UserListJson;
 import com.aca.acacourierservice.service.UserService;
@@ -17,6 +16,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,14 +33,14 @@ public class UserController {
     }
 
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE ,consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Status> login(@RequestBody User user) {
+    public ResponseEntity<String> login(@RequestBody UserJson userJson) {
         try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userJson.getEmail(), userJson.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new Status("Authentication failed"), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>("You are successfully logged in:",HttpStatus.OK);
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>("You have entered an invalid username or password:", HttpStatus.UNAUTHORIZED);
         }
-        return ResponseEntity.ok(new Status("Login successful"));
     }
     @GetMapping(value="/profile/get")
     @Secured({"ROLE_ADMIN", "ROLE_STORE_ADMIN", "ROLE_COURIER"})
@@ -52,7 +52,7 @@ public class UserController {
             userJson.setPassword("Password hidden");
             return new ResponseEntity<>(userJson,HttpStatus.OK);
         }catch (CourierServiceException e){
-            return new ResponseEntity<>("Not found",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Not found:",HttpStatus.NOT_FOUND);
         }
     }
     @PutMapping(value ="/profile/update" )
@@ -62,17 +62,17 @@ public class UserController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             userService.updateUser(userJson,username);
-            return new ResponseEntity<>("Profile updated",HttpStatus.OK);
+            return new ResponseEntity<>("Profile updated:",HttpStatus.OK);
         }catch (CourierServiceException e){
-            return new ResponseEntity<>("Not found",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Not found:",HttpStatus.NOT_FOUND);
         }
     }
     @PostMapping("/courier/register")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<?> register(@RequestBody UserJson userJson) {
+    public ResponseEntity<String> register(@RequestBody UserJson userJson) {
         userJson.setRole(User.Role.ROLE_COURIER);
         userService.saveUser(userJson);
-        return new ResponseEntity<>("Registered",HttpStatus.OK);
+        return new ResponseEntity<>("Registered:",HttpStatus.OK);
     }
     @GetMapping(value="/courier/{courierId}")
     @Secured("ROLE_ADMIN")
@@ -85,7 +85,7 @@ public class UserController {
             }
             return new ResponseEntity<>(userJson,HttpStatus.OK);
         } catch (CourierServiceException e){
-            return new ResponseEntity<>("There is no courier with id="+courierId,HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("There is no courier with id="+courierId+":",HttpStatus.BAD_REQUEST);
         }
     }
     @GetMapping(value="/courier/list")
@@ -106,11 +106,13 @@ public class UserController {
             if (!courier.getRole().equals(User.Role.ROLE_COURIER)){
                 throw new CourierServiceException();
             }
+            courierJson.setRole(User.Role.ROLE_COURIER);
             userService.updateUser(courierJson,courier);
-            //TODO: check courier role
-            return new ResponseEntity<>("Courier updated",HttpStatus.OK);
+            return new ResponseEntity<>("Courier updated:",HttpStatus.OK);
         }catch (CourierServiceException e){
-            return new ResponseEntity<>("There is no courier with id="+courierId,HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("There is no courier with id="+courierId+":",HttpStatus.BAD_REQUEST);
+        }catch (Exception e) {
+            return new ResponseEntity<>("Email already exists:", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @DeleteMapping(value ="/courier/{courierId}")
@@ -121,9 +123,9 @@ public class UserController {
                 throw new CourierServiceException();
             }
             userService.deleteExistingUserById(courierId);
-            return new ResponseEntity<>("Courier deleted",HttpStatus.OK);
+            return new ResponseEntity<>("Courier deleted:",HttpStatus.OK);
         }catch (CourierServiceException e){
-            return new ResponseEntity<>("There is no courier with id="+courierId,HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("There is no courier with id="+courierId+":",HttpStatus.BAD_REQUEST);
         }
     }
 }

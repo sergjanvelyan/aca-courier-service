@@ -27,17 +27,17 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User getUserById(long id) {
+    public User getUserById(long id) throws CourierServiceException {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
-            throw new CourierServiceException("There is no user with id="+id);
+            throw new CourierServiceException("There is no user with id="+id+":");
         }
         return userOptional.get();
     }
-    public User getUserByEmail(String email) {
+    public User getUserByEmail(String email) throws CourierServiceException {
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isEmpty()) {
-            throw new CourierServiceException("There is no user with email '"+email+"'");
+            throw new CourierServiceException("There is no user with email '"+email+"':");
         }
         return userOptional.get();
     }
@@ -55,14 +55,14 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(UserJson model, long userId) {
+    public void updateUser(UserJson model, long userId) throws CourierServiceException {
         User entity = getUserById(userId);
-        entity.setPassword(passwordEncoder.encode(entity.getPassword()));
+        entity.setPassword(passwordEncoder.encode(model.getPassword()));
         entity = userConverter.convertToEntity(model, entity);
         userRepository.save(entity);
     }
     @Transactional
-    public void updateUser(UserJson model, String email) {
+    public void updateUser(UserJson model, String email) throws CourierServiceException {
         User entity = getUserByEmail(email);
         entity = userConverter.convertToEntity(model, entity);
         entity.setPassword(passwordEncoder.encode(model.getPassword()));
@@ -76,9 +76,9 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUserById(long id) {
+    public void deleteUserById(long id) throws CourierServiceException {
         if (!userRepository.existsById(id)) {
-            throw new CourierServiceException("There is no user with id="+id);
+            throw new CourierServiceException("There is no user with id="+id+":");
         }
         userRepository.deleteById(id);
     }

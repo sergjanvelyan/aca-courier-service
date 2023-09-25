@@ -35,7 +35,6 @@ public class OrderService{
     }
     @Transactional
      public long addOrder(OrderJson orderJson){
-        //TODO: Here we can do some additional work before adding order in database
         Order order = orderConverter.convertToEntity(orderJson);
         order.setStore(storeService.getStoreById(orderJson.getStoreId()));
         order.setStatus(Order.Status.NEW);

@@ -10,7 +10,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
+    @Column(unique = true,nullable = false)
     private String email;
     @Column(nullable = false)
     private String password;
@@ -25,7 +25,7 @@ public class User {
     private String fullName;
     @Column
     @Temporal(TemporalType.DATE)
-    private LocalDate birthdate;
+    private LocalDate birthDate;
 
     public Long getId() {
         return id;
@@ -83,12 +83,12 @@ public class User {
         this.fullName = fullName;
     }
 
-    public LocalDate getBirthdate() {
-        return birthdate;
+    public LocalDate getBirthDate() {
+        return this.birthDate;
     }
 
-    public void setBirthdate(LocalDate birthdate) {
-        this.birthdate = birthdate;
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 
     public enum Role {

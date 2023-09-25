@@ -41,6 +41,7 @@ public class StoreController {
         Store store;
         try {
             store = storeService.getStoreById(storeId);
+            store.getAdmin().setPassword("Password hidden");
         } catch (CourierServiceException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
@@ -58,11 +59,12 @@ public class StoreController {
     @Secured("ROLE_ADMIN")
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Status> registerStore(@RequestBody StoreJson storeJson) {
-        User admin = storeJson.getAdmin();
-        userService.saveUser(admin);
         try {
+            User admin = storeJson.getAdmin();
+            admin.setRole(User.Role.ROLE_STORE_ADMIN);
+            userService.saveUser(admin);
             long id = storeService.addStore(storeJson);
-            return new ResponseEntity<>(new StatusWithId("created", id), HttpStatus.CREATED);
+            return new ResponseEntity<>(new StatusWithId("Store registered", id), HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -78,22 +80,23 @@ public class StoreController {
         } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(new Status("updated"), HttpStatus.OK);
+        return new ResponseEntity<>(new Status("Store updated"), HttpStatus.OK);
     }
 
     @Secured("ROLE_ADMIN")
     @PutMapping(value = "/{storeId}/admin/update", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Status> updateStoreAdmin(@RequestBody UserJson admin, @PathVariable long storeId) {
         Store store = storeService.getStoreById(storeId);
+        admin.setRole(User.Role.ROLE_STORE_ADMIN);
         User adminEntity = store.getAdmin();
         try {
-            userService.updateUser(admin, adminEntity.getId());
+            userService.updateUser(admin, adminEntity);
         } catch (CourierServiceException e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(new Status("updated"), HttpStatus.OK);
+        return new ResponseEntity<>(new Status("Store admin updated"), HttpStatus.OK);
     }
 
     @Secured("ROLE_ADMIN")
@@ -106,7 +109,7 @@ public class StoreController {
         } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(new Status("updated"), HttpStatus.OK);
+        return new ResponseEntity<>(new Status("Store deleted"), HttpStatus.OK);
     }
 
     @Secured("ROLE_STORE_ADMIN")
