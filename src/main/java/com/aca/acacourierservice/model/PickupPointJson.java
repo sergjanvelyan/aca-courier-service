@@ -4,7 +4,7 @@ public class PickupPointJson {
     private String city;
     private String country;
     private String address;
-    private long zipCode;
+    private String zipCode;
     private String phoneNumber;
     private long storeId;
 
@@ -33,11 +33,11 @@ public class PickupPointJson {
         this.address = address;
     }
 
-    public long getZipCode() {
+    public String getZipCode() {
         return zipCode;
     }
 
-    public void setZipCode(long zipCode) {
+    public void setZipCode(String zipCode) {
         this.zipCode = zipCode;
     }
 

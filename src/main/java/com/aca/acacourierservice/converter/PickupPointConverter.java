@@ -2,24 +2,16 @@ package com.aca.acacourierservice.converter;
 
 import com.aca.acacourierservice.entity.PickupPoint;
 import com.aca.acacourierservice.model.PickupPointJson;
-import com.aca.acacourierservice.service.StoreService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class PickupPointConverter implements Converter<PickupPoint, PickupPointJson> {
 
-    private final StoreService storeService;
-
-    @Autowired
-    public PickupPointConverter(@Lazy StoreService storeService) {
-        this.storeService = storeService;
-    }
-
     @Override
     public PickupPoint convertToEntity(PickupPointJson model, PickupPoint entity) {
-        entity.setStore(storeService.getStoreById(model.getStoreId()));
         entity.setCity(model.getCity());
         entity.setCountry(model.getCountry());
         entity.setAddress(model.getAddress());
@@ -46,5 +38,20 @@ public class PickupPointConverter implements Converter<PickupPoint, PickupPointJ
         model.setZipCode(entity.getZipCode());
 
         return model;
+    }
+
+    public List<PickupPointJson> convertToModelList(List<PickupPoint> pickupPoints){
+        List<PickupPointJson> pickupPointJson = new ArrayList<>();
+        for (PickupPoint pickupPoint:pickupPoints){
+            pickupPointJson.add(convertToModel(pickupPoint));
+        }
+        return pickupPointJson;
+    }
+    public List<PickupPoint> convertToEntityList(List<PickupPointJson> pickupPointJsons){
+        List<PickupPoint> pickupPoints = new ArrayList<>();
+        for (PickupPointJson pickupPointJson:pickupPointJsons){
+            pickupPoints.add(convertToEntity(pickupPointJson));
+        }
+        return pickupPoints;
     }
 }

@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface StoreRepository extends JpaRepository<Store, Long> {
     Optional<Store> findByApiKey(String apiKey);
+    Optional<Store> findByAdmin_Email(String email);
 }

@@ -1,6 +1,5 @@
 package com.aca.acacourierservice.model;
 
-import com.aca.acacourierservice.entity.PickupPoint;
 import com.aca.acacourierservice.entity.User;
 
 import java.util.List;
@@ -8,7 +7,7 @@ import java.util.List;
 public class StoreJson {
     private String name;
     private User admin;
-    private List<PickupPoint> pickupPoints;
+    private List<PickupPointJson> pickupPoints;
     private String storeUrl;
     private String phoneNumber;
     private String apiKey;
@@ -30,11 +29,11 @@ public class StoreJson {
         this.admin = admin;
     }
 
-    public List<PickupPoint> getPickupPoints() {
+    public List<PickupPointJson> getPickupPoints() {
         return pickupPoints;
     }
 
-    public void setPickupPoints(List<PickupPoint> pickupPoints) {
+    public void setPickupPoints(List<PickupPointJson> pickupPoints) {
         this.pickupPoints = pickupPoints;
     }
 

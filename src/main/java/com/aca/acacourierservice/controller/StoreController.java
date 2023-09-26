@@ -42,12 +42,13 @@ public class StoreController {
         try {
             store = storeService.getStoreById(storeId);
             store.getAdmin().setPassword("Password hidden");
+            StoreJson storeJson = storeConverter.convertToModel(store);
+            return new ResponseEntity<>(storeJson, HttpStatus.OK);
         } catch (CourierServiceException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(storeConverter.convertToModel(store), HttpStatus.OK);
     }
 
     @Secured("ROLE_ADMIN")

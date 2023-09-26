@@ -1,5 +1,6 @@
 package com.aca.acacourierservice.service;
 
+import com.aca.acacourierservice.converter.PickupPointConverter;
 import com.aca.acacourierservice.converter.StoreConverter;
 import com.aca.acacourierservice.converter.UserConverter;
 import com.aca.acacourierservice.entity.PickupPoint;
@@ -27,20 +28,36 @@ public class StoreService {
     private final StoreConverter storeConverter;
     private final UserService userService;
     private final UserConverter userConverter;
+    private final PickupPointConverter pickupPointConverter;
 
     @Autowired
-    public StoreService(PickupPointRepository pickupPointRepository, StoreRepository storeRepository, StoreConverter storeConverter, UserService userService, UserConverter userConverter) {
+    public StoreService(PickupPointRepository pickupPointRepository, StoreRepository storeRepository, StoreConverter storeConverter, UserService userService, UserConverter userConverter, PickupPointConverter pickupPointConverter) {
         this.pickupPointRepository = pickupPointRepository;
         this.storeRepository = storeRepository;
         this.storeConverter = storeConverter;
         this.userService = userService;
         this.userConverter = userConverter;
+        this.pickupPointConverter = pickupPointConverter;
     }
 
     public Store getStoreById(long storeId) throws CourierServiceException {
         Optional<Store> storeOptional = storeRepository.findById(storeId);
         if (storeOptional.isEmpty()) {
             throw new CourierServiceException("There is no store with id=" + storeId+":");
+        }
+        return storeOptional.get();
+    }
+    public Store getStoreByApiKey(String apiKey) throws CourierServiceException {
+        Optional<Store> storeOptional = storeRepository.findByApiKey(apiKey);
+        if (storeOptional.isEmpty()) {
+            throw new CourierServiceException("There is no store with apiKey=" + apiKey+":");
+        }
+        return storeOptional.get();
+    }
+    public Store getStoreByAdminUsername(String email) throws CourierServiceException {
+        Optional<Store> storeOptional = storeRepository.findByAdmin_Email(email);
+        if (storeOptional.isEmpty()) {
+            throw new CourierServiceException("There is no store with admin username=" + email+":");
         }
         return storeOptional.get();
     }
@@ -78,7 +95,7 @@ public class StoreService {
             store.setAdmin(storeAdmin);
         }
         if (storeJson.getPickupPoints() != null) {
-            store.setPickupPoints(storeJson.getPickupPoints());
+            store.setPickupPoints(pickupPointConverter.convertToEntityList(storeJson.getPickupPoints()));
         }
         storeRepository.save(store);
     }
@@ -107,12 +124,5 @@ public class StoreService {
             throw new CourierServiceException("There is no store with id=" + id+":");
         }
         storeRepository.deleteById(id);
-    }
-    public Store getStoreByApiKey(String apiKey) throws CourierServiceException {
-        Optional<Store> storeOptional = storeRepository.findByApiKey(apiKey);
-        if (storeOptional.isEmpty()) {
-            throw new CourierServiceException("There is no store with apiKey=" + apiKey+":");
-        }
-        return storeOptional.get();
     }
 }

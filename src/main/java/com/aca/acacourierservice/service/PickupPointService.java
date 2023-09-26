@@ -7,6 +7,8 @@ import com.aca.acacourierservice.model.PickupPointJson;
 import com.aca.acacourierservice.repository.PickupPointRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -38,20 +40,27 @@ public class PickupPointService {
     public PickupPoint getPickupPointById(long id) throws CourierServiceException {
         Optional<PickupPoint> pickupPointOptional = pickupPointRepository.findById(id);
         if (pickupPointOptional.isEmpty()) {
-            throw new CourierServiceException("There is no pickup point with id(" + id + ")");
+            throw new CourierServiceException("There is no pickup point with id="+id+":");
         }
         return pickupPointOptional.get();
+    }
+    public List<PickupPoint> getPickupPointsByStoreId(long storeId,int page,int size) throws CourierServiceException {
+        Page<PickupPoint> pickupPointsPage = pickupPointRepository.findAllByStoreId(storeId, PageRequest.of(page, size));
+        if(pickupPointsPage.isEmpty()){
+            throw new CourierServiceException("There is no pickup points for store:");
+        }
+        return pickupPointsPage.getContent();
     }
 
     public PickupPoint modifyPickupPoint(long id, PickupPointJson pickupPointJson) throws CourierServiceException {
         Optional<PickupPoint> pickupPointOptional = pickupPointRepository.findById(id);
         if (pickupPointOptional.isEmpty()) {
-            throw new CourierServiceException("There is no pickup point with id(" + id + ")");
+            throw new CourierServiceException("There is no pickup point with id="+id+":");
         }
         PickupPoint pickupPoint = pickupPointOptional.get();
-        PickupPoint updatedPickupPoint = pickupPointConverter.convertToEntity(pickupPointJson, pickupPoint);
-        pickupPointRepository.save(updatedPickupPoint);
-        return updatedPickupPoint;
+        pickupPoint = pickupPointConverter.convertToEntity(pickupPointJson, pickupPoint);
+        pickupPointRepository.save(pickupPoint);
+        return pickupPoint;
     }
 
     @Transactional
@@ -64,7 +73,7 @@ public class PickupPointService {
     @Transactional
     public void deletePickupPoint(long id) throws CourierServiceException {
         if (!pickupPointRepository.existsById(id)) {
-            throw new CourierServiceException("There is no pickup point with id(" + id + ")");
+            throw new CourierServiceException("There is no pickup point with id="+id+":");
         }
         pickupPointRepository.deleteById(id);
     }
