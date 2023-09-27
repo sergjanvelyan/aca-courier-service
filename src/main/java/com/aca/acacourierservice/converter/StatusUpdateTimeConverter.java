@@ -22,7 +22,9 @@ public class StatusUpdateTimeConverter implements Converter<StatusUpdateTime, St
     @Override
     public StatusUpdateTimeJson convertToModel(StatusUpdateTime entity) {
         StatusUpdateTimeJson model = new StatusUpdateTimeJson();
-        model.setOrderId(entity.getOrder().getId());
+        if(entity.getOrder()!=null){
+            model.setOrderId(entity.getOrder().getId());
+        }
         model.setUpdatedTo(entity.getUpdatedTo());
         model.setUpdatedFrom(entity.getUpdatedFrom());
         model.setUpdateTime(entity.getUpdateTime());
