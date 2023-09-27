@@ -3,6 +3,7 @@ package com.aca.acacourierservice.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 public class StatusUpdateTime {
@@ -69,5 +70,26 @@ public class StatusUpdateTime {
 
     public void setOrder(Order order) {
         this.order = order;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StatusUpdateTime that = (StatusUpdateTime) o;
+        return id == that.id
+                && Objects.equals(updateTime, that.updateTime)
+                && updatedFrom == that.updatedFrom
+                && updatedTo == that.updatedTo
+                && Objects.equals(additionalInfo, that.additionalInfo)
+                && Objects.equals(order, that.order);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id,
+                updateTime,
+                updatedFrom,
+                updatedTo,
+                additionalInfo,
+                order);
     }
 }

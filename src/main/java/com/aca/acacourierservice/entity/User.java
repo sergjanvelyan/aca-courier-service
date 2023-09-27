@@ -3,6 +3,7 @@ package com.aca.acacourierservice.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
@@ -96,5 +97,29 @@ public class User {
         ROLE_STORE_ADMIN,
         ROLE_COURIER
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id)
+                && Objects.equals(email, user.email)
+                && Objects.equals(password, user.password)
+                && role == user.role
+                && Objects.equals(address, user.address)
+                && Objects.equals(phoneNumber, user.phoneNumber)
+                && Objects.equals(fullName, user.fullName)
+                && Objects.equals(birthDate, user.birthDate);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id,
+                email,
+                password,
+                role,
+                address,
+                phoneNumber,
+                fullName,
+                birthDate);
+    }
 }
-

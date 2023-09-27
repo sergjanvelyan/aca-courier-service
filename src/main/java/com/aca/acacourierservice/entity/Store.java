@@ -5,6 +5,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @SQLDelete(sql = "UPDATE store SET deleted = true WHERE id=?")
@@ -92,5 +93,32 @@ public class Store {
 
     public void setApiSecret(String apiSecret) {
         this.apiSecret = apiSecret;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Store store = (Store) o;
+        return Objects.equals(id, store.id)
+                && Objects.equals(name, store.name)
+                && Objects.equals(admin, store.admin)
+                && Objects.equals(pickupPoints, store.pickupPoints)
+                && Objects.equals(storeUrl, store.storeUrl)
+                && Objects.equals(phoneNumber, store.phoneNumber)
+                && Objects.equals(apiKey, store.apiKey)
+                && Objects.equals(apiSecret, store.apiSecret)
+                && Objects.equals(deleted, store.deleted);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id,
+                name,
+                admin,
+                pickupPoints,
+                storeUrl,
+                phoneNumber,
+                apiKey,
+                apiSecret,
+                deleted);
     }
 }
