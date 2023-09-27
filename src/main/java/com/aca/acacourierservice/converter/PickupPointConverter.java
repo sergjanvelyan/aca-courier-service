@@ -9,7 +9,6 @@ import java.util.List;
 
 @Component
 public class PickupPointConverter implements Converter<PickupPoint, PickupPointJson> {
-
     @Override
     public PickupPoint convertToEntity(PickupPointJson model, PickupPoint entity) {
         entity.setCity(model.getCity());
@@ -17,29 +16,26 @@ public class PickupPointConverter implements Converter<PickupPoint, PickupPointJ
         entity.setAddress(model.getAddress());
         entity.setPhoneNumber(model.getPhoneNumber());
         entity.setZipCode(model.getZipCode());
-
         return entity;
     }
-
     @Override
     public PickupPoint convertToEntity(PickupPointJson model) {
         PickupPoint entity = new PickupPoint();
         return convertToEntity(model, entity);
     }
-
     @Override
     public PickupPointJson convertToModel(PickupPoint entity) {
         PickupPointJson model = new PickupPointJson();
-        model.setStoreId(entity.getStore().getId());
+        if(entity.getStore()!=null){
+            model.setStoreId(entity.getStore().getId());
+        }
         model.setCity(entity.getCity());
         model.setCountry(entity.getCountry());
         model.setAddress(entity.getAddress());
         model.setPhoneNumber(entity.getPhoneNumber());
         model.setZipCode(entity.getZipCode());
-
         return model;
     }
-
     public List<PickupPointJson> convertToModelList(List<PickupPoint> pickupPoints){
         List<PickupPointJson> pickupPointJson = new ArrayList<>();
         for (PickupPoint pickupPoint:pickupPoints){

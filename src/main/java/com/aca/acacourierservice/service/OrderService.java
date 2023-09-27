@@ -50,20 +50,22 @@ public class OrderService{
      }
     @Transactional
     public void updateOrderStatus(long id,Order.Status status,String additionalInfo) throws CourierServiceException {
-        try{
-            Order order = getOrderById(id);
-            StatusUpdateTimeJson statusUpdateTimeJson = new StatusUpdateTimeJson();
-            statusUpdateTimeJson.setOrderId(id);
-            statusUpdateTimeJson.setUpdatedFrom(order.getStatus());
-            statusUpdateTimeJson.setUpdatedTo(status);
-            statusUpdateTimeJson.setUpdateTime(LocalDateTime.now(ZoneId.of("Asia/Yerevan")));
-            statusUpdateTimeJson.setAdditionalInfo(additionalInfo);
-            statusUpdateTimeService.addStatusUpdateTime(statusUpdateTimeJson);
-            order.setStatus(status);
-            orderRepository.save(order);
-        }catch (CourierServiceException e){
-            throw new CourierServiceException("Can't update nonexistent order(id="+id+")");
+        Order order = getOrderById(id);
+        if(order.getStatus()==status){
+            throw new CourierServiceException("Can't update to same status(status="+status+")");
         }
+        StatusUpdateTimeJson statusUpdateTimeJson = new StatusUpdateTimeJson();
+        statusUpdateTimeJson.setOrderId(id);
+        statusUpdateTimeJson.setUpdatedFrom(order.getStatus());
+        statusUpdateTimeJson.setUpdatedTo(status);
+        statusUpdateTimeJson.setUpdateTime(LocalDateTime.now(ZoneId.of("Asia/Yerevan")));
+        statusUpdateTimeJson.setAdditionalInfo(additionalInfo);
+        statusUpdateTimeService.addStatusUpdateTime(statusUpdateTimeJson);
+        order.setStatus(status);
+        if(status== Order.Status.DELIVERED){
+            order.setOrderDeliveredTime(statusUpdateTimeJson.getUpdateTime());
+        }
+        orderRepository.save(order);
     }
     @Transactional
     public void assignCourierToOrder(long orderId,long courierId) throws CourierServiceException {
@@ -71,21 +73,24 @@ public class OrderService{
         try{
             order = getOrderById(orderId);
         }catch (CourierServiceException e){
-            throw new CourierServiceException("Can't assign nonexistent order(id="+orderId+")+ to courier(id="+courierId+")");
+            throw new CourierServiceException("Can't assign nonexistent order(id="+orderId+") to courier:");
         }
         User courier;
         try {
             courier = userService.getUserById(courierId);
         }catch (CourierServiceException e){
-            throw new CourierServiceException("Can't assign order(id="+orderId+")+ to nonexistent courier(id="+courierId+")");
+            throw new CourierServiceException("Can't assign order to nonexistent courier(id="+courierId+"):");
         }
-        order.setCourier(courier);
+        if(courier.getRole()!= User.Role.ROLE_COURIER){
+            throw new CourierServiceException("Can't assign order(id="+orderId+") to a user other than courier:");
+        }
+            order.setCourier(courier);
         orderRepository.save(order);
     }
     public Order getOrderById(long id) throws CourierServiceException {
         Optional<Order> orderOptional = orderRepository.findById(id);
         if (orderOptional.isEmpty()){
-            throw new CourierServiceException("There is no order with id("+id+")");
+            throw new CourierServiceException("There is no order with id="+id+":");
         }
         return orderOptional.get();
     }
