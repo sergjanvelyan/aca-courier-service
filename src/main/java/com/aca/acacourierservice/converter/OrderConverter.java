@@ -1,10 +1,8 @@
 package com.aca.acacourierservice.converter;
 
 import com.aca.acacourierservice.entity.Order;
-import com.aca.acacourierservice.entity.StatusUpdateTime;
 import com.aca.acacourierservice.model.OrderJson;
 import com.aca.acacourierservice.model.OrderListJson;
-import com.aca.acacourierservice.model.StatusUpdateTimeJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -15,12 +13,10 @@ import java.util.List;
 @Component
 public class OrderConverter implements Converter<Order, OrderJson> {
     private final StatusUpdateTimeConverter statusUpdateTimeConverter;
-
     @Autowired
     public OrderConverter(StatusUpdateTimeConverter statusUpdateTimeConverter) {
         this.statusUpdateTimeConverter = statusUpdateTimeConverter;
     }
-
     @Override
     public Order convertToEntity(OrderJson model, Order entity) {
         entity.setOrderId(model.getOrderId());
@@ -38,6 +34,7 @@ public class OrderConverter implements Converter<Order, OrderJson> {
         entity.setStatus(model.getStatus());
         entity.setOrderConfirmedTime(model.getOrderConfirmedTime());
         entity.setOrderDeliveredTime(model.getOrderDeliveredTime());
+        entity.setStatusUpdateTimeList(statusUpdateTimeConverter.convertToListEntity(model.getStatusUpdateHistory()));
         return entity;
     }
     @Override
@@ -50,7 +47,9 @@ public class OrderConverter implements Converter<Order, OrderJson> {
         OrderJson model = new OrderJson();
         model.setOrderId(entity.getOrderId());
         model.setTrackingNumber(entity.getTrackingNumber());
-        model.setStoreId(entity.getStore().getId());
+        if(entity.getStore()!=null){
+            model.setStoreId(entity.getStore().getId());
+        }
         model.setFullName(entity.getFullName());
         model.setCountry(entity.getCountry());
         model.setCity(entity.getCity());
@@ -67,12 +66,7 @@ public class OrderConverter implements Converter<Order, OrderJson> {
         model.setStatus(entity.getStatus());
         model.setOrderConfirmedTime(entity.getOrderConfirmedTime());
         model.setOrderDeliveredTime(entity.getOrderDeliveredTime());
-        List<StatusUpdateTime> statusUpdateTimeList = entity.getStatusUpdateTimeList();
-        List<StatusUpdateTimeJson> statusUpdateTimeJsonList = new ArrayList<>();
-        for (StatusUpdateTime statusUpdateTime:statusUpdateTimeList) {
-            statusUpdateTimeJsonList.add(statusUpdateTimeConverter.convertToModel(statusUpdateTime));
-        }
-        model.setStatusUpdateHistory(statusUpdateTimeJsonList);
+        model.setStatusUpdateHistory(statusUpdateTimeConverter.convertToListModel(entity.getStatusUpdateTimeList()));
         return model;
     }
     public OrderListJson convertToListModel(Page<Order> orders){

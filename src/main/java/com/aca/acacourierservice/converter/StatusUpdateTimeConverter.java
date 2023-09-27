@@ -4,6 +4,9 @@ import com.aca.acacourierservice.entity.StatusUpdateTime;
 import com.aca.acacourierservice.model.StatusUpdateTimeJson;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class StatusUpdateTimeConverter implements Converter<StatusUpdateTime, StatusUpdateTimeJson>{
     @Override
@@ -30,5 +33,19 @@ public class StatusUpdateTimeConverter implements Converter<StatusUpdateTime, St
         model.setUpdateTime(entity.getUpdateTime());
         model.setAdditionalInfo(entity.getAdditionalInfo());
         return model;
+    }
+    public List<StatusUpdateTimeJson> convertToListModel(List<StatusUpdateTime> statusUpdateTimeList){
+        List<StatusUpdateTimeJson> statusUpdateTimeJsonList = new ArrayList<>();
+        for (StatusUpdateTime statusUpdateTime:statusUpdateTimeList) {
+            statusUpdateTimeJsonList.add(convertToModel(statusUpdateTime));
+        }
+        return statusUpdateTimeJsonList;
+    }
+    public List<StatusUpdateTime> convertToListEntity(List<StatusUpdateTimeJson> statusUpdateTimeListJson){
+        List<StatusUpdateTime> statusUpdateTimeList = new ArrayList<>();
+        for (StatusUpdateTimeJson statusUpdateTime:statusUpdateTimeListJson) {
+            statusUpdateTimeList.add(convertToEntity(statusUpdateTime));
+        }
+        return statusUpdateTimeList;
     }
 }

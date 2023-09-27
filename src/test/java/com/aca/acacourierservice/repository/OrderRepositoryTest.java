@@ -52,7 +52,7 @@ public class OrderRepositoryTest {
         courier.setId(userRepository.save(courier).getId());
 
         Store store = new Store();
-        store.setName("Store Name");
+        store.setName("storeName");
         store.setAdmin(storeAdmin);
         store.setId(storeRepository.save(store).getId());
 
@@ -97,43 +97,12 @@ public class OrderRepositoryTest {
         Page<Order> ordersPage = orderRepository.findAllByStoreId(store.getId(), PageRequest.of(0,5));
         assertEquals(2,ordersPage.getTotalElements());
         List<Order> orders = ordersPage.getContent();
-        assertEquals(order.getId(),orders.get(0).getId());
-        assertEquals(order.getOrderId(),orders.get(0).getOrderId());
-        assertEquals(order.getStatus(),orders.get(0).getStatus());
-        assertEquals(order.getStore().getId(),orders.get(0).getStore().getId());
-        assertEquals(order.getCourier().getId(),orders.get(0).getCourier().getId());
-        assertEquals(order.getCountry(),orders.get(0).getCountry());
-        assertEquals(order.getCity(),orders.get(0).getCity());
-        assertEquals(order.getAddress(),orders.get(0).getAddress());
-        assertEquals(order.getPhone(),orders.get(0).getPhone());
-        assertEquals(order.getZipCode(),orders.get(0).getZipCode());
-        assertEquals(order.getFullName(),orders.get(0).getFullName());
-        assertEquals(order.getTrackingNumber(),orders.get(0).getTrackingNumber());
-        assertEquals(order.getDeliveryPrice(),orders.get(0).getDeliveryPrice());
-        assertEquals(order.getTotalPrice(),orders.get(0).getTotalPrice());
-        assertEquals(order.getWeightKg(),orders.get(0).getWeightKg());
-        assertEquals(order.getSize(),orders.get(0).getSize());
-        assertEquals(order.getOrderConfirmedTime(),orders.get(0).getOrderConfirmedTime());
-        assertEquals(order.getOrderDeliveredTime(),orders.get(0).getOrderDeliveredTime());
 
-        assertEquals(anotherOrder.getId(),orders.get(1).getId());
-        assertEquals(anotherOrder.getOrderId(),orders.get(1).getOrderId());
-        assertEquals(anotherOrder.getStatus(),orders.get(1).getStatus());
-        assertEquals(anotherOrder.getStore().getId(),orders.get(1).getStore().getId());
-        assertEquals(anotherOrder.getCourier().getId(),orders.get(1).getCourier().getId());
-        assertEquals(anotherOrder.getCountry(),orders.get(1).getCountry());
-        assertEquals(anotherOrder.getCity(),orders.get(1).getCity());
-        assertEquals(anotherOrder.getAddress(),orders.get(1).getAddress());
-        assertEquals(anotherOrder.getPhone(),orders.get(1).getPhone());
-        assertEquals(anotherOrder.getZipCode(),orders.get(1).getZipCode());
-        assertEquals(anotherOrder.getFullName(),orders.get(1).getFullName());
-        assertEquals(anotherOrder.getTrackingNumber(),orders.get(1).getTrackingNumber());
-        assertEquals(anotherOrder.getDeliveryPrice(),orders.get(1).getDeliveryPrice());
-        assertEquals(anotherOrder.getTotalPrice(),orders.get(1).getTotalPrice());
-        assertEquals(anotherOrder.getWeightKg(),orders.get(1).getWeightKg());
-        assertEquals(anotherOrder.getSize(),orders.get(1).getSize());
-        assertEquals(anotherOrder.getOrderConfirmedTime(),orders.get(1).getOrderConfirmedTime());
-        assertEquals(anotherOrder.getOrderDeliveredTime(),orders.get(1).getOrderDeliveredTime());
+        Order savedOrder = orders.get(0);
+        assertEquals(order,savedOrder);
+
+        Order savedAnotherOrder = orders.get(1);
+        assertEquals(anotherOrder,savedAnotherOrder);
 
         Page<Order> ordersAnotherPage = orderRepository.findAllByStoreId(store.getId(), PageRequest.of(1,5));
         assertTrue(ordersAnotherPage.isEmpty());
@@ -187,7 +156,6 @@ public class OrderRepositoryTest {
         order.setId(orderRepository.save(order).getId());
 
         Order orderTwo = new Order();
-        orderTwo.setId(2L);
         orderTwo.setOrderId("orderId1234");
         orderTwo.setStatus(Order.Status.SHIPPED);
         orderTwo.setStore(store);
@@ -228,41 +196,14 @@ public class OrderRepositoryTest {
         assertEquals(2,unassignedOrders.getTotalElements());
 
         List<Order> orders = unassignedOrders.getContent();
-        assertEquals(order.getId(),orders.get(0).getId());
-        assertEquals(order.getOrderId(),orders.get(0).getOrderId());
-        assertEquals(order.getStatus(),orders.get(0).getStatus());
-        assertEquals(order.getStore().getId(),orders.get(0).getStore().getId());
-        assertNull(order.getCourier());
-        assertEquals(order.getCountry(),orders.get(0).getCountry());
-        assertEquals(order.getCity(),orders.get(0).getCity());
-        assertEquals(order.getAddress(),orders.get(0).getAddress());
-        assertEquals(order.getPhone(),orders.get(0).getPhone());
-        assertEquals(order.getZipCode(),orders.get(0).getZipCode());
-        assertEquals(order.getFullName(),orders.get(0).getFullName());
-        assertEquals(order.getTrackingNumber(),orders.get(0).getTrackingNumber());
-        assertEquals(order.getDeliveryPrice(),orders.get(0).getDeliveryPrice());
-        assertEquals(order.getTotalPrice(),orders.get(0).getTotalPrice());
-        assertEquals(order.getWeightKg(),orders.get(0).getWeightKg());
-        assertEquals(order.getSize(),orders.get(0).getSize());
-        assertEquals(order.getOrderConfirmedTime(),orders.get(0).getOrderConfirmedTime());
 
-        assertEquals(orderTwo.getId(),orders.get(1).getId());
-        assertEquals(orderTwo.getOrderId(),orders.get(1).getOrderId());
-        assertEquals(orderTwo.getStatus(),orders.get(1).getStatus());
-        assertEquals(orderTwo.getStore().getId(),orders.get(1).getStore().getId());
-        assertNull(orderTwo.getCourier());
-        assertEquals(orderTwo.getCountry(),orders.get(1).getCountry());
-        assertEquals(orderTwo.getCity(),orders.get(1).getCity());
-        assertEquals(orderTwo.getAddress(),orders.get(1).getAddress());
-        assertEquals(orderTwo.getPhone(),orders.get(1).getPhone());
-        assertEquals(orderTwo.getZipCode(),orders.get(1).getZipCode());
-        assertEquals(orderTwo.getFullName(),orders.get(1).getFullName());
-        assertEquals(orderTwo.getTrackingNumber(),orders.get(1).getTrackingNumber());
-        assertEquals(orderTwo.getDeliveryPrice(),orders.get(1).getDeliveryPrice());
-        assertEquals(orderTwo.getTotalPrice(),orders.get(1).getTotalPrice());
-        assertEquals(orderTwo.getWeightKg(),orders.get(1).getWeightKg());
-        assertEquals(orderTwo.getSize(),orders.get(1).getSize());
-        assertEquals(orderTwo.getOrderConfirmedTime(),orders.get(1).getOrderConfirmedTime());
+        Order savedOrder = orders.get(0);
+        assertEquals(order,savedOrder);
+        assertNull(savedOrder.getCourier());
+
+        Order savedOrderTwo = orders.get(1);
+        assertEquals(orderTwo,savedOrderTwo);
+        assertNull(savedOrderTwo.getCourier());
     }
     @Test
     void testFindAllByCourierIsNullWhenAllOrdersAssigned() {
@@ -430,63 +371,18 @@ public class OrderRepositoryTest {
 
         List<Order> courierOrders = ordersPage.getContent();
 
-        assertEquals(order.getId(),courierOrders.get(0).getId());
-        assertEquals(order.getOrderId(),courierOrders.get(0).getOrderId());
-        assertEquals(order.getStatus(),courierOrders.get(0).getStatus());
-        assertEquals(order.getStore().getId(),courierOrders.get(0).getStore().getId());
-        assertEquals(order.getCourier().getId(),courierOrders.get(0).getCourier().getId());
-        assertEquals(order.getCountry(),courierOrders.get(0).getCountry());
-        assertEquals(order.getCity(),courierOrders.get(0).getCity());
-        assertEquals(order.getAddress(),courierOrders.get(0).getAddress());
-        assertEquals(order.getPhone(),courierOrders.get(0).getPhone());
-        assertEquals(order.getZipCode(),courierOrders.get(0).getZipCode());
-        assertEquals(order.getFullName(),courierOrders.get(0).getFullName());
-        assertEquals(order.getTrackingNumber(),courierOrders.get(0).getTrackingNumber());
-        assertEquals(order.getDeliveryPrice(),courierOrders.get(0).getDeliveryPrice());
-        assertEquals(order.getTotalPrice(),courierOrders.get(0).getTotalPrice());
-        assertEquals(order.getWeightKg(),courierOrders.get(0).getWeightKg());
-        assertEquals(order.getSize(),courierOrders.get(0).getSize());
-        assertEquals(order.getOrderConfirmedTime(),courierOrders.get(0).getOrderConfirmedTime());
+        Order savedOrder = courierOrders.get(0);
+        assertEquals(order,savedOrder);
 
-        assertEquals(orderTwo.getId(),courierOrders.get(1).getId());
-        assertEquals(orderTwo.getOrderId(),courierOrders.get(1).getOrderId());
-        assertEquals(orderTwo.getStatus(),courierOrders.get(1).getStatus());
-        assertEquals(orderTwo.getStore().getId(),courierOrders.get(1).getStore().getId());
-        assertEquals(order.getCourier().getId(),courierOrders.get(1).getCourier().getId());
-        assertEquals(orderTwo.getCountry(),courierOrders.get(1).getCountry());
-        assertEquals(orderTwo.getCity(),courierOrders.get(1).getCity());
-        assertEquals(orderTwo.getAddress(),courierOrders.get(1).getAddress());
-        assertEquals(orderTwo.getPhone(),courierOrders.get(1).getPhone());
-        assertEquals(orderTwo.getZipCode(),courierOrders.get(1).getZipCode());
-        assertEquals(orderTwo.getFullName(),courierOrders.get(1).getFullName());
-        assertEquals(orderTwo.getTrackingNumber(),courierOrders.get(1).getTrackingNumber());
-        assertEquals(orderTwo.getDeliveryPrice(),courierOrders.get(1).getDeliveryPrice());
-        assertEquals(orderTwo.getTotalPrice(),courierOrders.get(1).getTotalPrice());
-        assertEquals(orderTwo.getWeightKg(),courierOrders.get(1).getWeightKg());
-        assertEquals(orderTwo.getSize(),courierOrders.get(1).getSize());
-        assertEquals(orderTwo.getOrderConfirmedTime(),courierOrders.get(1).getOrderConfirmedTime());
+        Order savedOrderTwo = courierOrders.get(1);
+        assertEquals(orderTwo,savedOrderTwo);
 
         Page<Order> anotherOrdersPage = orderRepository.findAllByCourierId(anotherCourier.getId(),PageRequest.of(0,5));
         assertEquals(1,anotherOrdersPage.getTotalElements());
         List<Order> anotherCourierOrders = anotherOrdersPage.getContent();
-        assertEquals(anotherOrder.getId(),anotherCourierOrders.get(0).getId());
-        assertEquals(anotherOrder.getOrderId(),anotherCourierOrders.get(0).getOrderId());
-        assertEquals(anotherOrder.getStatus(),anotherCourierOrders.get(0).getStatus());
-        assertEquals(anotherOrder.getStore().getId(),anotherCourierOrders.get(0).getStore().getId());
-        assertEquals(anotherOrder.getCourier().getId(),anotherCourierOrders.get(0).getCourier().getId());
-        assertEquals(anotherOrder.getCountry(),anotherCourierOrders.get(0).getCountry());
-        assertEquals(anotherOrder.getCity(),anotherCourierOrders.get(0).getCity());
-        assertEquals(anotherOrder.getAddress(),anotherCourierOrders.get(0).getAddress());
-        assertEquals(anotherOrder.getPhone(),anotherCourierOrders.get(0).getPhone());
-        assertEquals(anotherOrder.getZipCode(),anotherCourierOrders.get(0).getZipCode());
-        assertEquals(anotherOrder.getFullName(),anotherCourierOrders.get(0).getFullName());
-        assertEquals(anotherOrder.getTrackingNumber(),anotherCourierOrders.get(0).getTrackingNumber());
-        assertEquals(anotherOrder.getDeliveryPrice(),anotherCourierOrders.get(0).getDeliveryPrice());
-        assertEquals(anotherOrder.getTotalPrice(),anotherCourierOrders.get(0).getTotalPrice());
-        assertEquals(anotherOrder.getWeightKg(),anotherCourierOrders.get(0).getWeightKg());
-        assertEquals(anotherOrder.getSize(),anotherCourierOrders.get(0).getSize());
-        assertEquals(anotherOrder.getOrderConfirmedTime(),anotherCourierOrders.get(0).getOrderConfirmedTime());
-        assertEquals(anotherOrder.getOrderDeliveredTime(),anotherCourierOrders.get(0).getOrderDeliveredTime());
+
+        Order savedAnotherOrder = anotherCourierOrders.get(0);
+        assertEquals(anotherOrder,savedAnotherOrder);
     }
     @Test
     void testFindAllByInvalidCourierId() {

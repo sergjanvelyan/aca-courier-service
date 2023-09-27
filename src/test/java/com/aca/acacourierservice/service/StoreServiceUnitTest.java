@@ -79,7 +79,7 @@ public class StoreServiceUnitTest {
         PickupPoint pickupPoint = new PickupPoint();
         pickupPoint.setId(1L);
         pickupPoint.setCity("city");
-        pickupPoint.setZipCode(5004L);
+        pickupPoint.setZipCode("5004");
         pickupPoint.setCountry("country");
         pickupPoint.setAddress("some address");
         pickupPoint.setPhoneNumber("+123456789");

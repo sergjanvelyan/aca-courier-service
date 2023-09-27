@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
@@ -46,7 +48,6 @@ public class StatusUpdateTimeRepositoryTest {
         storeAdmin.setId(userRepository.save(storeAdmin).getId());
 
         Store store = new Store();
-        store.setId(1L);
         store.setName("Store Name");
         store.setAdmin(storeAdmin);
         store.setId(storeRepository.save(store).getId());
@@ -69,7 +70,6 @@ public class StatusUpdateTimeRepositoryTest {
         order.setId(orderRepository.save(order).getId());
 
         StatusUpdateTime firstStatusUpdateTime = new StatusUpdateTime();
-        firstStatusUpdateTime.setId(1L);
         firstStatusUpdateTime.setOrder(order);
         firstStatusUpdateTime.setUpdatedTo(Order.Status.DELIVERING);
         firstStatusUpdateTime.setUpdatedFrom(Order.Status.SHIPPED);
@@ -77,7 +77,6 @@ public class StatusUpdateTimeRepositoryTest {
         firstStatusUpdateTime.setId(statusUpdateTimeRepository.save(firstStatusUpdateTime).getId());
 
         StatusUpdateTime secondStatusUpdateTime = new StatusUpdateTime();
-        secondStatusUpdateTime.setId(2L);
         secondStatusUpdateTime.setOrder(order);
         secondStatusUpdateTime.setUpdatedTo(Order.Status.DELIVERED);
         secondStatusUpdateTime.setUpdatedFrom(Order.Status.DELIVERING);
@@ -87,7 +86,12 @@ public class StatusUpdateTimeRepositoryTest {
 
         List<StatusUpdateTime> statusUpdateTimes = statusUpdateTimeRepository.findAllByOrderId(order.getId());
         Assertions.assertThat(statusUpdateTimes.size()).isEqualTo(2);
-        Assertions.assertThat(statusUpdateTimes.get(1).getUpdatedFrom()).isEqualTo(statusUpdateTimes.get(0).getUpdatedTo());
+
+        StatusUpdateTime savedFirstStatusUpdateTime = statusUpdateTimes.get(0);
+        assertEquals(firstStatusUpdateTime,savedFirstStatusUpdateTime);
+
+        StatusUpdateTime savedSecondStatusUpdateTime = statusUpdateTimes.get(1);
+        assertEquals(secondStatusUpdateTime,savedSecondStatusUpdateTime);
     }
     @Test
     public void testFindAllByInvalidOrderId(){

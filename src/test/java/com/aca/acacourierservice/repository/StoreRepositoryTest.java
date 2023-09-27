@@ -51,7 +51,7 @@ public class StoreRepositoryTest {
 
         PickupPoint pickupPoint = new PickupPoint();
         pickupPoint.setCity("city");
-        pickupPoint.setZipCode(5004L);
+        pickupPoint.setZipCode("5004");
         pickupPoint.setCountry("country");
         pickupPoint.setAddress("some address");
         pickupPoint.setPhoneNumber("+123456789");
