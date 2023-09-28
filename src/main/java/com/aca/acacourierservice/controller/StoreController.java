@@ -9,6 +9,7 @@ import com.aca.acacourierservice.model.*;
 import com.aca.acacourierservice.service.OrderService;
 import com.aca.acacourierservice.service.StoreService;
 import com.aca.acacourierservice.service.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -61,10 +62,7 @@ public class StoreController {
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Status> registerStore(@RequestBody StoreJson storeJson) {
         try {
-            User admin = storeJson.getAdmin();
-            admin.setRole(User.Role.ROLE_STORE_ADMIN);
-            userService.saveUser(admin);
-            long id = storeService.addStore(storeJson);
+            long id = storeService.addStoreAndAdmin(storeJson);
             return new ResponseEntity<>(new StatusWithId("Store registered", id), HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -87,17 +85,14 @@ public class StoreController {
     @Secured("ROLE_ADMIN")
     @PutMapping(value = "/{storeId}/admin/update", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Status> updateStoreAdmin(@RequestBody UserJson admin, @PathVariable long storeId) {
-        Store store = storeService.getStoreById(storeId);
-        admin.setRole(User.Role.ROLE_STORE_ADMIN);
-        User adminEntity = store.getAdmin();
         try {
-            userService.updateUser(admin, adminEntity);
+            long adminId = storeService.changeStoreAdmin(admin,storeId).getId();
+            return new ResponseEntity<>(new StatusWithId("Store admin updated", adminId), HttpStatus.OK);
         } catch (CourierServiceException e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(new Status("Store admin updated"), HttpStatus.OK);
     }
 
     @Secured("ROLE_ADMIN")
@@ -106,7 +101,7 @@ public class StoreController {
         try {
             storeService.deleteStoreById(storeId);
         } catch (CourierServiceException e) {
-            return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new StatusWithId(e.getMessage(), storeId), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -119,8 +114,6 @@ public class StoreController {
         Page<Order> orderPage;
         try {
             orderPage = orderService.getOrdersByStoreId(storeId, pageInfo.getPage(), pageInfo.getCount());
-        } catch (CourierServiceException e) {
-            return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }

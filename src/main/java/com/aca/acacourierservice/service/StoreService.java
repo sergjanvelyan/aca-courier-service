@@ -76,6 +76,22 @@ public class StoreService {
     }
 
     @Transactional
+    public long addStoreAndAdmin(StoreJson storeJson) {
+        Store store = storeConverter.convertToEntity(storeJson);
+        if (store.getPickupPoints() != null) {
+            for (PickupPoint pickupPoint : store.getPickupPoints()) {
+                pickupPoint.setStore(store);
+                pickupPointRepository.save(pickupPoint);
+            }
+        }
+        User admin = storeJson.getAdmin();
+        admin.setRole(User.Role.ROLE_STORE_ADMIN);
+        userService.saveUser(admin);
+        storeRepository.save(store);
+        return store.getId();
+    }
+
+    @Transactional
     public void updateStore(long id, StoreJson storeJson) throws CourierServiceException {
         Store store = getStoreById(id);
         if (storeJson.getName() != null) {
@@ -100,6 +116,14 @@ public class StoreService {
         storeRepository.save(store);
     }
 
+    public User changeStoreAdmin(UserJson admin, long storeId) throws CourierServiceException{
+        Store store = getStoreById(storeId);
+        admin.setRole(User.Role.ROLE_STORE_ADMIN);
+        store.setAdmin(userService.saveUser(admin));
+        storeRepository.save(store);
+        return store.getAdmin();
+    }
+
     @Transactional
     public void addPickupPoints(long id, List<PickupPoint> pickupPoints) {
         Store store = getStoreById(id);
@@ -121,7 +145,7 @@ public class StoreService {
     @Transactional
     public void deleteStoreById(long id) throws CourierServiceException {
         if (!storeRepository.existsById(id)) {
-            throw new CourierServiceException("There is no store with id=" + id+":");
+            throw new CourierServiceException("There is no store");
         }
         storeRepository.deleteById(id);
     }
