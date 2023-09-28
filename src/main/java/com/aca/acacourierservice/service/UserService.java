@@ -42,42 +42,56 @@ public class UserService {
         return userOptional.get();
     }
     @Transactional
-    public UserJson saveUser(UserJson model) {
+    public User saveUser(UserJson model) throws CourierServiceException{
+        if(userRepository.existsByEmail(model.getEmail())) {
+            throw new CourierServiceException("This email is already in use");
+        }
         User user = userConverter.convertToEntity(model);
         user.setPassword(passwordEncoder.encode(model.getPassword()));
-        return userConverter.convertToModel(userRepository.save(user));
+        return userRepository.save(user);
     }
 
     @Transactional
-    public UserJson saveUser(User entity) {
+    public User saveUser(User entity) {
+        if(userRepository.existsByEmail(entity.getEmail())) {
+            throw new CourierServiceException("This email is already in use");
+        }
         entity.setPassword(passwordEncoder.encode(entity.getPassword()));
-        return userConverter.convertToModel(userRepository.save(entity));
+        return userRepository.save(entity);
     }
 
     @Transactional
     public void updateUser(UserJson model, long userId) throws CourierServiceException {
         User entity = getUserById(userId);
+        String email = entity.getEmail();
         User.Role role = entity.getRole();
+
         entity.setPassword(passwordEncoder.encode(model.getPassword()));
         entity = userConverter.convertToEntity(model, entity);
         entity.setRole(role);
+        entity.setEmail(email);
         userRepository.save(entity);
     }
     @Transactional
     public void updateUser(UserJson model, String email) throws CourierServiceException {
         User entity = getUserByEmail(email);
         User.Role role = entity.getRole();
+
         entity = userConverter.convertToEntity(model, entity);
         entity.setPassword(passwordEncoder.encode(model.getPassword()));
         entity.setRole(role);
+        entity.setEmail(email);
         userRepository.save(entity);
     }
     @Transactional
     public void updateUser(UserJson model, User entity) {
         User.Role role = entity.getRole();
+        String email = entity.getEmail();
+
         entity = userConverter.convertToEntity(model, entity);
         entity.setPassword(passwordEncoder.encode(model.getPassword()));
         entity.setRole(role);
+        entity.setEmail(email);
         userRepository.save(entity);
     }
 
