@@ -3,13 +3,10 @@ package com.aca.acacourierservice.controller;
 import com.aca.acacourierservice.converter.StoreConverter;
 import com.aca.acacourierservice.entity.Order;
 import com.aca.acacourierservice.entity.Store;
-import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.exception.CourierServiceException;
 import com.aca.acacourierservice.model.*;
 import com.aca.acacourierservice.service.OrderService;
 import com.aca.acacourierservice.service.StoreService;
-import com.aca.acacourierservice.service.UserService;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -25,14 +22,12 @@ import java.util.List;
 public class StoreController {
     private final StoreService storeService;
     private final StoreConverter storeConverter;
-    private final UserService userService;
     private final OrderService orderService;
 
     @Autowired
-    public StoreController(StoreService storeService, StoreConverter storeConverter, UserService userService, OrderService orderService) {
+    public StoreController(StoreService storeService, StoreConverter storeConverter, OrderService orderService) {
         this.storeService = storeService;
         this.storeConverter = storeConverter;
-        this.userService = userService;
         this.orderService = orderService;
     }
 
