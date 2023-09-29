@@ -19,11 +19,13 @@ import java.util.Optional;
 public class PickupPointService {
     private final PickupPointRepository pickupPointRepository;
     private final PickupPointConverter pickupPointConverter;
+    private final StoreService storeService;
 
     @Autowired
-    public PickupPointService(PickupPointRepository pickupPointRepository, PickupPointConverter pickupPointConverter) {
+    public PickupPointService(PickupPointRepository pickupPointRepository, PickupPointConverter pickupPointConverter, StoreService storeService) {
         this.pickupPointRepository = pickupPointRepository;
         this.pickupPointConverter = pickupPointConverter;
+        this.storeService = storeService;
     }
 
     public List<PickupPointJson> findAll() {
@@ -40,7 +42,7 @@ public class PickupPointService {
     public PickupPoint getPickupPointById(long id) throws CourierServiceException {
         Optional<PickupPoint> pickupPointOptional = pickupPointRepository.findById(id);
         if (pickupPointOptional.isEmpty()) {
-            throw new CourierServiceException("There is no pickup point with id="+id+":");
+            throw new CourierServiceException("Pickup point not found");
         }
         return pickupPointOptional.get();
     }
@@ -52,28 +54,27 @@ public class PickupPointService {
         return pickupPointsPage.getContent();
     }
 
-    public PickupPoint modifyPickupPoint(long id, PickupPointJson pickupPointJson) throws CourierServiceException {
-        Optional<PickupPoint> pickupPointOptional = pickupPointRepository.findById(id);
+    public PickupPoint modifyPickupPoint(long id, String email, PickupPointJson pickupPointJson) throws CourierServiceException {
+        Optional<PickupPoint> pickupPointOptional = pickupPointRepository.findByIdAndStore_Admin_Email(id,email);
         if (pickupPointOptional.isEmpty()) {
-            throw new CourierServiceException("There is no pickup point with id="+id+":");
+            throw new CourierServiceException("Pickup point for this store not found");
         }
         PickupPoint pickupPoint = pickupPointOptional.get();
         pickupPoint = pickupPointConverter.convertToEntity(pickupPointJson, pickupPoint);
-        pickupPointRepository.save(pickupPoint);
-        return pickupPoint;
+        return pickupPointRepository.save(pickupPoint);
     }
 
     @Transactional
-    public long addPickupPoint(PickupPointJson pickupPointJson) {
+    public PickupPoint addPickupPoint(PickupPointJson pickupPointJson) throws CourierServiceException{
         PickupPoint pickupPoint = pickupPointConverter.convertToEntity(pickupPointJson);
-        pickupPointRepository.save(pickupPoint);
-        return pickupPoint.getId();
+        pickupPoint.setStore(storeService.getStoreById(pickupPointJson.getStoreId()));
+        return pickupPointRepository.save(pickupPoint);
     }
 
     @Transactional
-    public void deletePickupPoint(long id) throws CourierServiceException {
-        if (!pickupPointRepository.existsById(id)) {
-            throw new CourierServiceException("There is no pickup point with id="+id+":");
+    public void deletePickupPoint(long id, String email) throws CourierServiceException {
+        if (!pickupPointRepository.existsByIdAndStore_Admin_Email(id,email)) {
+            throw new CourierServiceException("Pickup point for this store not found");
         }
         pickupPointRepository.deleteById(id);
     }

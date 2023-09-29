@@ -51,8 +51,11 @@ public class OrderService{
     @Transactional
     public void updateOrderStatus(long id,Order.Status status,String additionalInfo) throws CourierServiceException {
         Order order = getOrderById(id);
+        if(order.getCourier()==null){
+            throw new CourierServiceException("Can't update unassigned order status");
+        }
         if(order.getStatus()==status){
-            throw new CourierServiceException("Can't update to same status(status="+status+")");
+            throw new CourierServiceException("Can't update to same status");
         }
         StatusUpdateTimeJson statusUpdateTimeJson = new StatusUpdateTimeJson();
         statusUpdateTimeJson.setOrderId(id);
@@ -73,16 +76,16 @@ public class OrderService{
         try{
             order = getOrderById(orderId);
         }catch (CourierServiceException e){
-            throw new CourierServiceException("Can't assign nonexistent order(id="+orderId+") to courier:");
+            throw new CourierServiceException("Can't assign nonexistent order to courier");
         }
         User courier;
         try {
             courier = userService.getUserById(courierId);
         }catch (CourierServiceException e){
-            throw new CourierServiceException("Can't assign order to nonexistent courier(id="+courierId+"):");
+            throw new CourierServiceException("Can't assign order to nonexistent courier");
         }
         if(courier.getRole()!= User.Role.ROLE_COURIER){
-            throw new CourierServiceException("Can't assign order(id="+orderId+") to a user other than courier:");
+            throw new CourierServiceException("Can't assign order(id="+orderId+") to a user other than courier");
         }
             order.setCourier(courier);
         orderRepository.save(order);
@@ -90,7 +93,7 @@ public class OrderService{
     public Order getOrderById(long id) throws CourierServiceException {
         Optional<Order> orderOptional = orderRepository.findById(id);
         if (orderOptional.isEmpty()){
-            throw new CourierServiceException("There is no order with id="+id+":");
+            throw new CourierServiceException("Order not found");
         }
         return orderOptional.get();
     }

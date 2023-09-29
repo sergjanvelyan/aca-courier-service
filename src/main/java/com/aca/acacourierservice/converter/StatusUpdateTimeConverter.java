@@ -41,11 +41,4 @@ public class StatusUpdateTimeConverter implements Converter<StatusUpdateTime, St
         }
         return statusUpdateTimeJsonList;
     }
-    public List<StatusUpdateTime> convertToListEntity(List<StatusUpdateTimeJson> statusUpdateTimeListJson){
-        List<StatusUpdateTime> statusUpdateTimeList = new ArrayList<>();
-        for (StatusUpdateTimeJson statusUpdateTime:statusUpdateTimeListJson) {
-            statusUpdateTimeList.add(convertToEntity(statusUpdateTime));
-        }
-        return statusUpdateTimeList;
-    }
 }

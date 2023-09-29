@@ -112,37 +112,4 @@ class StatusUpdateTimeConverterTest {
         assertEquals(entityTwo.getAdditionalInfo(),modelTwo.getAdditionalInfo());
         assertEquals(entityTwo.getOrder().getId(),modelTwo.getOrderId());
     }
-
-    @Test
-    void testConvertToListEntity() {
-        StatusUpdateTimeJson modelOne = new StatusUpdateTimeJson();
-        modelOne.setUpdatedTo(Order.Status.DELIVERING);
-        modelOne.setUpdatedFrom(Order.Status.SHIPPED);
-        modelOne.setUpdateTime(LocalDateTime.of(2023, Month.AUGUST,29,1,30,56));
-        modelOne.setAdditionalInfo("Additional info");
-
-        StatusUpdateTimeJson modelTwo = new StatusUpdateTimeJson();
-        modelTwo.setUpdatedTo(Order.Status.DELIVERED);
-        modelTwo.setUpdatedFrom(Order.Status.DELIVERING);
-        modelTwo.setUpdateTime(LocalDateTime.of(2023, Month.AUGUST,30,1,30,56));
-        modelTwo.setAdditionalInfo("Additional info");
-
-        List<StatusUpdateTime> listEntity = statusUpdateTimeConverter.convertToListEntity(Arrays.asList(modelOne,modelTwo));
-
-        assertEquals(2,listEntity.size());
-
-        StatusUpdateTime entityOne = listEntity.get(0);
-
-        assertEquals(modelOne.getUpdateTime(),entityOne.getUpdateTime());
-        assertEquals(modelOne.getUpdatedTo(),entityOne.getUpdatedTo());
-        assertEquals(modelOne.getUpdatedFrom(),entityOne.getUpdatedFrom());
-        assertEquals(modelOne.getAdditionalInfo(),entityOne.getAdditionalInfo());
-
-        StatusUpdateTime entityTwo = listEntity.get(1);
-
-        assertEquals(modelTwo.getUpdateTime(),entityTwo.getUpdateTime());
-        assertEquals(modelTwo.getUpdatedTo(),entityTwo.getUpdatedTo());
-        assertEquals(modelTwo.getUpdatedFrom(),entityTwo.getUpdatedFrom());
-        assertEquals(modelTwo.getAdditionalInfo(),entityTwo.getAdditionalInfo());
-    }
 }

@@ -7,6 +7,7 @@ import com.aca.acacourierservice.exception.CourierServiceException;
 import com.aca.acacourierservice.model.PageInfo;
 import com.aca.acacourierservice.model.PickupPointJson;
 import com.aca.acacourierservice.model.Status;
+import com.aca.acacourierservice.model.StatusWithId;
 import com.aca.acacourierservice.service.PickupPointService;
 import com.aca.acacourierservice.service.StoreService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +42,8 @@ public class PickupPointRestController {
             Store store = storeService.getStoreByAdminUsername(username);
             long storeId = store.getId();
             pickupPointJson.setStoreId(storeId);
-            pickupPointService.addPickupPoint(pickupPointJson);
-            return ResponseEntity.ok().body(new Status("Created"));
+            long pickupPointId = pickupPointService.addPickupPoint(pickupPointJson).getId();
+            return  new ResponseEntity<>(new StatusWithId("Created",pickupPointId),HttpStatus.OK);
         }catch (CourierServiceException e){
             return new ResponseEntity<>(new Status(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -56,7 +57,7 @@ public class PickupPointRestController {
             PickupPointJson pickupPointJson = pickupPointConverter.convertToModel(pickupPoint);
             return new ResponseEntity<>(pickupPointJson,HttpStatus.OK);
         }catch (CourierServiceException e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Status(e.getMessage()),HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -71,29 +72,33 @@ public class PickupPointRestController {
             List<PickupPointJson> pickupPointJsons = pickupPointConverter.convertToModelList(pickupPointList);
             return new ResponseEntity<>(pickupPointJsons,HttpStatus.OK);
         }catch (CourierServiceException e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new Status(e.getMessage()),HttpStatus.NO_CONTENT);
         }
     }
 
     @PutMapping("/{pickupPointId}")
     @Secured("ROLE_STORE_ADMIN")
-    public ResponseEntity<?> putPickupPointById(@PathVariable Long pickupPointId, @RequestBody PickupPointJson pickupPointJson) {
+    public ResponseEntity<Status> putPickupPointById(@PathVariable Long pickupPointId, @RequestBody PickupPointJson pickupPointJson) {
         try{
-            pickupPointService.modifyPickupPoint(pickupPointId,pickupPointJson);
-            return new ResponseEntity<>("Pickup point updated:",HttpStatus.OK);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            pickupPointService.modifyPickupPoint(pickupPointId,username,pickupPointJson);
+            return new ResponseEntity<>(new Status("Pickup point updated"),HttpStatus.OK);
         }catch (CourierServiceException e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Status(e.getMessage()),HttpStatus.BAD_REQUEST);
         }
     }
 
     @DeleteMapping("/{id}")
     @Secured("ROLE_STORE_ADMIN")
-    public ResponseEntity<String> deletePickupPointById(@PathVariable Long id) {
+    public ResponseEntity<Status> deletePickupPointById(@PathVariable Long id) {
         try {
-            pickupPointService.deletePickupPoint(id);
-            return new ResponseEntity<>("Pickup point deleted:", HttpStatus.OK);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            pickupPointService.deletePickupPoint(id,username);
+            return new ResponseEntity<>(new Status("Pickup point deleted"), HttpStatus.OK);
         } catch (CourierServiceException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Status(e.getMessage()),HttpStatus.BAD_REQUEST);
         }
     }
 }

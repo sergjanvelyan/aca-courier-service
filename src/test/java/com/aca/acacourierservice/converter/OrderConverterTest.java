@@ -32,14 +32,7 @@ public class OrderConverterTest {
     private OrderConverter orderConverter;
     @Test
     void testConvertToEntityWithEntity() {
-        StatusUpdateTime statusUpdateTime = new StatusUpdateTime();
-        statusUpdateTime.setAdditionalInfo("statusUpdateTime");
-        StatusUpdateTime secondStatusUpdateTime = new StatusUpdateTime();
-        secondStatusUpdateTime.setAdditionalInfo("secondStatusUpdateTime");
-        List<StatusUpdateTime> statusUpdateTimeList = Arrays.asList(statusUpdateTime,secondStatusUpdateTime);
-        when(statusUpdateTimeConverter.convertToListEntity(anyList())).thenReturn(statusUpdateTimeList);
-
-        OrderJson model = new OrderJson();
+       OrderJson model = new OrderJson();
         model.setOrderId("orderId1234");
         model.setStatus(Order.Status.SHIPPED);
         model.setCountry("Armenia");
@@ -55,7 +48,6 @@ public class OrderConverterTest {
         model.setSize(Order.Size.MEDIUM);
         model.setOrderConfirmedTime(LocalDateTime.of(2023, Month.SEPTEMBER,6,14,40,26));
         model.setOrderDeliveredTime(LocalDateTime.of(2023, Month.SEPTEMBER,15,15,0));
-        model.setStatusUpdateHistory(Arrays.asList(new StatusUpdateTimeJson(),new StatusUpdateTimeJson()));
 
         Order entity = new Order();
         orderConverter.convertToEntity(model,entity);
@@ -75,18 +67,10 @@ public class OrderConverterTest {
         assertEquals(model.getSize(),entity.getSize());
         assertEquals(model.getOrderConfirmedTime(),entity.getOrderConfirmedTime());
         assertEquals(model.getOrderDeliveredTime(),entity.getOrderDeliveredTime());
-        assertEquals(statusUpdateTimeList,entity.getStatusUpdateTimeList());
     }
 
     @Test
     void testConvertToEntityWithoutEntity() {
-        StatusUpdateTime statusUpdateTime = new StatusUpdateTime();
-        statusUpdateTime.setAdditionalInfo("statusUpdateTime");
-        StatusUpdateTime secondStatusUpdateTime = new StatusUpdateTime();
-        secondStatusUpdateTime.setAdditionalInfo("secondStatusUpdateTime");
-        List<StatusUpdateTime> statusUpdateTimeList = Arrays.asList(statusUpdateTime,secondStatusUpdateTime);
-        when(statusUpdateTimeConverter.convertToListEntity(anyList())).thenReturn(statusUpdateTimeList);
-
         OrderJson model = new OrderJson();
         model.setOrderId("orderId1234");
         model.setStatus(Order.Status.SHIPPED);
@@ -103,7 +87,6 @@ public class OrderConverterTest {
         model.setSize(Order.Size.MEDIUM);
         model.setOrderConfirmedTime(LocalDateTime.of(2023, Month.SEPTEMBER,6,14,40,26));
         model.setOrderDeliveredTime(LocalDateTime.of(2023, Month.SEPTEMBER,15,15,0));
-        model.setStatusUpdateHistory(Arrays.asList(new StatusUpdateTimeJson(),new StatusUpdateTimeJson()));
 
         Order entity = orderConverter.convertToEntity(model);
 
@@ -122,7 +105,6 @@ public class OrderConverterTest {
         assertEquals(model.getSize(),entity.getSize());
         assertEquals(model.getOrderConfirmedTime(),entity.getOrderConfirmedTime());
         assertEquals(model.getOrderDeliveredTime(),entity.getOrderDeliveredTime());
-        assertEquals(statusUpdateTimeList,entity.getStatusUpdateTimeList());
     }
 
     @Test

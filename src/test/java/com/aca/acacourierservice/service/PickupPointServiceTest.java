@@ -52,26 +52,9 @@ public class PickupPointServiceTest {
         when(pickupPointConverter.convertToEntity(pickupPointJson)).thenReturn(pickupPoint);
         when(pickupPointRepository.save(pickupPoint)).thenReturn(pickupPoint);
 
-        long resultId = pickupPointService.addPickupPoint(pickupPointJson);
+        long resultId = pickupPointService.addPickupPoint(pickupPointJson).getId();
 
         assertEquals(pickupPoint.getId(), resultId);
-    }
-
-    @Test
-    public void testDeletePickupPoint_ExistingId() {
-        long id = 1L;
-        when(pickupPointRepository.existsById(id)).thenReturn(true);
-
-        assertDoesNotThrow(() -> pickupPointService.deletePickupPoint(id));
-        verify(pickupPointRepository, times(1)).deleteById(id);
-    }
-
-    @Test
-    public void testDeletePickupPoint_NonExistingId() {
-        long id = 1L;
-        when(pickupPointRepository.existsById(id)).thenReturn(false);
-
-        assertThrows(CourierServiceException.class, () -> pickupPointService.deletePickupPoint(id));
     }
 }
 

@@ -34,7 +34,6 @@ public class OrderConverter implements Converter<Order, OrderJson> {
         entity.setStatus(model.getStatus());
         entity.setOrderConfirmedTime(model.getOrderConfirmedTime());
         entity.setOrderDeliveredTime(model.getOrderDeliveredTime());
-        entity.setStatusUpdateTimeList(statusUpdateTimeConverter.convertToListEntity(model.getStatusUpdateHistory()));
         return entity;
     }
     @Override

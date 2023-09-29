@@ -33,8 +33,8 @@ public class OrderRestController {
         this.userService = userService;
     }
     @ExceptionHandler
-    public ResponseEntity<String> exceptionHandler(InvalidStoreCredentialsException exception){
-        return new ResponseEntity<>(exception.getMessage(),HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<Status> exceptionHandler(InvalidStoreCredentialsException e){
+        return new ResponseEntity<>(new Status(e.getMessage()),HttpStatus.UNAUTHORIZED);
     }
 
     @PostMapping(value = "/create")
@@ -52,7 +52,7 @@ public class OrderRestController {
             OrderJson orderJson = orderConverter.convertToModel(orderService.getOrderById(orderId));
             return new ResponseEntity<>(orderJson,HttpStatus.OK);
         }catch (CourierServiceException e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Status(e.getMessage()),HttpStatus.NOT_FOUND);
         }
     }
 
@@ -61,7 +61,7 @@ public class OrderRestController {
     public ResponseEntity<?> getUnassignedOrders(@RequestBody PageInfo pageInfo){
         Page<Order> orders =orderService.getUnassignedOrders(pageInfo.getPage(), pageInfo.getCount());
         if(orders.isEmpty()){
-            return new ResponseEntity<>("There is no unassigned orders:",HttpStatus.OK);
+            return new ResponseEntity<>(new Status("There is no unassigned orders"),HttpStatus.OK);
         }
         OrderListJson orderListJson = orderConverter.convertToListModel(orders);
         return new ResponseEntity<>(orderListJson,HttpStatus.OK);
@@ -72,7 +72,7 @@ public class OrderRestController {
     public ResponseEntity<?> getOrders(@RequestBody PageInfo pageInfo){
         Page<Order> orders = orderService.getOrders(pageInfo.getPage(), pageInfo.getCount());
         if(orders.isEmpty()){
-            return new ResponseEntity<>("There is no orders:",HttpStatus.OK);
+            return new ResponseEntity<>(new Status("There is no orders"),HttpStatus.OK);
         }
         OrderListJson orderListJson = orderConverter.convertToListModel(orders);
         return new ResponseEntity<>(orderListJson,HttpStatus.OK);
@@ -83,9 +83,9 @@ public class OrderRestController {
     public ResponseEntity<?>  updateOrderStatus(@PathVariable long orderId, @RequestBody StatusInfoJson statusInfoJson){
         try{
             orderService.updateOrderStatus(orderId,statusInfoJson.getStatus(),statusInfoJson.getAdditionalInfo());
-            return new ResponseEntity<>("Order(id="+orderId+") status updated:",HttpStatus.OK);
+            return new ResponseEntity<>(new Status("Order status updated"),HttpStatus.OK);
         }catch (CourierServiceException e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Status(e.getMessage()),HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -99,12 +99,12 @@ public class OrderRestController {
             long courierId = courier.getId();
             Page<Order> courierOrders = orderService.getOrdersByCourierId(courierId,pageInfo.getPage(), pageInfo.getCount());
             if(courierOrders.isEmpty()){
-                return new ResponseEntity<>("There is no orders assigned to you:",HttpStatus.OK);
+                return new ResponseEntity<>(new Status("There is no orders assigned to you"),HttpStatus.OK);
             }
             OrderListJson orderListJson = orderConverter.convertToListModel(courierOrders);
             return new ResponseEntity<>(orderListJson,HttpStatus.OK);
         }catch (CourierServiceException e){
-            return new ResponseEntity<>("Not found",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Status("Not found"),HttpStatus.NOT_FOUND);
         }
     }
 
@@ -114,9 +114,9 @@ public class OrderRestController {
         try{
             orderService.assignCourierToOrder(orderId,courierId);
         }catch (CourierServiceException e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Status(e.getMessage()),HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>("Order(id="+orderId+") assigned to courier(id="+courierId+"):",HttpStatus.OK);
+        return new ResponseEntity<>(new Status("Order assigned to courier"),HttpStatus.OK);
     }
 
     @PutMapping(value = "/{orderId}/assignToMe")
@@ -128,9 +128,9 @@ public class OrderRestController {
             User courier = userService.getUserByEmail(username);
             long courierId = courier.getId();
             orderService.assignCourierToOrder(orderId,courierId);
-            return new ResponseEntity<>("Order(id="+orderId+") assigned to you:",HttpStatus.OK);
+            return new ResponseEntity<>(new Status("Order assigned to you"),HttpStatus.OK);
         }catch (CourierServiceException e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Status(e.getMessage()),HttpStatus.BAD_REQUEST);
         }
     }
 }
