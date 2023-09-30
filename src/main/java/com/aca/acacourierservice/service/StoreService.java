@@ -39,7 +39,6 @@ public class StoreService {
         this.userConverter = userConverter;
         this.pickupPointConverter = pickupPointConverter;
     }
-
     public Store getStoreById(long storeId) throws CourierServiceException {
         Optional<Store> storeOptional = storeRepository.findById(storeId);
         if (storeOptional.isEmpty()) {
@@ -61,7 +60,6 @@ public class StoreService {
         }
         return storeOptional.get();
     }
-
     @Transactional
     public long addStore(StoreJson storeJson) {
         Store store = storeConverter.convertToEntity(storeJson);
@@ -74,7 +72,6 @@ public class StoreService {
         storeRepository.save(store);
         return store.getId();
     }
-
     @Transactional
     public long addStoreAndAdmin(StoreJson storeJson) {
         Store store = storeConverter.convertToEntity(storeJson);
@@ -90,7 +87,6 @@ public class StoreService {
         storeRepository.save(store);
         return store.getId();
     }
-
     @Transactional
     public void updateStore(long id, StoreJson storeJson) throws CourierServiceException {
         Store store = getStoreById(id);
@@ -115,7 +111,6 @@ public class StoreService {
         }
         storeRepository.save(store);
     }
-
     public User changeStoreAdmin(UserJson admin, long storeId) throws CourierServiceException{
         Store store = getStoreById(storeId);
         admin.setRole(User.Role.ROLE_STORE_ADMIN);
@@ -123,14 +118,6 @@ public class StoreService {
         storeRepository.save(store);
         return store.getAdmin();
     }
-
-    @Transactional
-    public void addPickupPoints(long id, List<PickupPoint> pickupPoints) {
-        Store store = getStoreById(id);
-        store.setPickupPoints(pickupPoints);
-        storeRepository.save(store);
-    }
-
     public List<StoreJson> listStoresByPage(int page, int count) {
         Page<Store> storePage = storeRepository.findAll(PageRequest.of(page, count));
         List<StoreJson> stores = new ArrayList<>();
@@ -141,7 +128,6 @@ public class StoreService {
         }
         return stores;
     }
-
     @Transactional
     public void deleteStoreById(long id) throws CourierServiceException {
         if (!storeRepository.existsById(id)) {

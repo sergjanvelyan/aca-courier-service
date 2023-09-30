@@ -11,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,18 +26,6 @@ public class PickupPointService {
         this.pickupPointConverter = pickupPointConverter;
         this.storeService = storeService;
     }
-
-    public List<PickupPointJson> findAll() {
-        List<PickupPoint> pickupPoints = pickupPointRepository.findAll();
-        List<PickupPointJson> pickupPointJsonList = new ArrayList<>();
-        pickupPoints.forEach(pickupPoint -> {
-            PickupPointJson pickupPointJson = pickupPointConverter.convertToModel(pickupPoint);
-            pickupPointJsonList.add(pickupPointJson);
-        });
-
-        return pickupPointJsonList;
-    }
-
     public PickupPoint getPickupPointById(long id) throws CourierServiceException {
         Optional<PickupPoint> pickupPointOptional = pickupPointRepository.findById(id);
         if (pickupPointOptional.isEmpty()) {
@@ -53,15 +40,14 @@ public class PickupPointService {
         }
         return pickupPointsPage.getContent();
     }
-
-    public PickupPoint modifyPickupPoint(long id, String email, PickupPointJson pickupPointJson) throws CourierServiceException {
+    public void modifyPickupPoint(long id, String email, PickupPointJson pickupPointJson) throws CourierServiceException {
         Optional<PickupPoint> pickupPointOptional = pickupPointRepository.findByIdAndStore_Admin_Email(id,email);
         if (pickupPointOptional.isEmpty()) {
             throw new CourierServiceException("Pickup point for this store not found");
         }
         PickupPoint pickupPoint = pickupPointOptional.get();
         pickupPoint = pickupPointConverter.convertToEntity(pickupPointJson, pickupPoint);
-        return pickupPointRepository.save(pickupPoint);
+        pickupPointRepository.save(pickupPoint);
     }
 
     @Transactional
@@ -70,7 +56,6 @@ public class PickupPointService {
         pickupPoint.setStore(storeService.getStoreById(pickupPointJson.getStoreId()));
         return pickupPointRepository.save(pickupPoint);
     }
-
     @Transactional
     public void deletePickupPoint(long id, String email) throws CourierServiceException {
         if (!pickupPointRepository.existsByIdAndStore_Admin_Email(id,email)) {

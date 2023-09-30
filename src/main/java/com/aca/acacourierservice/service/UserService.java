@@ -26,7 +26,6 @@ public class UserService {
         this.userConverter = userConverter;
         this.passwordEncoder = passwordEncoder;
     }
-
     public User getUserById(long id) throws CourierServiceException {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
@@ -50,26 +49,12 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(model.getPassword()));
         return userRepository.save(user);
     }
-
     @Transactional
-    public User saveUser(User entity) {
+    public void saveUser(User entity) {
         if(userRepository.existsByEmail(entity.getEmail())) {
             throw new CourierServiceException("This email is already in use");
         }
         entity.setPassword(passwordEncoder.encode(entity.getPassword()));
-        return userRepository.save(entity);
-    }
-
-    @Transactional
-    public void updateUser(UserJson model, long userId) throws CourierServiceException {
-        User entity = getUserById(userId);
-        String email = entity.getEmail();
-        User.Role role = entity.getRole();
-
-        entity.setPassword(passwordEncoder.encode(model.getPassword()));
-        entity = userConverter.convertToEntity(model, entity);
-        entity.setRole(role);
-        entity.setEmail(email);
         userRepository.save(entity);
     }
     @Transactional
@@ -93,14 +78,6 @@ public class UserService {
         entity.setRole(role);
         entity.setEmail(email);
         userRepository.save(entity);
-    }
-
-    @Transactional
-    public void deleteUserById(long id) throws CourierServiceException {
-        if (!userRepository.existsById(id)) {
-            throw new CourierServiceException("There is no user with id="+id+":");
-        }
-        userRepository.deleteById(id);
     }
     @Transactional
     public void deleteExistingUserById(long id) {
