@@ -86,4 +86,19 @@ class UserRepositoryTest {
         User savedAdmin = admins.get(0);
         assertEquals(admin,savedAdmin);
     }
+
+    @Test
+    void testExistsByEmail() {
+        User admin = new User();
+        admin.setEmail("admin@gmail.com");
+        admin.setPassword("admin");
+        admin.setRole(User.Role.ROLE_ADMIN);
+        admin.setId(userRepository.save(admin).getId());
+
+        assertTrue(userRepository.existsByEmail("admin@gmail.com"));
+    }
+    @Test
+    void testExistsByInvalidEmail() {
+        assertFalse(userRepository.existsByEmail("admin@gmail.com"));
+    }
 }

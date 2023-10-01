@@ -56,10 +56,10 @@ public class OrderRestController {
         }
     }
 
-    @GetMapping(value = "/list/unassigned")
+    @GetMapping(value = "/list/unassigned/page/{page}/count/{count}")
     @Secured({"ROLE_ADMIN","ROLE_COURIER"})
-    public ResponseEntity<?> getUnassignedOrders(@RequestBody PageInfo pageInfo){
-        Page<Order> orders =orderService.getUnassignedOrders(pageInfo.getPage(), pageInfo.getCount());
+    public ResponseEntity<?> getUnassignedOrders(@PathVariable int page, @PathVariable int count){
+        Page<Order> orders =orderService.getUnassignedOrders(page, count);
         if(orders.isEmpty()){
             return new ResponseEntity<>(new Status("There is no unassigned orders"),HttpStatus.OK);
         }
@@ -67,10 +67,10 @@ public class OrderRestController {
         return new ResponseEntity<>(orderListJson,HttpStatus.OK);
     }
 
-    @GetMapping(value = "/list")
+    @GetMapping(value = "/list/page/{page}/count/{count}")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<?> getOrders(@RequestBody PageInfo pageInfo){
-        Page<Order> orders = orderService.getOrders(pageInfo.getPage(), pageInfo.getCount());
+    public ResponseEntity<?> getOrders(@PathVariable int page, @PathVariable int count){
+        Page<Order> orders = orderService.getOrders(page, count);
         if(orders.isEmpty()){
             return new ResponseEntity<>(new Status("There is no orders"),HttpStatus.OK);
         }
@@ -89,15 +89,15 @@ public class OrderRestController {
         }
     }
 
-    @GetMapping(value = "/list/mine")
+    @GetMapping(value = "/list/mine/page/{page}/count/{count}")
     @Secured("ROLE_COURIER")
-    public ResponseEntity<?> getCourierOrders(@RequestBody PageInfo pageInfo){
+    public ResponseEntity<?> getCourierOrders(@PathVariable int page, @PathVariable int count){
         try{
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             User courier = userService.getUserByEmail(username);
             long courierId = courier.getId();
-            Page<Order> courierOrders = orderService.getOrdersByCourierId(courierId,pageInfo.getPage(), pageInfo.getCount());
+            Page<Order> courierOrders = orderService.getOrdersByCourierId(courierId,page, count);
             if(courierOrders.isEmpty()){
                 return new ResponseEntity<>(new Status("There is no orders assigned to you"),HttpStatus.OK);
             }

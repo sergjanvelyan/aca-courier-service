@@ -4,7 +4,6 @@ import com.aca.acacourierservice.converter.PickupPointConverter;
 import com.aca.acacourierservice.entity.PickupPoint;
 import com.aca.acacourierservice.entity.Store;
 import com.aca.acacourierservice.exception.CourierServiceException;
-import com.aca.acacourierservice.model.PageInfo;
 import com.aca.acacourierservice.model.PickupPointJson;
 import com.aca.acacourierservice.model.Status;
 import com.aca.acacourierservice.model.StatusWithId;
@@ -61,14 +60,14 @@ public class PickupPointRestController {
         }
     }
 
-    @GetMapping("/list")
+    @GetMapping("/list/page/{page}/count/{count}")
     @Secured("ROLE_STORE_ADMIN")
-    public ResponseEntity<?> getPickupPointList(@RequestBody PageInfo pageInfo) {
+    public ResponseEntity<?> getPickupPointList(@PathVariable int page, @PathVariable int count) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             Store store = storeService.getStoreByAdminUsername(username);
-            List<PickupPoint> pickupPointList = pickupPointService.getPickupPointsByStoreId(store.getId(),pageInfo.getPage(), pageInfo.getCount());
+            List<PickupPoint> pickupPointList = pickupPointService.getPickupPointsByStoreId(store.getId(),page, count);
             List<PickupPointJson> pickupPointJsons = pickupPointConverter.convertToModelList(pickupPointList);
             return new ResponseEntity<>(pickupPointJsons,HttpStatus.OK);
         }catch (CourierServiceException e){
