@@ -41,6 +41,7 @@ public class StoreConverter implements Converter<Store, StoreJson> {
     @Override
     public StoreJson convertToModel(Store entity) {
         StoreJson model = new StoreJson();
+        model.setId(entity.getId());
         model.setName(entity.getName());
         model.setAdmin(entity.getAdmin());
         model.setPhoneNumber(entity.getPhoneNumber());

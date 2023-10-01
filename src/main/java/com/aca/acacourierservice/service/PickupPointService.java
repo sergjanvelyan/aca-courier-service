@@ -35,9 +35,6 @@ public class PickupPointService {
     }
     public List<PickupPoint> getPickupPointsByStoreId(long storeId,int page,int size) throws CourierServiceException {
         Page<PickupPoint> pickupPointsPage = pickupPointRepository.findAllByStoreId(storeId, PageRequest.of(page, size));
-        if(pickupPointsPage.isEmpty()){
-            throw new CourierServiceException("There is no pickup points for store:");
-        }
         return pickupPointsPage.getContent();
     }
     public void modifyPickupPoint(long id, String email, PickupPointJson pickupPointJson) throws CourierServiceException {

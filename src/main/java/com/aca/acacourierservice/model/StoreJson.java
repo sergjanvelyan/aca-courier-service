@@ -5,6 +5,7 @@ import com.aca.acacourierservice.entity.User;
 import java.util.List;
 
 public class StoreJson {
+    private long id;
     private String name;
     private User admin;
     private List<PickupPointJson> pickupPoints;
@@ -67,5 +68,13 @@ public class StoreJson {
 
     public void setApiSecret(String apiSecret) {
         this.apiSecret = apiSecret;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

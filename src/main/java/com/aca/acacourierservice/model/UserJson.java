@@ -5,6 +5,7 @@ import com.aca.acacourierservice.entity.User;
 import java.time.LocalDate;
 
 public class UserJson {
+    private long id;
     private String email;
     private String password;
     private User.Role role;
@@ -67,5 +68,13 @@ public class UserJson {
 
     public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

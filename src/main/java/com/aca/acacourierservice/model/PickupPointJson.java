@@ -1,6 +1,7 @@
 package com.aca.acacourierservice.model;
 
 public class PickupPointJson {
+    private long id;
     private String city;
     private String country;
     private String address;
@@ -55,5 +56,13 @@ public class PickupPointJson {
 
     public void setStoreId(long storeId) {
         this.storeId = storeId;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

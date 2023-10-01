@@ -62,17 +62,13 @@ public class PickupPointRestController {
 
     @GetMapping("/list/page/{page}/count/{count}")
     @Secured("ROLE_STORE_ADMIN")
-    public ResponseEntity<?> getPickupPointList(@PathVariable int page, @PathVariable int count) {
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String username = authentication.getName();
-            Store store = storeService.getStoreByAdminUsername(username);
-            List<PickupPoint> pickupPointList = pickupPointService.getPickupPointsByStoreId(store.getId(),page, count);
-            List<PickupPointJson> pickupPointJsons = pickupPointConverter.convertToModelList(pickupPointList);
-            return new ResponseEntity<>(pickupPointJsons,HttpStatus.OK);
-        }catch (CourierServiceException e){
-            return new ResponseEntity<>(new Status(e.getMessage()),HttpStatus.NO_CONTENT);
-        }
+    public ResponseEntity<List<PickupPointJson>> getPickupPointList(@PathVariable int page, @PathVariable int count) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Store store = storeService.getStoreByAdminUsername(username);
+        List<PickupPoint> pickupPointList = pickupPointService.getPickupPointsByStoreId(store.getId(),page, count);
+        List<PickupPointJson> pickupPointJsons = pickupPointConverter.convertToModelList(pickupPointList);
+        return new ResponseEntity<>(pickupPointJsons,HttpStatus.OK);
     }
 
     @PutMapping("/{pickupPointId}")

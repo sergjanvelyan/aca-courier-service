@@ -29,6 +29,7 @@ public class PickupPointConverter implements Converter<PickupPoint, PickupPointJ
         if(entity.getStore()!=null){
             model.setStoreId(entity.getStore().getId());
         }
+        model.setId(entity.getId());
         model.setCity(entity.getCity());
         model.setCountry(entity.getCountry());
         model.setAddress(entity.getAddress());
