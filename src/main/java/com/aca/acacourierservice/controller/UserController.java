@@ -90,13 +90,10 @@ public class UserController {
             return new ResponseEntity<>(new StatusWithId("There is no courier", courierId),HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping(value="/courier/list")
+    @GetMapping(value="/courier/list/page/{page}/count/{count}")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<?> getCourierList(@RequestBody PageInfo pageInfo){
-        Page<User> couriers = userService.getCouriers(pageInfo.getPage(), pageInfo.getCount());
-        if(couriers.isEmpty()){
-            return new ResponseEntity<>(new Status("There are no couriers:"), HttpStatus.NO_CONTENT);
-        }
+    public ResponseEntity<?> getCourierList(@PathVariable int page, @PathVariable int count){
+        Page<User> couriers = userService.getCouriers(page, count);
         UserListJson userListJson = userConverter.convertToListModel(couriers);
         return new ResponseEntity<>(userListJson,HttpStatus.OK);
     }

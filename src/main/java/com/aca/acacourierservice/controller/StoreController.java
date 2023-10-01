@@ -48,9 +48,9 @@ public class StoreController {
     }
 
     @Secured("ROLE_ADMIN")
-    @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public List<StoreJson> listStores(@RequestBody PageInfo pageInfo) {
-        return storeService.listStoresByPage(pageInfo.getPage(), pageInfo.getCount());
+    @GetMapping(value = "/list/page/{page}/count/{count}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<StoreJson> listStores(@PathVariable int page, @PathVariable int count) {
+        return storeService.listStoresByPage(page, count);
     }
 
     @Secured("ROLE_ADMIN")
@@ -104,11 +104,11 @@ public class StoreController {
     }
 
     @Secured("ROLE_STORE_ADMIN")
-    @GetMapping(value = "/{storeId}/order/list", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> listOrders(@PathVariable long storeId, @RequestBody PageInfo pageInfo) {
+    @GetMapping(value = "/{storeId}/order/list/page/{page}/count/{count}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> listOrders(@PathVariable long storeId, @PathVariable int page, @PathVariable int count) {
         Page<Order> orderPage;
         try {
-            orderPage = orderService.getOrdersByStoreId(storeId, pageInfo.getPage(), pageInfo.getCount());
+            orderPage = orderService.getOrdersByStoreId(storeId, page, count);
         } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
