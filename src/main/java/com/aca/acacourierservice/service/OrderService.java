@@ -34,7 +34,7 @@ public class OrderService{
         this.storeService = storeService;
     }
     @Transactional
-     public long addOrder(OrderJson orderJson){
+     public String addOrder(OrderJson orderJson){
         Order order = orderConverter.convertToEntity(orderJson);
         order.setStore(storeService.getStoreById(orderJson.getStoreId()));
         order.setStatus(Order.Status.NEW);
@@ -46,7 +46,7 @@ public class OrderService{
         statusUpdateTimeJson.setUpdateTime(order.getOrderConfirmedTime());
         statusUpdateTimeJson.setAdditionalInfo("Created new order");
         statusUpdateTimeService.addStatusUpdateTime(statusUpdateTimeJson);
-        return id;
+        return order.getTrackingNumber();
      }
     @Transactional
     public void updateOrderStatus(long id,Order.Status status,String additionalInfo) throws CourierServiceException {

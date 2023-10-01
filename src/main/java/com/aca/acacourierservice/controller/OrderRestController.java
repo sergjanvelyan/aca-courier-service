@@ -39,10 +39,10 @@ public class OrderRestController {
 
     @PostMapping(value = "/create")
     @ValidateApiKeySecret
-    public Status createOrder(@RequestBody OrderJson orderJson,HttpServletRequest request){
+    public StatusWithTrackingNumber createOrder(@RequestBody OrderJson orderJson,HttpServletRequest request){
         orderJson.setStoreId((Long) request.getAttribute("storeId"));
-        long id = orderService.addOrder(orderJson);
-        return new StatusWithId("Created order",id);
+        String trackingNumber = orderService.addOrder(orderJson);
+        return new StatusWithTrackingNumber("Created order",trackingNumber);
     }
 
     @GetMapping("/{orderId}")
