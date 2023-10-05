@@ -5,6 +5,8 @@ import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.exception.CourierServiceException;
 import com.aca.acacourierservice.model.*;
 import com.aca.acacourierservice.service.UserService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -31,11 +33,11 @@ public class UserController {
     }
 
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE ,consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Status> login(@RequestBody UserJson userJson) {
+    public ResponseEntity<Status> login(@RequestBody @Valid UserJson userJson) {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userJson.getEmail(), userJson.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            return new ResponseEntity<>(new Status("You are successfully logged in:"),HttpStatus.OK);
+            return new ResponseEntity<>(new Status("You are successfully logged in:"), HttpStatus.OK);
         } catch (AuthenticationException e) {
             return new ResponseEntity<>(new Status("You have entered an invalid username or password:"), HttpStatus.UNAUTHORIZED);
         }
@@ -55,7 +57,7 @@ public class UserController {
     }
     @PutMapping(value ="/profile/update" )
     @Secured({"ROLE_ADMIN", "ROLE_STORE_ADMIN", "ROLE_COURIER"})
-    public ResponseEntity<?> updateUserProfile(@RequestBody UserJson userJson){
+    public ResponseEntity<?> updateUserProfile(@RequestBody @Valid UserJson userJson){
         try{
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
@@ -67,7 +69,7 @@ public class UserController {
     }
     @PostMapping("/courier/register")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<Status> register(@RequestBody UserJson userJson) {
+    public ResponseEntity<Status> register(@RequestBody @Valid UserJson userJson) {
         userJson.setRole(User.Role.ROLE_COURIER);
         try {
             long id = userService.saveUser(userJson).getId();
@@ -78,7 +80,7 @@ public class UserController {
     }
     @GetMapping(value="/courier/{courierId}")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<?> getCourier(@PathVariable Long courierId){
+    public ResponseEntity<?> getCourier(@PathVariable @Min(1) Long courierId){
         try{
             UserJson userJson = userConverter.convertToModel(userService.getUserById(courierId));
             userJson.setPassword("Password hidden");
@@ -92,14 +94,14 @@ public class UserController {
     }
     @GetMapping(value="/courier/list/page/{page}/count/{count}")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<?> getCourierList(@PathVariable int page, @PathVariable int count){
+    public ResponseEntity<?> getCourierList(@PathVariable @Min(0) int page, @PathVariable @Min(1) int count){
         Page<User> couriers = userService.getCouriers(page, count);
         UserListJson userListJson = userConverter.convertToListModel(couriers);
         return new ResponseEntity<>(userListJson,HttpStatus.OK);
     }
     @PutMapping(value ="/courier/{courierId}")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<?> updateCourier(@RequestBody UserJson courierJson,@PathVariable long courierId){
+    public ResponseEntity<?> updateCourier(@RequestBody @Valid UserJson courierJson, @PathVariable @Min(1) long courierId){
         try{
             User courier = userService.getUserById(courierId);
             if (!courier.getRole().equals(User.Role.ROLE_COURIER)){
@@ -116,7 +118,7 @@ public class UserController {
     }
     @DeleteMapping(value ="/courier/{courierId}")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<?> deleteCourier(@PathVariable long courierId){
+    public ResponseEntity<?> deleteCourier(@PathVariable @Min(1) long courierId){
         try {
             if(!userService.getUserById(courierId).getRole().equals(User.Role.ROLE_COURIER)){
                 throw new CourierServiceException();

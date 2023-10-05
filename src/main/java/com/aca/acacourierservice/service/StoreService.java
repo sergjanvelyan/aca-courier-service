@@ -12,6 +12,9 @@ import com.aca.acacourierservice.model.UserJson;
 import com.aca.acacourierservice.repository.PickupPointRepository;
 import com.aca.acacourierservice.repository.StoreRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,7 +42,7 @@ public class StoreService {
         this.userConverter = userConverter;
         this.pickupPointConverter = pickupPointConverter;
     }
-    public Store getStoreById(long storeId) throws CourierServiceException {
+    public Store getStoreById(@Min(1) long storeId) throws CourierServiceException {
         Optional<Store> storeOptional = storeRepository.findById(storeId);
         if (storeOptional.isEmpty()) {
             throw new CourierServiceException("There is no store with id=" + storeId+":");
@@ -53,7 +56,7 @@ public class StoreService {
         }
         return storeOptional.get();
     }
-    public Store getStoreByAdminUsername(String email) throws CourierServiceException {
+    public Store getStoreByAdminUsername(@Email String email) throws CourierServiceException {
         Optional<Store> storeOptional = storeRepository.findByAdmin_Email(email);
         if (storeOptional.isEmpty()) {
             throw new CourierServiceException("There is no store with admin username=" + email+":");
@@ -61,7 +64,7 @@ public class StoreService {
         return storeOptional.get();
     }
     @Transactional
-    public long addStore(StoreJson storeJson) {
+    public long addStore(@Valid StoreJson storeJson) {
         Store store = storeConverter.convertToEntity(storeJson);
         if (store.getPickupPoints() != null) {
             for (PickupPoint pickupPoint : store.getPickupPoints()) {
@@ -73,7 +76,7 @@ public class StoreService {
         return store.getId();
     }
     @Transactional
-    public long addStoreAndAdmin(StoreJson storeJson) {
+    public long addStoreAndAdmin(@Valid StoreJson storeJson) {
         Store store = storeConverter.convertToEntity(storeJson);
         if (store.getPickupPoints() != null) {
             for (PickupPoint pickupPoint : store.getPickupPoints()) {
@@ -88,7 +91,7 @@ public class StoreService {
         return store.getId();
     }
     @Transactional
-    public void updateStore(long id, StoreJson storeJson) throws CourierServiceException {
+    public void updateStore(@Min(1) long id, @Valid StoreJson storeJson) throws CourierServiceException {
         Store store = getStoreById(id);
         if (storeJson.getName() != null) {
             store.setName(storeJson.getName());
@@ -111,14 +114,14 @@ public class StoreService {
         }
         storeRepository.save(store);
     }
-    public User changeStoreAdmin(UserJson admin, long storeId) throws CourierServiceException{
+    public User changeStoreAdmin(@Valid UserJson admin, @Min(1) long storeId) throws CourierServiceException{
         Store store = getStoreById(storeId);
         admin.setRole(User.Role.ROLE_STORE_ADMIN);
         store.setAdmin(userService.saveUser(admin));
         storeRepository.save(store);
         return store.getAdmin();
     }
-    public List<StoreJson> listStoresByPage(int page, int count) {
+    public List<StoreJson> listStoresByPage(@Min(0) int page, @Min(1) int count) {
         Page<Store> storePage = storeRepository.findAll(PageRequest.of(page, count));
         List<StoreJson> stores = new ArrayList<>();
         for (Store store : storePage) {
@@ -129,7 +132,7 @@ public class StoreService {
         return stores;
     }
     @Transactional
-    public void deleteStoreById(long id) throws CourierServiceException {
+    public void deleteStoreById(@Min(1) long id) throws CourierServiceException {
         if (!storeRepository.existsById(id)) {
             throw new CourierServiceException("There is no store");
         }

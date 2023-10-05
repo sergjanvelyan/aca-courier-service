@@ -1,6 +1,8 @@
 package com.aca.acacourierservice.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -11,9 +13,11 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true,nullable = false)
+    @Column(unique = true, nullable = false)
+    @Email(message = "Invalid email")
     private String email;
     @Column(nullable = false)
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#$%^&*()_+{}\\[\\]:;<>,.?~\\\\-]{8,}$", message = "Invalid password")
     private String password;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -21,8 +25,10 @@ public class User {
     @Column
     private String address;
     @Column
+    @Pattern(regexp = "^\\+?\\d+$", message = "Invalid phone number")
     private String phoneNumber;
     @Column
+    @Pattern(regexp = "^[A-Za-z]+(?:[ A-Za-z'-]*[A-Za-z]+)*$", message = "Invalid name")
     private String fullName;
     @Column
     @Temporal(TemporalType.DATE)

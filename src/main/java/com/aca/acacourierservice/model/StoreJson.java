@@ -1,15 +1,22 @@
 package com.aca.acacourierservice.model;
 
 import com.aca.acacourierservice.entity.User;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.util.List;
 
 public class StoreJson {
     private long id;
+    @NotNull
+    @Pattern(regexp = "^[A-Za-z]+(?:[ A-Za-z'-]*[A-Za-z]+)*$")
     private String name;
+    @NotNull
     private User admin;
     private List<PickupPointJson> pickupPoints;
+    @Pattern(regexp = "^(https?|ftp)?://(?!.*example)[^\\s/$.?#].[^\\s]*$")
     private String storeUrl;
+    @Pattern(regexp = "^\\+?\\d+$")
     private String phoneNumber;
     private String apiKey;
     private String apiSecret;

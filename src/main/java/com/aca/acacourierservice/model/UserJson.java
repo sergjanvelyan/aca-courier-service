@@ -1,16 +1,25 @@
 package com.aca.acacourierservice.model;
 
 import com.aca.acacourierservice.entity.User;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDate;
 
 public class UserJson {
     private long id;
+    @Email
+    @NotNull
     private String email;
+    @NotNull
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#$%^&*()_+{}\\[\\]:;<>,.?~\\\\-]{8,}$")
     private String password;
     private User.Role role;
     private String address;
+    @Pattern(regexp = "^\\+?\\d+$")
     private String phoneNumber;
+    @Pattern(regexp = "^[A-Za-z]+(?:[ A-Za-z'-]*[A-Za-z]+)*$")
     private String fullName;
     private LocalDate birthDate;
 

@@ -4,9 +4,14 @@ import com.aca.acacourierservice.converter.StoreConverter;
 import com.aca.acacourierservice.entity.Order;
 import com.aca.acacourierservice.entity.Store;
 import com.aca.acacourierservice.exception.CourierServiceException;
-import com.aca.acacourierservice.model.*;
+import com.aca.acacourierservice.model.Status;
+import com.aca.acacourierservice.model.StatusWithId;
+import com.aca.acacourierservice.model.StoreJson;
+import com.aca.acacourierservice.model.UserJson;
 import com.aca.acacourierservice.service.OrderService;
 import com.aca.acacourierservice.service.StoreService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -33,7 +38,7 @@ public class StoreController {
 
     @Secured("ROLE_ADMIN")
     @GetMapping(value = "/{storeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getStore(@PathVariable long storeId) {
+    public ResponseEntity<?> getStore(@PathVariable @Min(1) long storeId) {
         Store store;
         try {
             store = storeService.getStoreById(storeId);
@@ -49,13 +54,13 @@ public class StoreController {
 
     @Secured("ROLE_ADMIN")
     @GetMapping(value = "/list/page/{page}/count/{count}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<StoreJson> listStores(@PathVariable int page, @PathVariable int count) {
+    public List<StoreJson> listStores(@PathVariable @Min(0) int page, @PathVariable @Min(1) int count) {
         return storeService.listStoresByPage(page, count);
     }
 
     @Secured("ROLE_ADMIN")
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Status> registerStore(@RequestBody StoreJson storeJson) {
+    public ResponseEntity<Status> registerStore(@RequestBody @Valid StoreJson storeJson) {
         try {
             long id = storeService.addStoreAndAdmin(storeJson);
             return new ResponseEntity<>(new StatusWithId("Store registered", id), HttpStatus.CREATED);
@@ -66,7 +71,7 @@ public class StoreController {
 
     @Secured("ROLE_ADMIN")
     @PutMapping(value = "/{storeId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Status> updateStore(@RequestBody StoreJson storeJson, @PathVariable long storeId) {
+    public ResponseEntity<Status> updateStore(@RequestBody @Valid StoreJson storeJson, @PathVariable @Min(1) long storeId) {
         try {
             storeService.updateStore(storeId, storeJson);
         } catch (CourierServiceException e) {
@@ -79,9 +84,9 @@ public class StoreController {
 
     @Secured("ROLE_ADMIN")
     @PutMapping(value = "/{storeId}/admin/update", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Status> updateStoreAdmin(@RequestBody UserJson admin, @PathVariable long storeId) {
+    public ResponseEntity<Status> updateStoreAdmin(@RequestBody @Valid UserJson admin, @PathVariable @Min(1) long storeId) {
         try {
-            long adminId = storeService.changeStoreAdmin(admin,storeId).getId();
+            long adminId = storeService.changeStoreAdmin(admin, storeId).getId();
             return new ResponseEntity<>(new StatusWithId("Store admin updated", adminId), HttpStatus.OK);
         } catch (CourierServiceException e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.BAD_REQUEST);
@@ -92,7 +97,7 @@ public class StoreController {
 
     @Secured("ROLE_ADMIN")
     @DeleteMapping(value = "/{storeId}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Status> deleteStore(@PathVariable long storeId) {
+    public ResponseEntity<Status> deleteStore(@PathVariable @Min(1) long storeId) {
         try {
             storeService.deleteStoreById(storeId);
         } catch (CourierServiceException e) {
@@ -105,7 +110,7 @@ public class StoreController {
 
     @Secured("ROLE_STORE_ADMIN")
     @GetMapping(value = "/{storeId}/order/list/page/{page}/count/{count}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> listOrders(@PathVariable long storeId, @PathVariable int page, @PathVariable int count) {
+    public ResponseEntity<?> listOrders(@PathVariable @Min(1) long storeId, @PathVariable @Min(0) int page, @PathVariable @Min(1) int count) {
         Page<Order> orderPage;
         try {
             orderPage = orderService.getOrdersByStoreId(storeId, page, count);

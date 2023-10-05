@@ -1,6 +1,7 @@
 package com.aca.acacourierservice.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -15,6 +16,7 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
+    @Pattern(regexp = "^[A-Za-z]+(?:[ A-Za-z'-]*[A-Za-z]+)*$")
     private String name;
     @OneToOne
     @JoinColumn(name = "admin_id", nullable = false)
@@ -22,8 +24,10 @@ public class Store {
     @OneToMany(mappedBy = "store")
     private List<PickupPoint> pickupPoints;
     @Column
+    @Pattern(regexp = "^(https?|ftp)?://(?!.*example)[^\\s/$.?#].[^\\s]*$")
     private String storeUrl;
     @Column
+    @Pattern(regexp = "^\\+?\\d+$")
     private String phoneNumber;
     @Column(unique = true)
     private String apiKey;
