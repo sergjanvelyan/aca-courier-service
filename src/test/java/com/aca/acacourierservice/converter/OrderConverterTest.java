@@ -42,8 +42,8 @@ public class OrderConverterTest {
         model.setZipCode("0015");
         model.setFullName("FirstName LastName");
         model.setTrackingNumber("I entered this");
-        model.setDeliveryPrice(10);
-        model.setTotalPrice(50);
+        model.setDeliveryPrice(10.0);
+        model.setTotalPrice(50.0);
         model.setWeightKg(5.5);
         model.setSize(Order.Size.MEDIUM);
         model.setOrderConfirmedTime(LocalDateTime.of(2023, Month.SEPTEMBER,6,14,40,26));
@@ -81,8 +81,8 @@ public class OrderConverterTest {
         model.setZipCode("0015");
         model.setFullName("FirstName LastName");
         model.setTrackingNumber("I entered this");
-        model.setDeliveryPrice(10);
-        model.setTotalPrice(50);
+        model.setDeliveryPrice(10.0);
+        model.setTotalPrice(50.0);
         model.setWeightKg(5.5);
         model.setSize(Order.Size.MEDIUM);
         model.setOrderConfirmedTime(LocalDateTime.of(2023, Month.SEPTEMBER,6,14,40,26));
@@ -131,8 +131,8 @@ public class OrderConverterTest {
         entity.setZipCode("0015");
         entity.setFullName("FirstName LastName");
         entity.setTrackingNumber("I entered this");
-        entity.setDeliveryPrice(10);
-        entity.setTotalPrice(50);
+        entity.setDeliveryPrice(10.0);
+        entity.setTotalPrice(50.0);
         entity.setWeightKg(5.5);
         entity.setSize(Order.Size.MEDIUM);
         entity.setOrderConfirmedTime(LocalDateTime.of(2023, Month.SEPTEMBER,6,14,40,26));
@@ -185,8 +185,8 @@ public class OrderConverterTest {
         orderOne.setZipCode("0015");
         orderOne.setFullName("FirstName LastName");
         orderOne.setTrackingNumber("I entered this");
-        orderOne.setDeliveryPrice(10);
-        orderOne.setTotalPrice(50);
+        orderOne.setDeliveryPrice(10.0);
+        orderOne.setTotalPrice(50.0);
         orderOne.setWeightKg(5.5);
         orderOne.setSize(Order.Size.MEDIUM);
         orderOne.setOrderConfirmedTime(LocalDateTime.of(2023, Month.SEPTEMBER,6,14,40,26));
@@ -205,8 +205,8 @@ public class OrderConverterTest {
         orderTwo.setZipCode("0015");
         orderTwo.setFullName("FirstName LastName");
         orderTwo.setTrackingNumber("I entered this");
-        orderTwo.setDeliveryPrice(10);
-        orderTwo.setTotalPrice(50);
+        orderTwo.setDeliveryPrice(10.0);
+        orderTwo.setTotalPrice(50.0);
         orderTwo.setWeightKg(5.5);
         orderTwo.setSize(Order.Size.MEDIUM);
         orderTwo.setOrderConfirmedTime(LocalDateTime.of(2023, Month.SEPTEMBER,6,14,40,26));
