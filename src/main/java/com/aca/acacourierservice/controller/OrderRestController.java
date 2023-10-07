@@ -9,7 +9,9 @@ import com.aca.acacourierservice.exception.InvalidStoreCredentialsException;
 import com.aca.acacourierservice.model.*;
 import com.aca.acacourierservice.service.OrderService;
 import com.aca.acacourierservice.service.UserService;
+import com.aca.acacourierservice.validationGroups.OnCreate;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -17,10 +19,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
+@Validated
 @RequestMapping(value = "/order")
 public class OrderRestController {
     private final OrderService orderService;
@@ -39,7 +43,10 @@ public class OrderRestController {
 
     @PostMapping(value = "/create")
     @ValidateApiKeySecret
-    public StatusWithTrackingNumber createOrder(@RequestBody OrderJson orderJson,HttpServletRequest request){
+    @Validated(OnCreate.class)
+    public StatusWithTrackingNumber createOrder(
+            @RequestBody @Valid OrderJson orderJson,
+            HttpServletRequest request){
         orderJson.setStoreId((Long) request.getAttribute("storeId"));
         String trackingNumber = orderService.addOrder(orderJson);
         return new StatusWithTrackingNumber("Created order",trackingNumber);
