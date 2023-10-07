@@ -17,7 +17,9 @@ public class StoreConverter implements Converter<Store, StoreJson> {
     public Store convertToEntity(StoreJson model, Store entity) {
         entity.setName(model.getName());
         entity.setPhoneNumber(model.getPhoneNumber());
-        entity.setPickupPoints(pickupPointConverter.convertToEntityList(model.getPickupPoints()));
+        if (model.getPickupPoints() != null) {
+            entity.setPickupPoints(pickupPointConverter.convertToEntityList(model.getPickupPoints()));
+        }
         entity.setStoreUrl(model.getStoreUrl());
         entity.setApiKey(model.getApiKey());
         entity.setApiSecret(model.getApiSecret());
@@ -30,7 +32,9 @@ public class StoreConverter implements Converter<Store, StoreJson> {
         Store entity = new Store();
         entity.setName(model.getName());
         entity.setPhoneNumber(model.getPhoneNumber());
-        entity.setPickupPoints(pickupPointConverter.convertToEntityList(model.getPickupPoints()));
+        if (model.getPickupPoints() != null) {
+            entity.setPickupPoints(pickupPointConverter.convertToEntityList(model.getPickupPoints()));
+        }
         entity.setStoreUrl(model.getStoreUrl());
         entity.setApiKey(model.getApiKey());
         entity.setApiSecret(model.getApiSecret());

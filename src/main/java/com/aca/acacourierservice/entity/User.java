@@ -3,6 +3,7 @@ package com.aca.acacourierservice.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -14,10 +15,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(unique = true, nullable = false)
-    @Email(message = "Invalid email")
+    @Email(message = "The email ${validatedValue} is not valid")
     private String email;
     @Column(nullable = false)
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#$%^&*()_+{}\\[\\]:;<>,.?~\\\\-]{8,}$", message = "Invalid password")
+    @Size(min = 8, message = "Password should be at least 8 characters long")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$", message = "Password should contain at least 1 letter and 1 number")
     private String password;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -28,7 +30,7 @@ public class User {
     @Pattern(regexp = "^\\+?\\d+$", message = "Invalid phone number")
     private String phoneNumber;
     @Column
-    @Pattern(regexp = "^[A-Za-z]+(?:[ A-Za-z'-]*[A-Za-z]+)*$", message = "Invalid name")
+    @Pattern(regexp = "^[A-Za-z]+(?:[ A-Za-z'-]*[A-Za-z]+)*$", message = "Name should contain letters")
     private String fullName;
     @Column
     @Temporal(TemporalType.DATE)
@@ -98,11 +100,6 @@ public class User {
         this.birthDate = birthDate;
     }
 
-    public enum Role {
-        ROLE_ADMIN,
-        ROLE_STORE_ADMIN,
-        ROLE_COURIER
-    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -117,6 +114,7 @@ public class User {
                 && Objects.equals(fullName, user.fullName)
                 && Objects.equals(birthDate, user.birthDate);
     }
+
     @Override
     public int hashCode() {
         return Objects.hash(id,
@@ -127,5 +125,11 @@ public class User {
                 phoneNumber,
                 fullName,
                 birthDate);
+    }
+
+    public enum Role {
+        ROLE_ADMIN,
+        ROLE_STORE_ADMIN,
+        ROLE_COURIER
     }
 }

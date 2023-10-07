@@ -1,22 +1,23 @@
 package com.aca.acacourierservice.model;
 
 import com.aca.acacourierservice.entity.User;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 
 import java.util.List;
 
 public class StoreJson {
     private long id;
-    @NotNull
-    @Pattern(regexp = "^[A-Za-z]+(?:[ A-Za-z'-]*[A-Za-z]+)*$")
+    @NotEmpty(message = "The name field must not be empty")
     private String name;
-    @NotNull
+    @Valid
     private User admin;
+    @Valid
     private List<PickupPointJson> pickupPoints;
-    @Pattern(regexp = "^(https?|ftp)?://(?!.*example)[^\\s/$.?#].[^\\s]*$")
+    @Pattern(regexp = "^(https:\\/\\/)?[^\\s/$.?#]+\\.[^\\s]*$", message = "The url ${validatedValue} is invalid")
     private String storeUrl;
-    @Pattern(regexp = "^\\+?\\d+$")
+    @Pattern(regexp = "^\\+?\\d+$", message = "Invalid phone number")
     private String phoneNumber;
     private String apiKey;
     private String apiSecret;

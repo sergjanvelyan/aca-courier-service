@@ -1,6 +1,8 @@
 package com.aca.acacourierservice.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -16,18 +18,19 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    @Pattern(regexp = "^[A-Za-z]+(?:[ A-Za-z'-]*[A-Za-z]+)*$")
+    @NotEmpty(message = "The name field must not be empty")
     private String name;
     @OneToOne
-    @JoinColumn(name = "admin_id", nullable = false)
+    @NotNull(message = "Admin must not be null")
+    @JoinColumn(name = "admin_id")
     private User admin;
     @OneToMany(mappedBy = "store")
     private List<PickupPoint> pickupPoints;
     @Column
-    @Pattern(regexp = "^(https?|ftp)?://(?!.*example)[^\\s/$.?#].[^\\s]*$")
+    @Pattern(regexp = "^(https?:\\/\\/)?[^\\s/$.?#].[^\\s]*$", message = "The url ${validatedValue} is invalid")
     private String storeUrl;
     @Column
-    @Pattern(regexp = "^\\+?\\d+$")
+    @Pattern(regexp = "^\\+?\\d+$", message = "Invalid phone number")
     private String phoneNumber;
     @Column(unique = true)
     private String apiKey;
@@ -98,6 +101,7 @@ public class Store {
     public void setApiSecret(String apiSecret) {
         this.apiSecret = apiSecret;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -113,6 +117,7 @@ public class Store {
                 && Objects.equals(apiSecret, store.apiSecret)
                 && Objects.equals(deleted, store.deleted);
     }
+
     @Override
     public int hashCode() {
         return Objects.hash(id,

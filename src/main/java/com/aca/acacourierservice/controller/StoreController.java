@@ -18,12 +18,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/store")
+@Validated
 public class StoreController {
     private final StoreService storeService;
     private final StoreConverter storeConverter;
@@ -65,6 +67,9 @@ public class StoreController {
             long id = storeService.addStoreAndAdmin(storeJson);
             return new ResponseEntity<>(new StatusWithId("Store registered", id), HttpStatus.CREATED);
         } catch (Exception e) {
+            if(e.getMessage().contains("duplicate key value violates unique constraint")) {
+                return new ResponseEntity<>(new Status("Duplicate api key or api secret"), HttpStatus.BAD_REQUEST);
+            }
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

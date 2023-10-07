@@ -3,7 +3,10 @@ package com.aca.acacourierservice.controller;
 import com.aca.acacourierservice.converter.UserConverter;
 import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.exception.CourierServiceException;
-import com.aca.acacourierservice.model.*;
+import com.aca.acacourierservice.model.Status;
+import com.aca.acacourierservice.model.StatusWithId;
+import com.aca.acacourierservice.model.UserJson;
+import com.aca.acacourierservice.model.UserListJson;
 import com.aca.acacourierservice.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -18,9 +21,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Validated
 public class UserController {
     private final UserService userService;
     private final UserConverter userConverter;
@@ -57,7 +62,7 @@ public class UserController {
     }
     @PutMapping(value ="/profile/update" )
     @Secured({"ROLE_ADMIN", "ROLE_STORE_ADMIN", "ROLE_COURIER"})
-    public ResponseEntity<?> updateUserProfile(@RequestBody @Valid UserJson userJson){
+    public ResponseEntity<Status> updateUserProfile(@RequestBody @Valid UserJson userJson) {
         try{
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
