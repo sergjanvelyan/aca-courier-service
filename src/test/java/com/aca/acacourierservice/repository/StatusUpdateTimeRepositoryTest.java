@@ -62,8 +62,8 @@ public class StatusUpdateTimeRepositoryTest {
         order.setPhone("+374-77-77-77-77");
         order.setZipCode("0015");
         order.setFullName("FirstName LastName");
-        order.setDeliveryPrice(10);
-        order.setTotalPrice(50);
+        order.setDeliveryPrice(10.0);
+        order.setTotalPrice(50.0);
         order.setWeightKg(5.5);
         order.setSize(Order.Size.MEDIUM);
         order.setOrderConfirmedTime(LocalDateTime.of(2023, Month.AUGUST, 25, 15, 10, 3));

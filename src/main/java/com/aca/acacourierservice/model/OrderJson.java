@@ -1,24 +1,39 @@
 package com.aca.acacourierservice.model;
 
 import com.aca.acacourierservice.entity.Order;
+import com.aca.acacourierservice.validationGroups.OnCreate;
+import jakarta.validation.constraints.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
-
 public class OrderJson {
+    @NotBlank
     private String orderId;
+    @Null(groups = OnCreate.class,message = "Tracking number should be generated")
     private String trackingNumber;
-    private long storeId;
+    @Null(groups = OnCreate.class,message = "You don't need to enter store id")
+    @Positive
+    private Long storeId;
+    @Pattern(regexp ="^[a-zA-Z]{2,30}$",message = "Not valid name")
     private String fullName;
+    @Pattern(regexp ="^[a-zA-Z]{2,15}$",message = "Not valid country")
     private String country;
+    @Pattern(regexp ="^[a-zA-Z]{2,15}$",message = "Not valid city")
     private String city;
+    @Pattern(regexp = "^([a-zA-Z]{2,15}|[1-9]+)\\s([1-9]+|([1-9]+/[1-9]+))$",message = "Not valid address")
     private String address;
+    @Pattern(regexp ="^[+][0-9]{10,15}$",message = "Phone number should be like +{country code}{phone number}")
     private String phone;
+    @Pattern(regexp ="^[A-Z0-9]{2,15}$",message = "Not valid zip code")
     private String zipCode;
-    private double weightKg;
+    @Positive
+    private Double weightKg;
     private Order.Size size;
     private long courierId;
-    private double deliveryPrice;
-    private double totalPrice;
+    @Positive
+    private Double deliveryPrice;
+    @Positive
+    private Double totalPrice;
     private Order.Status status;
     private LocalDateTime orderConfirmedTime;
     private LocalDateTime orderDeliveredTime;
@@ -104,11 +119,11 @@ public class OrderJson {
         this.zipCode = zipCode;
     }
 
-    public double getWeightKg() {
+    public Double getWeightKg() {
         return weightKg;
     }
 
-    public void setWeightKg(double weightKg) {
+    public void setWeightKg(Double weightKg) {
         this.weightKg = weightKg;
     }
 
@@ -128,19 +143,19 @@ public class OrderJson {
         this.courierId = courierId;
     }
 
-    public double getDeliveryPrice() {
+    public Double getDeliveryPrice() {
         return deliveryPrice;
     }
 
-    public void setDeliveryPrice(double deliveryPrice) {
+    public void setDeliveryPrice(Double deliveryPrice) {
         this.deliveryPrice = deliveryPrice;
     }
 
-    public double getTotalPrice() {
+    public Double getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(double totalPrice) {
+    public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
     }
 

@@ -39,11 +39,11 @@ public class Order {
     @Column
     private String trackingNumber;
     @Column(nullable = false)
-    private double deliveryPrice;
+    private Double deliveryPrice;
     @Column(nullable = false)
-    private double totalPrice;
+    private Double totalPrice;
     @Column(nullable = false)
-    private double weightKg;
+    private Double weightKg;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Size size;
@@ -156,27 +156,27 @@ public class Order {
         this.trackingNumber = trackingNumber;
     }
 
-    public double getDeliveryPrice() {
+    public Double getDeliveryPrice() {
         return deliveryPrice;
     }
 
-    public void setDeliveryPrice(double deliveryPrice) {
+    public void setDeliveryPrice(Double deliveryPrice) {
         this.deliveryPrice = deliveryPrice;
     }
 
-    public double getTotalPrice() {
+    public Double getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(double totalPrice) {
+    public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
     }
 
-    public double getWeightKg() {
+    public Double getWeightKg() {
         return weightKg;
     }
 
-    public void setWeightKg(double weightKg) {
+    public void setWeightKg(Double weightKg) {
         this.weightKg = weightKg;
     }
 
