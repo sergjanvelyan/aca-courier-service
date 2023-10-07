@@ -6,12 +6,15 @@ import com.aca.acacourierservice.exception.CourierServiceException;
 import com.aca.acacourierservice.model.StatusUpdateTimeJson;
 import com.aca.acacourierservice.repository.StatusUpdateTimeRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
 @Service
+@Validated
 public class StatusUpdateTimeService {
     private final StatusUpdateTimeRepository statusUpdateTimeRepository;
     private final StatusUpdateTimeConverter statusUpdateTimeConverter;
@@ -29,7 +32,7 @@ public class StatusUpdateTimeService {
         statusUpdateTimeRepository.save(statusUpdateTime);
         return statusUpdateTime.getId();
     }
-    public List<StatusUpdateTime> getStatusUpdateTimeListByOrderId(long orderId) throws CourierServiceException {
+    public List<StatusUpdateTime> getStatusUpdateTimeListByOrderId(@Min(1) long orderId) throws CourierServiceException {
         List<StatusUpdateTime> statusUpdateTimeList = statusUpdateTimeRepository.findAllByOrderId(orderId);
         if(statusUpdateTimeList.isEmpty()){
             throw new CourierServiceException("There is no status update history for order(id="+orderId+")");

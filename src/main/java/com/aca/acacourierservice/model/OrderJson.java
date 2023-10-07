@@ -1,42 +1,71 @@
 package com.aca.acacourierservice.model;
 
 import com.aca.acacourierservice.entity.Order;
-import com.aca.acacourierservice.validationGroups.OnCreate;
+import com.aca.acacourierservice.validation.OnCreate;
+import com.aca.acacourierservice.validation.ValidEnum;
+import com.aca.acacourierservice.view.Lists;
+import com.aca.acacourierservice.view.PrivateSecondLevel;
+import com.aca.acacourierservice.view.Public;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrderJson {
+    @JsonView(Lists.class)
+    private Long id;
+    @JsonView(Public.class)
     @NotBlank
     private String orderId;
+    @JsonView(Public.class)
     @Null(groups = OnCreate.class,message = "Tracking number should be generated")
     private String trackingNumber;
+    @JsonView(Public.class)
     @Null(groups = OnCreate.class,message = "You don't need to enter store id")
     @Positive
     private Long storeId;
+    @JsonView(PrivateSecondLevel.class)
     @Pattern(regexp ="^[a-zA-Z]{2,30}$",message = "Not valid name")
     private String fullName;
+    @JsonView(Public.class)
     @Pattern(regexp ="^[a-zA-Z]{2,15}$",message = "Not valid country")
     private String country;
+    @JsonView(Public.class)
     @Pattern(regexp ="^[a-zA-Z]{2,15}$",message = "Not valid city")
     private String city;
+    @JsonView(PrivateSecondLevel.class)
     @Pattern(regexp = "^([a-zA-Z]{2,15}|[1-9]+)\\s([1-9]+|([1-9]+/[1-9]+))$",message = "Not valid address")
     private String address;
+    @JsonView(PrivateSecondLevel.class)
     @Pattern(regexp ="^[+][0-9]{10,15}$",message = "Phone number should be like +{country code}{phone number}")
     private String phone;
+    @JsonView(Public.class)
     @Pattern(regexp ="^[A-Z0-9]{2,15}$",message = "Not valid zip code")
     private String zipCode;
+    @JsonView(Public.class)
     @Positive
     private Double weightKg;
-    private Order.Size size;
+    @JsonView(Public.class)
+    @ValidEnum(enumClass = Order.Size.class)
+    private String size;
+    @JsonView(PrivateSecondLevel.class)
     private long courierId;
+    @JsonView(Public.class)
     @Positive
     private Double deliveryPrice;
+    @JsonView(Public.class)
     @Positive
     private Double totalPrice;
-    private Order.Status status;
+    @JsonView(Public.class)
+    @Null(groups = OnCreate.class,message = "You don't need to enter status.When creating order the status is 'NEW' by default")
+    private String status;
+    @JsonView(Public.class)
     private LocalDateTime orderConfirmedTime;
+    @JsonView(Public.class)
     private LocalDateTime orderDeliveredTime;
+    @JsonView(PrivateSecondLevel.class)
     private List<StatusUpdateTimeJson> statusUpdateHistory;
 
     public List<StatusUpdateTimeJson> getStatusUpdateHistory() {
@@ -45,6 +74,14 @@ public class OrderJson {
 
     public void setStatusUpdateHistory(List<StatusUpdateTimeJson> statusUpdateHistory) {
         this.statusUpdateHistory = statusUpdateHistory;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getOrderId() {
@@ -128,10 +165,13 @@ public class OrderJson {
     }
 
     public Order.Size getSize() {
-        return size;
+        if(size==null){
+            return null;
+        }
+        return Order.Size.valueOf(size.toUpperCase());
     }
 
-    public void setSize(Order.Size size) {
+    public void setSize(String size) {
         this.size = size;
     }
 
@@ -160,10 +200,13 @@ public class OrderJson {
     }
 
     public Order.Status getStatus() {
-        return status;
+        if(status==null){
+            return null;
+        }
+        return Order.Status.valueOf(status.toUpperCase());
     }
 
-    public void setStatus(Order.Status status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

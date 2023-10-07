@@ -9,9 +9,13 @@ import com.aca.acacourierservice.exception.InvalidStoreCredentialsException;
 import com.aca.acacourierservice.model.*;
 import com.aca.acacourierservice.service.OrderService;
 import com.aca.acacourierservice.service.UserService;
-import com.aca.acacourierservice.validationGroups.OnCreate;
+import com.aca.acacourierservice.validation.OnCreate;
+import com.aca.acacourierservice.view.Lists;
+import com.aca.acacourierservice.view.PrivateSecondLevel;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -53,8 +57,9 @@ public class OrderRestController {
     }
 
     @GetMapping("/{orderId}")
+    @JsonView(PrivateSecondLevel.class)
     @Secured({"ROLE_ADMIN","ROLE_STORE_ADMIN","ROLE_COURIER"})
-    public ResponseEntity<?> getOrder(@PathVariable long orderId){
+    public ResponseEntity<?> getOrder(@PathVariable @Min(1) long orderId){
         try{
             OrderJson orderJson = orderConverter.convertToModel(orderService.getOrderById(orderId));
             return new ResponseEntity<>(orderJson,HttpStatus.OK);
@@ -64,8 +69,9 @@ public class OrderRestController {
     }
 
     @GetMapping(value = "/list/unassigned/page/{page}/count/{count}")
+    @JsonView(Lists.class)
     @Secured({"ROLE_ADMIN","ROLE_COURIER"})
-    public ResponseEntity<?> getUnassignedOrders(@PathVariable int page, @PathVariable int count){
+    public ResponseEntity<?> getUnassignedOrders(@PathVariable @Min(0) int page, @PathVariable @Min(1) int count){
         Page<Order> orders =orderService.getUnassignedOrders(page, count);
         if(orders.isEmpty()){
             return new ResponseEntity<>(new Status("There is no unassigned orders"),HttpStatus.OK);
@@ -75,8 +81,9 @@ public class OrderRestController {
     }
 
     @GetMapping(value = "/list/page/{page}/count/{count}")
+    @JsonView(Lists.class)
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<?> getOrders(@PathVariable int page, @PathVariable int count){
+    public ResponseEntity<?> getOrders(@PathVariable @Min(0) int page, @PathVariable @Min(1) int count){
         Page<Order> orders = orderService.getOrders(page, count);
         if(orders.isEmpty()){
             return new ResponseEntity<>(new Status("There is no orders"),HttpStatus.OK);
@@ -87,9 +94,9 @@ public class OrderRestController {
 
     @PutMapping(value = "/{orderId}/updateStatus")
     @Secured({"ROLE_ADMIN","ROLE_COURIER"})
-    public ResponseEntity<?>  updateOrderStatus(@PathVariable long orderId, @RequestBody StatusInfoJson statusInfoJson){
+    public ResponseEntity<?>  updateOrderStatus(@PathVariable @Min(1) long orderId, @RequestBody @Valid StatusInfoJson statusInfoJson){
         try{
-            orderService.updateOrderStatus(orderId,statusInfoJson.getStatus(),statusInfoJson.getAdditionalInfo());
+            orderService.updateOrderStatus(orderId,statusInfoJson);
             return new ResponseEntity<>(new Status("Order status updated"),HttpStatus.OK);
         }catch (CourierServiceException e){
             return new ResponseEntity<>(new Status(e.getMessage()),HttpStatus.BAD_REQUEST);
@@ -97,8 +104,9 @@ public class OrderRestController {
     }
 
     @GetMapping(value = "/list/mine/page/{page}/count/{count}")
+    @JsonView(Lists.class)
     @Secured("ROLE_COURIER")
-    public ResponseEntity<?> getCourierOrders(@PathVariable int page, @PathVariable int count){
+    public ResponseEntity<?> getCourierOrders(@PathVariable @Min(0) int page, @PathVariable @Min(1) int count){
         try{
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
@@ -117,7 +125,7 @@ public class OrderRestController {
 
     @PutMapping(value = "/{orderId}/assignCourier/{courierId}")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<?>  assignCourierToOrder(@PathVariable long orderId,@PathVariable long courierId){
+    public ResponseEntity<?>  assignCourierToOrder(@PathVariable @Min(1) long orderId,@PathVariable @Min(1) long courierId){
         try{
             orderService.assignCourierToOrder(orderId,courierId);
         }catch (CourierServiceException e){
@@ -128,7 +136,7 @@ public class OrderRestController {
 
     @PutMapping(value = "/{orderId}/assignToMe")
     @Secured("ROLE_COURIER")
-    public ResponseEntity<?>  assignOrder(@PathVariable long orderId){
+    public ResponseEntity<?>  assignOrder(@PathVariable @Min(1) long orderId){
         try{
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();

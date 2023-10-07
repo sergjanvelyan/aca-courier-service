@@ -34,7 +34,7 @@ public class OrderConverterTest {
     void testConvertToEntityWithEntity() {
        OrderJson model = new OrderJson();
         model.setOrderId("orderId1234");
-        model.setStatus(Order.Status.SHIPPED);
+        model.setStatus(Order.Status.SHIPPED.toString());
         model.setCountry("Armenia");
         model.setCity("Yerevan");
         model.setAddress("Address 7");
@@ -45,7 +45,7 @@ public class OrderConverterTest {
         model.setDeliveryPrice(10.0);
         model.setTotalPrice(50.0);
         model.setWeightKg(5.5);
-        model.setSize(Order.Size.MEDIUM);
+        model.setSize(Order.Size.MEDIUM.toString());
         model.setOrderConfirmedTime(LocalDateTime.of(2023, Month.SEPTEMBER,6,14,40,26));
         model.setOrderDeliveredTime(LocalDateTime.of(2023, Month.SEPTEMBER,15,15,0));
 
@@ -73,7 +73,7 @@ public class OrderConverterTest {
     void testConvertToEntityWithoutEntity() {
         OrderJson model = new OrderJson();
         model.setOrderId("orderId1234");
-        model.setStatus(Order.Status.SHIPPED);
+        model.setStatus(Order.Status.SHIPPED.toString());
         model.setCountry("Armenia");
         model.setCity("Yerevan");
         model.setAddress("Address 7");
@@ -84,7 +84,7 @@ public class OrderConverterTest {
         model.setDeliveryPrice(10.0);
         model.setTotalPrice(50.0);
         model.setWeightKg(5.5);
-        model.setSize(Order.Size.MEDIUM);
+        model.setSize(Order.Size.MEDIUM.toString());
         model.setOrderConfirmedTime(LocalDateTime.of(2023, Month.SEPTEMBER,6,14,40,26));
         model.setOrderDeliveredTime(LocalDateTime.of(2023, Month.SEPTEMBER,15,15,0));
 

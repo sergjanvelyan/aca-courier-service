@@ -31,7 +31,9 @@ public class OrderConverter implements Converter<Order, OrderJson> {
         entity.setSize(model.getSize());
         entity.setDeliveryPrice(model.getDeliveryPrice());
         entity.setTotalPrice(model.getTotalPrice());
-        entity.setStatus(model.getStatus());
+        if(model.getStatus()!=null){
+            entity.setStatus(model.getStatus());
+        }
         entity.setOrderConfirmedTime(model.getOrderConfirmedTime());
         entity.setOrderDeliveredTime(model.getOrderDeliveredTime());
         return entity;
@@ -44,6 +46,7 @@ public class OrderConverter implements Converter<Order, OrderJson> {
     @Override
     public OrderJson convertToModel(Order entity) {
         OrderJson model = new OrderJson();
+        model.setId(entity.getId());
         model.setOrderId(entity.getOrderId());
         model.setTrackingNumber(entity.getTrackingNumber());
         if(entity.getStore()!=null){
@@ -56,13 +59,13 @@ public class OrderConverter implements Converter<Order, OrderJson> {
         model.setPhone(entity.getPhone());
         model.setZipCode(entity.getZipCode());
         model.setWeightKg(entity.getWeightKg());
-        model.setSize(entity.getSize());
+        model.setSize(entity.getSize().toString());
         if(entity.getCourier()!=null){
             model.setCourierId(entity.getCourier().getId());
         }
         model.setDeliveryPrice(entity.getDeliveryPrice());
         model.setTotalPrice(entity.getTotalPrice());
-        model.setStatus(entity.getStatus());
+        model.setStatus(entity.getStatus().toString());
         model.setOrderConfirmedTime(entity.getOrderConfirmedTime());
         model.setOrderDeliveredTime(entity.getOrderDeliveredTime());
         model.setStatusUpdateHistory(statusUpdateTimeConverter.convertToListModel(entity.getStatusUpdateTimeList()));
