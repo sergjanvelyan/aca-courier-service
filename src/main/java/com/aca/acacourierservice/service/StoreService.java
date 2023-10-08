@@ -21,7 +21,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,27 +48,31 @@ public class StoreService {
         this.userConverter = userConverter;
         this.pickupPointConverter = pickupPointConverter;
     }
+
     public Store getStoreById(@Min(1) long storeId) throws CourierServiceException {
         Optional<Store> storeOptional = storeRepository.findById(storeId);
         if (storeOptional.isEmpty()) {
-            throw new CourierServiceException("There is no store with id=" + storeId+":");
+            throw new CourierServiceException("There is no store with id=" + storeId + ":");
         }
         return storeOptional.get();
     }
+
     public Store getStoreByApiKey(String apiKey) throws CourierServiceException {
         Optional<Store> storeOptional = storeRepository.findByApiKey(apiKey);
         if (storeOptional.isEmpty()) {
-            throw new CourierServiceException("There is no store with apiKey=" + apiKey+":");
+            throw new CourierServiceException("There is no store with apiKey=" + apiKey + ":");
         }
         return storeOptional.get();
     }
+
     public Store getStoreByAdminUsername(@Email String email) throws CourierServiceException {
         Optional<Store> storeOptional = storeRepository.findByAdmin_Email(email);
         if (storeOptional.isEmpty()) {
-            throw new CourierServiceException("There is no store with admin username=" + email+":");
+            throw new CourierServiceException("There is no store with admin username=" + email + ":");
         }
         return storeOptional.get();
     }
+
     @Transactional
     public long addStore(@Valid StoreJson storeJson) {
         Store store = storeConverter.convertToEntity(storeJson);
@@ -77,9 +85,13 @@ public class StoreService {
         storeRepository.save(store);
         return store.getId();
     }
+
     @Transactional
-    public long addStoreAndAdmin(@Valid StoreJson storeJson) {
+    public Store addStoreAndAdmin(@Valid StoreJson storeJson) throws NoSuchAlgorithmException {
         Store store = storeConverter.convertToEntity(storeJson);
+        store.setApiKey(generateKey(256));
+        store.setApiSecret(generateKey(256));
+
         if (store.getPickupPoints() != null) {
             for (PickupPoint pickupPoint : store.getPickupPoints()) {
                 pickupPoint.setStore(store);
@@ -90,8 +102,9 @@ public class StoreService {
         admin.setRole(User.Role.ROLE_STORE_ADMIN);
         userService.saveUser(admin);
         storeRepository.save(store);
-        return store.getId();
+        return store;
     }
+
     @Transactional
     public void updateStore(@Min(1) long id, @Valid StoreJson storeJson) throws CourierServiceException {
         Store store = getStoreById(id);
@@ -108,7 +121,7 @@ public class StoreService {
             UserJson newStoreAdminJson = userConverter.convertToModel(storeJson.getAdmin());
             newStoreAdminJson.setRole(User.Role.ROLE_STORE_ADMIN);
             User storeAdmin = store.getAdmin();
-            userService.updateUser(newStoreAdminJson,storeAdmin);
+            userService.updateUser(newStoreAdminJson, storeAdmin);
             store.setAdmin(storeAdmin);
         }
         if (storeJson.getPickupPoints() != null) {
@@ -116,13 +129,15 @@ public class StoreService {
         }
         storeRepository.save(store);
     }
-    public User changeStoreAdmin(@Valid UserJson admin, @Min(1) long storeId) throws CourierServiceException{
+
+    public User changeStoreAdmin(@Valid UserJson admin, @Min(1) long storeId) throws CourierServiceException {
         Store store = getStoreById(storeId);
         admin.setRole(User.Role.ROLE_STORE_ADMIN);
         store.setAdmin(userService.saveUser(admin));
         storeRepository.save(store);
         return store.getAdmin();
     }
+
     public List<StoreJson> listStoresByPage(@Min(0) int page, @Min(1) int count) {
         Page<Store> storePage = storeRepository.findAll(PageRequest.of(page, count));
         List<StoreJson> stores = new ArrayList<>();
@@ -133,11 +148,20 @@ public class StoreService {
         }
         return stores;
     }
+
     @Transactional
     public void deleteStoreById(@Min(1) long id) throws CourierServiceException {
         if (!storeRepository.existsById(id)) {
             throw new CourierServiceException("There is no store");
         }
         storeRepository.deleteById(id);
+    }
+
+    public String generateKey(int length) throws NoSuchAlgorithmException {
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        keyGenerator.init(length);
+        SecretKey secretKey = keyGenerator.generateKey();
+        byte[] rawData = secretKey.getEncoded();
+        return Base64.getEncoder().encodeToString(rawData);
     }
 }

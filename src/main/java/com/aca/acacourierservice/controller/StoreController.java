@@ -4,10 +4,7 @@ import com.aca.acacourierservice.converter.StoreConverter;
 import com.aca.acacourierservice.entity.Order;
 import com.aca.acacourierservice.entity.Store;
 import com.aca.acacourierservice.exception.CourierServiceException;
-import com.aca.acacourierservice.model.Status;
-import com.aca.acacourierservice.model.StatusWithId;
-import com.aca.acacourierservice.model.StoreJson;
-import com.aca.acacourierservice.model.UserJson;
+import com.aca.acacourierservice.model.*;
 import com.aca.acacourierservice.service.OrderService;
 import com.aca.acacourierservice.service.StoreService;
 import jakarta.validation.Valid;
@@ -64,8 +61,8 @@ public class StoreController {
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Status> registerStore(@RequestBody @Valid StoreJson storeJson) {
         try {
-            long id = storeService.addStoreAndAdmin(storeJson);
-            return new ResponseEntity<>(new StatusWithId("Store registered", id), HttpStatus.CREATED);
+            Store store = storeService.addStoreAndAdmin(storeJson);
+            return new ResponseEntity<>(new StatusWithKeyAndSecret("Store registered", store.getId(), store.getApiKey(), store.getApiSecret()), HttpStatus.CREATED);
         } catch (Exception e) {
             if(e.getMessage().contains("duplicate key value violates unique constraint")) {
                 return new ResponseEntity<>(new Status("Duplicate api key or api secret"), HttpStatus.BAD_REQUEST);
