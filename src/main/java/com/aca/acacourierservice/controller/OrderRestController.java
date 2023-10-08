@@ -8,6 +8,7 @@ import com.aca.acacourierservice.exception.CourierServiceException;
 import com.aca.acacourierservice.exception.InvalidStoreCredentialsException;
 import com.aca.acacourierservice.model.*;
 import com.aca.acacourierservice.service.OrderService;
+import com.aca.acacourierservice.service.StatusUpdateTimeService;
 import com.aca.acacourierservice.service.UserService;
 import com.aca.acacourierservice.validation.OnCreate;
 import com.aca.acacourierservice.view.Lists;
@@ -26,6 +27,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @Validated
@@ -34,11 +37,13 @@ public class OrderRestController {
     private final OrderService orderService;
     private final OrderConverter orderConverter;
     private final UserService userService;
+    private final StatusUpdateTimeService statusUpdateTimeService;
     @Autowired
-    public OrderRestController(OrderService orderService, OrderConverter orderConverter, UserService userService) {
+    public OrderRestController(OrderService orderService, OrderConverter orderConverter, UserService userService, StatusUpdateTimeService statusUpdateTimeService) {
         this.orderService = orderService;
         this.orderConverter = orderConverter;
         this.userService = userService;
+        this.statusUpdateTimeService = statusUpdateTimeService;
     }
     @ExceptionHandler
     public ResponseEntity<Status> exceptionHandler(InvalidStoreCredentialsException e){
@@ -91,7 +96,17 @@ public class OrderRestController {
         OrderListJson orderListJson = orderConverter.convertToListModel(orders);
         return new ResponseEntity<>(orderListJson,HttpStatus.OK);
     }
-
+    @GetMapping(value = "/tracking/{trackingId}")
+    @JsonView(Lists.class)
+    @ValidateApiKeySecret
+    public ResponseEntity<?> trackOrder (@PathVariable String trackingId){
+        try {
+            List<StatusUpdateTimeJson> statusUpdateHistory = statusUpdateTimeService.getStatusUpdateTimeListByOrderTrackingNumber(trackingId);
+            return new ResponseEntity<>(statusUpdateHistory,HttpStatus.OK);
+        }catch (CourierServiceException e){
+            return new ResponseEntity<>(new Status(e.getMessage()),HttpStatus.BAD_REQUEST);
+        }
+    }
     @PutMapping(value = "/{orderId}/updateStatus")
     @Secured({"ROLE_ADMIN","ROLE_COURIER"})
     public ResponseEntity<?>  updateOrderStatus(@PathVariable @Min(1) long orderId, @RequestBody @Valid StatusInfoJson statusInfoJson){

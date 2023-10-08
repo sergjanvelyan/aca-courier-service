@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface StatusUpdateTimeRepository  extends JpaRepository<StatusUpdateTime, Long> {
     List<StatusUpdateTime> findAllByOrderId(long orderId);
+    List<StatusUpdateTime> findAllByOrder_TrackingNumber(String trackingNumber);
 }

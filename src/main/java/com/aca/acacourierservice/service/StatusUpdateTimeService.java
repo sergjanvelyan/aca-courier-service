@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,5 +39,16 @@ public class StatusUpdateTimeService {
             throw new CourierServiceException("There is no status update history for order(id="+orderId+")");
         }
         return statusUpdateTimeList;
+    }
+    public List<StatusUpdateTimeJson> getStatusUpdateTimeListByOrderTrackingNumber(String trackingNumber) throws CourierServiceException {
+        List<StatusUpdateTime> statusUpdateTimeList = statusUpdateTimeRepository.findAllByOrder_TrackingNumber(trackingNumber);
+        if(statusUpdateTimeList.isEmpty()){
+            throw new CourierServiceException("There is no order with tracking number ("+trackingNumber+")");
+        }
+        List<StatusUpdateTimeJson> statusUpdateHistoryJson = new ArrayList<>();
+        for (StatusUpdateTime statusUpdate:statusUpdateTimeList) {
+            statusUpdateHistoryJson.add(statusUpdateTimeConverter.convertToModel(statusUpdate));
+        }
+        return statusUpdateHistoryJson;
     }
 }
