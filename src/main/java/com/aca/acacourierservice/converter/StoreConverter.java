@@ -21,8 +21,6 @@ public class StoreConverter implements Converter<Store, StoreJson> {
             entity.setPickupPoints(pickupPointConverter.convertToEntityList(model.getPickupPoints()));
         }
         entity.setStoreUrl(model.getStoreUrl());
-        entity.setApiKey(model.getApiKey());
-        entity.setApiSecret(model.getApiSecret());
         entity.setAdmin(model.getAdmin());
         return entity;
     }
@@ -36,8 +34,6 @@ public class StoreConverter implements Converter<Store, StoreJson> {
             entity.setPickupPoints(pickupPointConverter.convertToEntityList(model.getPickupPoints()));
         }
         entity.setStoreUrl(model.getStoreUrl());
-        entity.setApiKey(model.getApiKey());
-        entity.setApiSecret(model.getApiSecret());
         entity.setAdmin(model.getAdmin());
         return entity;
     }
