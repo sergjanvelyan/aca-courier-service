@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -19,6 +20,7 @@ public class Store {
     private Long id;
     @Column(nullable = false)
     @NotEmpty(message = "The name field must not be empty")
+    @Size(min = 2, max = 20, message = "Store name length should be 2-20")
     private String name;
     @OneToOne
     @NotNull(message = "Admin must not be null")
@@ -30,7 +32,7 @@ public class Store {
     @Pattern(regexp = "^(https?:\\/\\/)?[^\\s/$.?#].[^\\s]*$", message = "The url ${validatedValue} is invalid")
     private String storeUrl;
     @Column
-    @Pattern(regexp = "^\\+?\\d+$", message = "Invalid phone number")
+    @Pattern(regexp = "^[+][0-9]{10,15}$", message = "Invalid phone number")
     private String phoneNumber;
     @Column(unique = true)
     private String apiKey;

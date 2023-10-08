@@ -8,6 +8,7 @@ import com.aca.acacourierservice.model.StatusWithId;
 import com.aca.acacourierservice.model.UserJson;
 import com.aca.acacourierservice.model.UserListJson;
 import com.aca.acacourierservice.service.UserService;
+import com.aca.acacourierservice.validation.OnUpdate;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,7 @@ public class UserController {
         }
     }
     @PutMapping(value ="/profile/update" )
+    @Validated(OnUpdate.class)
     @Secured({"ROLE_ADMIN", "ROLE_STORE_ADMIN", "ROLE_COURIER"})
     public ResponseEntity<Status> updateUserProfile(@RequestBody @Valid UserJson userJson) {
         try{
@@ -105,6 +107,7 @@ public class UserController {
         return new ResponseEntity<>(userListJson,HttpStatus.OK);
     }
     @PutMapping(value ="/courier/{courierId}")
+    @Validated(OnUpdate.class)
     @Secured("ROLE_ADMIN")
     public ResponseEntity<?> updateCourier(@RequestBody @Valid UserJson courierJson, @PathVariable @Min(1) long courierId){
         try{

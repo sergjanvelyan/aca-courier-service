@@ -7,6 +7,8 @@ import com.aca.acacourierservice.exception.CourierServiceException;
 import com.aca.acacourierservice.model.*;
 import com.aca.acacourierservice.service.OrderService;
 import com.aca.acacourierservice.service.StoreService;
+import com.aca.acacourierservice.validation.OnCreate;
+import com.aca.acacourierservice.validation.OnUpdate;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +60,7 @@ public class StoreController {
     }
 
     @Secured("ROLE_ADMIN")
+    @Validated(OnCreate.class)
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Status> registerStore(@RequestBody @Valid StoreJson storeJson) {
         try {
@@ -72,6 +75,7 @@ public class StoreController {
     }
 
     @Secured("ROLE_ADMIN")
+    @Validated(OnUpdate.class)
     @PutMapping(value = "/{storeId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Status> updateStore(@RequestBody @Valid StoreJson storeJson, @PathVariable @Min(1) long storeId) {
         try {
