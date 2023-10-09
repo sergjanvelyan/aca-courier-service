@@ -13,8 +13,6 @@ import java.util.List;
 public class UserConverter implements Converter<User, UserJson>{
     @Override
     public User convertToEntity(UserJson model, User entity) {
-        entity.setEmail(model.getEmail());
-        entity.setRole(model.getRole());
         entity.setAddress(model.getAddress());
         entity.setBirthDate(model.getBirthDate());
         entity.setFullName(model.getFullName());
@@ -24,7 +22,13 @@ public class UserConverter implements Converter<User, UserJson>{
     @Override
     public User convertToEntity(UserJson model) {
         User entity = new User();
-        return convertToEntity(model,entity);
+        entity.setEmail(model.getEmail());
+        entity.setRole(model.getRole());
+        entity.setAddress(model.getAddress());
+        entity.setBirthDate(model.getBirthDate());
+        entity.setFullName(model.getFullName());
+        entity.setPhoneNumber(model.getPhoneNumber());
+        return entity;
     }
     @Override
     public UserJson convertToModel(User entity) {

@@ -1,8 +1,6 @@
 package com.aca.acacourierservice.service;
 
-import com.aca.acacourierservice.converter.PickupPointConverter;
 import com.aca.acacourierservice.converter.StoreConverter;
-import com.aca.acacourierservice.converter.UserConverter;
 import com.aca.acacourierservice.entity.PickupPoint;
 import com.aca.acacourierservice.entity.Store;
 import com.aca.acacourierservice.entity.User;
@@ -36,17 +34,13 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final StoreConverter storeConverter;
     private final UserService userService;
-    private final UserConverter userConverter;
-    private final PickupPointConverter pickupPointConverter;
 
     @Autowired
-    public StoreService(PickupPointRepository pickupPointRepository, StoreRepository storeRepository, StoreConverter storeConverter, UserService userService, UserConverter userConverter, PickupPointConverter pickupPointConverter) {
+    public StoreService(PickupPointRepository pickupPointRepository, StoreRepository storeRepository, StoreConverter storeConverter, UserService userService) {
         this.pickupPointRepository = pickupPointRepository;
         this.storeRepository = storeRepository;
         this.storeConverter = storeConverter;
         this.userService = userService;
-        this.userConverter = userConverter;
-        this.pickupPointConverter = pickupPointConverter;
     }
 
     public Store getStoreById(@Min(1) long storeId) throws CourierServiceException {
@@ -108,25 +102,7 @@ public class StoreService {
     @Transactional
     public void updateStore(@Min(1) long id, @Valid StoreJson storeJson) throws CourierServiceException {
         Store store = getStoreById(id);
-        if (storeJson.getName() != null) {
-            store.setName(storeJson.getName());
-        }
-        if (storeJson.getStoreUrl() != null) {
-            store.setStoreUrl(storeJson.getStoreUrl());
-        }
-        if (storeJson.getPhoneNumber() != null) {
-            store.setPhoneNumber(storeJson.getPhoneNumber());
-        }
-        if (storeJson.getAdmin() != null) {
-            UserJson newStoreAdminJson = userConverter.convertToModel(storeJson.getAdmin());
-            newStoreAdminJson.setRole(User.Role.ROLE_STORE_ADMIN);
-            User storeAdmin = store.getAdmin();
-            userService.updateUser(newStoreAdminJson, storeAdmin);
-            store.setAdmin(storeAdmin);
-        }
-        if (storeJson.getPickupPoints() != null) {
-            store.setPickupPoints(pickupPointConverter.convertToEntityList(storeJson.getPickupPoints()));
-        }
+        store=storeConverter.convertToEntity(storeJson,store);
         storeRepository.save(store);
     }
 

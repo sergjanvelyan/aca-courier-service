@@ -17,11 +17,7 @@ public class StoreConverter implements Converter<Store, StoreJson> {
     public Store convertToEntity(StoreJson model, Store entity) {
         entity.setName(model.getName());
         entity.setPhoneNumber(model.getPhoneNumber());
-        if (model.getPickupPoints() != null) {
-            entity.setPickupPoints(pickupPointConverter.convertToEntityList(model.getPickupPoints()));
-        }
         entity.setStoreUrl(model.getStoreUrl());
-        entity.setAdmin(model.getAdmin());
         return entity;
     }
 
