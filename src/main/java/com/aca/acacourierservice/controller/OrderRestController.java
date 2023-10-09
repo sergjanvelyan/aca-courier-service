@@ -60,6 +60,15 @@ public class OrderRestController {
         String trackingNumber = orderService.addOrder(orderJson);
         return new StatusWithTrackingNumber("Created order",trackingNumber);
     }
+    @PostMapping(value = "/calculate")
+    @ValidateApiKeySecret
+    public ResponseEntity<DeliveryPriceInfo> calculateDeliveryPrice(
+            @RequestBody @Valid ItemOrderInfo itemInfo,
+            HttpServletRequest request){
+        long storeId = (long) request.getAttribute("storeId");
+        double deliveryPrice = orderService.calculateDeliveryPrice(itemInfo,storeId);
+        return new ResponseEntity<>(new DeliveryPriceInfo(deliveryPrice,"USD"),HttpStatus.OK);
+    }
 
     @GetMapping("/{orderId}")
     @JsonView(PrivateSecondLevel.class)

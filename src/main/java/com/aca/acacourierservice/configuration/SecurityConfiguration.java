@@ -44,7 +44,7 @@ public class SecurityConfiguration {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login","/order/create","/order/tracking/{trackingId}").permitAll()
+                        .requestMatchers("/login","/order/create","/order/tracking/{trackingId}","/order/calculate").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())

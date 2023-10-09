@@ -2,8 +2,11 @@ package com.aca.acacourierservice.service;
 
 import com.aca.acacourierservice.converter.OrderConverter;
 import com.aca.acacourierservice.entity.Order;
+import com.aca.acacourierservice.entity.PickupPoint;
+import com.aca.acacourierservice.entity.Store;
 import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.exception.CourierServiceException;
+import com.aca.acacourierservice.model.ItemOrderInfo;
 import com.aca.acacourierservice.model.OrderJson;
 import com.aca.acacourierservice.model.StatusInfoJson;
 import com.aca.acacourierservice.model.StatusUpdateTimeJson;
@@ -20,6 +23,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -38,8 +42,34 @@ public class OrderService{
         this.userService = userService;
         this.storeService = storeService;
     }
+    public double calculateDeliveryPrice(@Valid ItemOrderInfo itemOrderInfo,@Min(1) long storeId){
+        Order.Size size = itemOrderInfo.getSize();
+        double weight = itemOrderInfo.getWeightKg();
+        String destinationCountry = itemOrderInfo.getCountry();
+        final double DELIVERY_PRICE_USD_KG = 2;
+        Store store = storeService.getStoreById(storeId);
+        List<PickupPoint> pickupPoints = store.getPickupPoints();
+        double additionalFeeUSD = 1;
+        if(!isSameCountry(pickupPoints,destinationCountry)){
+            additionalFeeUSD+=2;
+        }
+        return additionalFeeUSD+switch (size){
+            case SMALL -> weight*DELIVERY_PRICE_USD_KG*0.9;
+            case MEDIUM -> weight*DELIVERY_PRICE_USD_KG;
+            case LARGE -> weight*DELIVERY_PRICE_USD_KG*1.1;
+            case EXTRA_LARGE -> weight*DELIVERY_PRICE_USD_KG*1.2;
+        };
+    }
+    public boolean isSameCountry(List<PickupPoint> pickupPoints,String destinationCountry){
+        for (PickupPoint pickupPoint:pickupPoints) {
+            if (pickupPoint.getCountry().equalsIgnoreCase(destinationCountry)){
+                return true;
+            }
+        }
+        return false;
+    }
     @Transactional
-     public String addOrder(@Valid OrderJson orderJson){
+    public String addOrder(@Valid OrderJson orderJson){
         Order order = orderConverter.convertToEntity(orderJson);
         order.setStore(storeService.getStoreById(orderJson.getStoreId()));
         order.setStatus(Order.Status.NEW);
