@@ -27,16 +27,16 @@ public class OrderJson {
     @Positive
     private Long storeId;
     @JsonView(PrivateSecondLevel.class)
-    @Pattern(regexp ="^[a-zA-Z]{2,30}$",message = "Not valid name")
+    @Pattern(regexp = "^(([a-zA-Z]{2,15})\\s?)+$",message = "Not valid name")
     private String fullName;
     @JsonView(Public.class)
-    @Pattern(regexp ="^[a-zA-Z]{2,15}$",message = "Not valid country")
+    @Pattern(regexp ="^(([a-zA-Z]{2,15})\\s?)+$",message = "Not valid country")
     private String country;
     @JsonView(Public.class)
-    @Pattern(regexp ="^[a-zA-Z]{2,15}$",message = "Not valid city")
+    @Pattern(regexp ="^(([a-zA-Z]{2,15})\\s?)+$",message = "Not valid city")
     private String city;
     @JsonView(PrivateSecondLevel.class)
-    @Pattern(regexp = "^([a-zA-Z]{2,15}|[1-9]+)\\s([1-9]+|([1-9]+/[1-9]+))$",message = "Not valid address")
+    @Pattern(regexp = "^(([a-zA-Z]{2,15}\\s?)+|[1-9]+)\\s([1-9]+[a-zA-Z]?|([1-9]+/[1-9]+))$",message = "Not valid address")
     private String address;
     @JsonView(PrivateSecondLevel.class)
     @Pattern(regexp ="^[+][0-9]{10,15}$",message = "Phone number should be like +{country code}{phone number}")

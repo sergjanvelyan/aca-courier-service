@@ -19,10 +19,11 @@ public class UserJson {
     private String password;
     @Null(groups = OnUpdate.class, message = "You can't change the role")
     private User.Role role;
+    @Pattern(regexp = "^(([a-zA-Z]{2,15}\\s?)+|[1-9]+)\\s([1-9]+[a-zA-Z]?|([1-9]+/[1-9]+))$",message = "Not valid address")
     private String address;
     @Pattern(regexp = "^[+][0-9]{10,15}$", message = "Invalid phone number")
     private String phoneNumber;
-    @Pattern(regexp = "^[A-Za-z]{2,30}$", message = "Name should contain letters")
+    @Pattern(regexp = "^(([a-zA-Z]{2,15})\\s?)+$", message = "Name should contain letters")
     private String fullName;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @JsonFormat(pattern = "dd/MM/yyyy")
