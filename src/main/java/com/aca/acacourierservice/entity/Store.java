@@ -20,7 +20,7 @@ public class Store {
     private Long id;
     @Column(nullable = false)
     @NotEmpty(message = "The name field must not be empty")
-    @Size(min = 2, max = 20, message = "Store name length should be 2-20")
+    @Size(min = 2, max = 30, message = "Store name length should be 2-30")
     private String name;
     @OneToOne
     @NotNull(message = "Admin must not be null")

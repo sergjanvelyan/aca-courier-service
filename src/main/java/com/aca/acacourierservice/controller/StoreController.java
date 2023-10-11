@@ -1,5 +1,6 @@
 package com.aca.acacourierservice.controller;
 
+import com.aca.acacourierservice.converter.OrderConverter;
 import com.aca.acacourierservice.converter.StoreConverter;
 import com.aca.acacourierservice.entity.Order;
 import com.aca.acacourierservice.entity.Store;
@@ -9,6 +10,9 @@ import com.aca.acacourierservice.service.OrderService;
 import com.aca.acacourierservice.service.StoreService;
 import com.aca.acacourierservice.validation.OnCreate;
 import com.aca.acacourierservice.validation.OnUpdate;
+import com.aca.acacourierservice.view.Lists;
+import com.aca.acacourierservice.view.Public;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,15 +33,18 @@ public class StoreController {
     private final StoreService storeService;
     private final StoreConverter storeConverter;
     private final OrderService orderService;
+    private final OrderConverter orderConverter;
 
     @Autowired
-    public StoreController(StoreService storeService, StoreConverter storeConverter, OrderService orderService) {
+    public StoreController(StoreService storeService, StoreConverter storeConverter, OrderService orderService, OrderConverter orderConverter) {
         this.storeService = storeService;
         this.storeConverter = storeConverter;
         this.orderService = orderService;
+        this.orderConverter = orderConverter;
     }
 
     @Secured("ROLE_ADMIN")
+    @JsonView(Public.class)
     @GetMapping(value = "/{storeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getStore(@PathVariable @Min(1) long storeId) {
         Store store;
@@ -54,6 +61,7 @@ public class StoreController {
     }
 
     @Secured("ROLE_ADMIN")
+    @JsonView(Lists.class)
     @GetMapping(value = "/list/page/{page}/count/{count}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<StoreJson> listStores(@PathVariable @Min(0) int page, @PathVariable @Min(1) int count) {
         return storeService.listStoresByPage(page, count);
@@ -67,7 +75,7 @@ public class StoreController {
             Store store = storeService.addStoreAndAdmin(storeJson);
             return new ResponseEntity<>(new StatusWithKeyAndSecret("Store registered", store.getId(), store.getApiKey(), store.getApiSecret()), HttpStatus.CREATED);
         } catch (Exception e) {
-            if(e.getMessage().contains("duplicate key value violates unique constraint")) {
+            if (e.getMessage().contains("duplicate key value violates unique constraint")) {
                 return new ResponseEntity<>(new Status("Duplicate api key or api secret"), HttpStatus.BAD_REQUEST);
             }
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -115,6 +123,7 @@ public class StoreController {
     }
 
     @Secured("ROLE_STORE_ADMIN")
+    @JsonView(Lists.class)
     @GetMapping(value = "/{storeId}/order/list/page/{page}/count/{count}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> listOrders(@PathVariable @Min(1) long storeId, @PathVariable @Min(0) int page, @PathVariable @Min(1) int count) {
         Page<Order> orderPage;
@@ -123,7 +132,7 @@ public class StoreController {
         } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        List<Order> orders = orderPage.toList();
+        OrderListJson orders = orderConverter.convertToListModel(orderPage);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 }

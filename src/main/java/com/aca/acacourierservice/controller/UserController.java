@@ -9,6 +9,9 @@ import com.aca.acacourierservice.model.UserJson;
 import com.aca.acacourierservice.model.UserListJson;
 import com.aca.acacourierservice.service.UserService;
 import com.aca.acacourierservice.validation.OnUpdate;
+import com.aca.acacourierservice.view.Lists;
+import com.aca.acacourierservice.view.Public;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,7 @@ public class UserController {
     private final UserService userService;
     private final UserConverter userConverter;
     private final AuthenticationManager authenticationManager;
+
     @Autowired
     public UserController(UserService userService, UserConverter userConverter, AuthenticationManager authenticationManager) {
         this.userService = userService;
@@ -38,7 +42,7 @@ public class UserController {
         this.authenticationManager = authenticationManager;
     }
 
-    @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE ,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Status> login(@RequestBody @Valid UserJson userJson) {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userJson.getEmail(), userJson.getPassword()));
@@ -48,93 +52,103 @@ public class UserController {
             return new ResponseEntity<>(new Status("You have entered an invalid username or password:"), HttpStatus.UNAUTHORIZED);
         }
     }
-    @GetMapping(value="/profile/get")
+
+    @GetMapping(value = "/profile/get")
+    @JsonView(Public.class)
     @Secured({"ROLE_ADMIN", "ROLE_STORE_ADMIN", "ROLE_COURIER"})
-    public ResponseEntity<?> getUserProfile(){
-        try{
+    public ResponseEntity<?> getUserProfile() {
+        try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             UserJson userJson = userConverter.convertToModel(userService.getUserByEmail(username));
             userJson.setPassword("Password hidden");
-            return new ResponseEntity<>(userJson,HttpStatus.OK);
-        }catch (CourierServiceException e){
-            return new ResponseEntity<>(new Status("Not found:"),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(userJson, HttpStatus.OK);
+        } catch (CourierServiceException e) {
+            return new ResponseEntity<>(new Status("Not found:"), HttpStatus.NOT_FOUND);
         }
     }
-    @PutMapping(value ="/profile/update" )
+
+    @PutMapping(value = "/profile/update")
     @Validated(OnUpdate.class)
     @Secured({"ROLE_ADMIN", "ROLE_STORE_ADMIN", "ROLE_COURIER"})
     public ResponseEntity<Status> updateUserProfile(@RequestBody @Valid UserJson userJson) {
-        try{
+        try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
-            userService.updateUser(userJson,username);
-            return new ResponseEntity<>(new Status("Profile updated:"),HttpStatus.OK);
-        }catch (CourierServiceException e){
-            return new ResponseEntity<>(new Status("Not found:"),HttpStatus.NOT_FOUND);
+            userService.updateUser(userJson, username);
+            return new ResponseEntity<>(new Status("Profile updated:"), HttpStatus.OK);
+        } catch (CourierServiceException e) {
+            return new ResponseEntity<>(new Status("Not found:"), HttpStatus.NOT_FOUND);
         }
     }
+
     @PostMapping("/courier/register")
     @Secured("ROLE_ADMIN")
     public ResponseEntity<Status> register(@RequestBody @Valid UserJson userJson) {
         userJson.setRole(User.Role.ROLE_COURIER);
         try {
             long id = userService.saveUser(userJson).getId();
-            return new ResponseEntity<>(new StatusWithId("Registered:", id),HttpStatus.OK);
+            return new ResponseEntity<>(new StatusWithId("Registered:", id), HttpStatus.OK);
         } catch (CourierServiceException e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping(value="/courier/{courierId}")
+
+    @GetMapping(value = "/courier/{courierId}")
+    @JsonView(Public.class)
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<?> getCourier(@PathVariable @Min(1) Long courierId){
-        try{
+    public ResponseEntity<?> getCourier(@PathVariable @Min(1) Long courierId) {
+        try {
             UserJson userJson = userConverter.convertToModel(userService.getUserById(courierId));
             userJson.setPassword("Password hidden");
-            if(!userJson.getRole().equals(User.Role.ROLE_COURIER)){
+            if (!userJson.getRole().equals(User.Role.ROLE_COURIER)) {
                 throw new CourierServiceException();
             }
-            return new ResponseEntity<>(userJson,HttpStatus.OK);
-        } catch (CourierServiceException e){
-            return new ResponseEntity<>(new StatusWithId("There is no courier", courierId),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(userJson, HttpStatus.OK);
+        } catch (CourierServiceException e) {
+            return new ResponseEntity<>(new StatusWithId("There is no courier", courierId), HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping(value="/courier/list/page/{page}/count/{count}")
+
+    @GetMapping(value = "/courier/list/page/{page}/count/{count}")
+    @JsonView(Lists.class)
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<?> getCourierList(@PathVariable @Min(0) int page, @PathVariable @Min(1) int count){
+    public ResponseEntity<?> getCourierList(@PathVariable @Min(0) int page, @PathVariable @Min(1) int count) {
         Page<User> couriers = userService.getCouriers(page, count);
         UserListJson userListJson = userConverter.convertToListModel(couriers);
-        return new ResponseEntity<>(userListJson,HttpStatus.OK);
+        return new ResponseEntity<>(userListJson, HttpStatus.OK);
     }
-    @PutMapping(value ="/courier/{courierId}")
+
+    @PutMapping(value = "/courier/{courierId}")
     @Validated(OnUpdate.class)
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<?> updateCourier(@RequestBody @Valid UserJson courierJson, @PathVariable @Min(1) long courierId){
-        try{
+    public ResponseEntity<?> updateCourier(@RequestBody @Valid UserJson courierJson, @PathVariable @Min(1) long courierId) {
+        try {
             User courier = userService.getUserById(courierId);
-            if (!courier.getRole().equals(User.Role.ROLE_COURIER)){
+            if (!courier.getRole().equals(User.Role.ROLE_COURIER)) {
                 throw new CourierServiceException();
             }
             courierJson.setRole(User.Role.ROLE_COURIER);
-            userService.updateUser(courierJson,courier);
-            return new ResponseEntity<>(new Status("Courier updated:"),HttpStatus.OK);
-        }catch (CourierServiceException e){
-            return new ResponseEntity<>(new StatusWithId("There is no courier", courierId),HttpStatus.BAD_REQUEST);
-        }catch (Exception e) {
+            userService.updateUser(courierJson, courier);
+            return new ResponseEntity<>(new Status("Courier updated:"), HttpStatus.OK);
+        } catch (CourierServiceException e) {
+            return new ResponseEntity<>(new StatusWithId("There is no courier", courierId), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @DeleteMapping(value ="/courier/{courierId}")
+
+    @DeleteMapping(value = "/courier/{courierId}")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<?> deleteCourier(@PathVariable @Min(1) long courierId){
+    public ResponseEntity<?> deleteCourier(@PathVariable @Min(1) long courierId) {
         try {
-            if(!userService.getUserById(courierId).getRole().equals(User.Role.ROLE_COURIER)){
+            if (!userService.getUserById(courierId).getRole().equals(User.Role.ROLE_COURIER)) {
                 throw new CourierServiceException();
             }
             userService.deleteExistingUserById(courierId);
-            return new ResponseEntity<>(new Status("Courier deleted"),HttpStatus.OK);
-        }catch (CourierServiceException e){
-            return new ResponseEntity<>(new StatusWithId("There is no courier", courierId),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Status("Courier deleted"), HttpStatus.OK);
+        } catch (CourierServiceException e) {
+            return new ResponseEntity<>(new StatusWithId("There is no courier", courierId), HttpStatus.BAD_REQUEST);
         }
     }
 }
