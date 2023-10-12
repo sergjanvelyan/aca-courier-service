@@ -30,7 +30,7 @@ public class User {
     @Pattern(regexp = "^[+][0-9]{10,15}$", message = "Invalid phone number")
     private String phoneNumber;
     @Column
-    @Pattern(regexp = "^[A-Za-z]{2,30}$", message = "Name should contain letters")
+    @Pattern(regexp = "^(([a-zA-Z]{2,15})\\s?)+$", message = "Name should contain letters")
     private String fullName;
     @Column
     @Temporal(TemporalType.DATE)

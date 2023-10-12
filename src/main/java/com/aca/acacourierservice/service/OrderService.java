@@ -6,11 +6,16 @@ import com.aca.acacourierservice.entity.PickupPoint;
 import com.aca.acacourierservice.entity.Store;
 import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.exception.CourierServiceException;
-import com.aca.acacourierservice.model.ItemOrderInfo;
-import com.aca.acacourierservice.model.OrderJson;
-import com.aca.acacourierservice.model.StatusInfoJson;
-import com.aca.acacourierservice.model.StatusUpdateTimeJson;
+import com.aca.acacourierservice.model.*;
 import com.aca.acacourierservice.repository.OrderRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.EntityType;
+import jakarta.persistence.metamodel.Metamodel;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -23,24 +28,70 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @Validated
 public class OrderService{
+    private final EntityManager entityManager;
     private final OrderRepository orderRepository;
     private final OrderConverter orderConverter;
     private final StatusUpdateTimeService statusUpdateTimeService;
     private final UserService userService;
     private final StoreService storeService;
     @Autowired
-    public OrderService(OrderRepository orderRepository, OrderConverter orderConverter, @Lazy StatusUpdateTimeService statusUpdateTimeService, UserService userService, StoreService storeService) {
+    public OrderService(EntityManager entityManager, OrderRepository orderRepository, OrderConverter orderConverter, @Lazy StatusUpdateTimeService statusUpdateTimeService, UserService userService, StoreService storeService) {
+        this.entityManager = entityManager;
         this.orderRepository = orderRepository;
         this.orderConverter = orderConverter;
         this.statusUpdateTimeService = statusUpdateTimeService;
         this.userService = userService;
         this.storeService = storeService;
+    }
+
+    public List<Order> listOrdersByFilters(@Valid FilteringInfo filteringInfo, @Min(0) int page, @Min(1) int count) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Order> orderCriteriaQuery = criteriaBuilder.createQuery(Order.class);
+        Root<Order> root = orderCriteriaQuery.from(Order.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+        if (filteringInfo.getCity() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("city"),filteringInfo.getCity()));
+        }
+        if (filteringInfo.getCountry() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("country"),filteringInfo.getCountry()));
+        }
+        if (filteringInfo.getStatus() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("status"),filteringInfo.getStatus()));
+        }
+        if (filteringInfo.getZipCode() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("zip_code"),filteringInfo.getZipCode()));
+        }
+        if (filteringInfo.getSize() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("size"),filteringInfo.getSize()));
+        }
+        if (filteringInfo.getDeliveryPriceMin() != null && filteringInfo.getDeliveryPriceMax() != null) {
+            predicates.add(criteriaBuilder.between(root.get("delivery_price"), filteringInfo.getDeliveryPriceMin(), filteringInfo.getDeliveryPriceMax()));
+        }
+        if (filteringInfo.getTotalPriceMin() != null && filteringInfo.getTotalPriceMax() != null) {
+            predicates.add(criteriaBuilder.between(root.get("total_price"), filteringInfo.getTotalPriceMin(), filteringInfo.getTotalPriceMax()));
+        }
+        if (filteringInfo.getWeightMin() != null && filteringInfo.getWeightMax() != null) {
+            predicates.add(criteriaBuilder.between(root.get("weight"), filteringInfo.getWeightMin(), filteringInfo.getWeightMax()));
+        }
+        if (filteringInfo.getOrderConfirmedTimeMin() != null && filteringInfo.getOrderConfirmedTimeMax() != null) {
+            predicates.add(criteriaBuilder.between(root.get("order_confirmed_time"), filteringInfo.getOrderConfirmedTimeMin(), filteringInfo.getOrderConfirmedTimeMax()));
+        }
+        if (filteringInfo.getOrderDeliveredTimeMin() != null && filteringInfo.getOrderDeliveredTimeMax() != null) {
+            predicates.add(criteriaBuilder.between(root.get("order_delivered_time"), filteringInfo.getOrderDeliveredTimeMin(), filteringInfo.getOrderDeliveredTimeMax()));
+        }
+        orderCriteriaQuery.select(root).where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+        TypedQuery<Order> typedQuery = entityManager.createQuery(orderCriteriaQuery);
+        typedQuery.setFirstResult((page-1) * count);
+        typedQuery.setMaxResults(count);
+        return typedQuery.getResultList();
     }
     public double calculateDeliveryPrice(@Valid ItemOrderInfo itemOrderInfo,@Min(1) long storeId){
         Order.Size size = itemOrderInfo.getSize();
