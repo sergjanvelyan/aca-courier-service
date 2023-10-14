@@ -8,14 +8,7 @@ import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.exception.CourierServiceException;
 import com.aca.acacourierservice.model.*;
 import com.aca.acacourierservice.repository.OrderRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.metamodel.EntityType;
-import jakarta.persistence.metamodel.Metamodel;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -23,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -35,89 +29,18 @@ import java.util.Optional;
 @Service
 @Validated
 public class OrderService{
-    private final EntityManager entityManager;
     private final OrderRepository orderRepository;
     private final OrderConverter orderConverter;
     private final StatusUpdateTimeService statusUpdateTimeService;
     private final UserService userService;
     private final StoreService storeService;
     @Autowired
-    public OrderService(EntityManager entityManager, OrderRepository orderRepository, OrderConverter orderConverter, @Lazy StatusUpdateTimeService statusUpdateTimeService, UserService userService, StoreService storeService) {
-        this.entityManager = entityManager;
+    public OrderService(OrderRepository orderRepository, OrderConverter orderConverter, @Lazy StatusUpdateTimeService statusUpdateTimeService, UserService userService, StoreService storeService) {
         this.orderRepository = orderRepository;
         this.orderConverter = orderConverter;
         this.statusUpdateTimeService = statusUpdateTimeService;
         this.userService = userService;
         this.storeService = storeService;
-    }
-
-    public List<Order> listOrdersByFilters(@Valid FilteringInfo filteringInfo, @Min(0) int page, @Min(1) int count) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Order> orderCriteriaQuery = criteriaBuilder.createQuery(Order.class);
-        Root<Order> root = orderCriteriaQuery.from(Order.class);
-
-        List<Predicate> predicates = new ArrayList<>();
-        if (filteringInfo.getCity() != null) {
-            predicates.add(criteriaBuilder.equal(root.get("city"),filteringInfo.getCity()));
-        }
-        if (filteringInfo.getCountry() != null) {
-            predicates.add(criteriaBuilder.equal(root.get("country"),filteringInfo.getCountry()));
-        }
-        if (filteringInfo.getStatus() != null) {
-            predicates.add(criteriaBuilder.equal(root.get("status"),filteringInfo.getStatus()));
-        }
-        if (filteringInfo.getZipCode() != null) {
-            predicates.add(criteriaBuilder.equal(root.get("zip_code"),filteringInfo.getZipCode()));
-        }
-        if (filteringInfo.getSize() != null) {
-            predicates.add(criteriaBuilder.equal(root.get("size"),filteringInfo.getSize()));
-        }
-        if (filteringInfo.getDeliveryPriceMin() != null && filteringInfo.getDeliveryPriceMax() != null) {
-            predicates.add(criteriaBuilder.between(root.get("delivery_price"), filteringInfo.getDeliveryPriceMin(), filteringInfo.getDeliveryPriceMax()));
-        }
-        if (filteringInfo.getTotalPriceMin() != null && filteringInfo.getTotalPriceMax() != null) {
-            predicates.add(criteriaBuilder.between(root.get("total_price"), filteringInfo.getTotalPriceMin(), filteringInfo.getTotalPriceMax()));
-        }
-        if (filteringInfo.getWeightMin() != null && filteringInfo.getWeightMax() != null) {
-            predicates.add(criteriaBuilder.between(root.get("weight"), filteringInfo.getWeightMin(), filteringInfo.getWeightMax()));
-        }
-        if (filteringInfo.getOrderConfirmedTimeMin() != null && filteringInfo.getOrderConfirmedTimeMax() != null) {
-            predicates.add(criteriaBuilder.between(root.get("order_confirmed_time"), filteringInfo.getOrderConfirmedTimeMin(), filteringInfo.getOrderConfirmedTimeMax()));
-        }
-        if (filteringInfo.getOrderDeliveredTimeMin() != null && filteringInfo.getOrderDeliveredTimeMax() != null) {
-            predicates.add(criteriaBuilder.between(root.get("order_delivered_time"), filteringInfo.getOrderDeliveredTimeMin(), filteringInfo.getOrderDeliveredTimeMax()));
-        }
-        orderCriteriaQuery.select(root).where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
-        TypedQuery<Order> typedQuery = entityManager.createQuery(orderCriteriaQuery);
-        typedQuery.setFirstResult((page-1) * count);
-        typedQuery.setMaxResults(count);
-        return typedQuery.getResultList();
-    }
-    public double calculateDeliveryPrice(@Valid ItemOrderInfo itemOrderInfo,@Min(1) long storeId){
-        Order.Size size = itemOrderInfo.getSize();
-        double weight = itemOrderInfo.getWeightKg();
-        String destinationCountry = itemOrderInfo.getCountry();
-        final double DELIVERY_PRICE_USD_KG = 2;
-        Store store = storeService.getStoreById(storeId);
-        List<PickupPoint> pickupPoints = store.getPickupPoints();
-        double additionalFeeUSD = 1;
-        if(!isSameCountry(pickupPoints,destinationCountry)){
-            additionalFeeUSD+=2;
-        }
-        return additionalFeeUSD+switch (size){
-            case SMALL -> weight*DELIVERY_PRICE_USD_KG*0.9;
-            case MEDIUM -> weight*DELIVERY_PRICE_USD_KG;
-            case LARGE -> weight*DELIVERY_PRICE_USD_KG*1.1;
-            case EXTRA_LARGE -> weight*DELIVERY_PRICE_USD_KG*1.2;
-        };
-    }
-    public boolean isSameCountry(List<PickupPoint> pickupPoints,String destinationCountry){
-        for (PickupPoint pickupPoint:pickupPoints) {
-            if (pickupPoint.getCountry().equalsIgnoreCase(destinationCountry)){
-                return true;
-            }
-        }
-        return false;
     }
     @Transactional
     public String addOrder(@Valid OrderJson orderJson){
@@ -186,6 +109,60 @@ public class OrderService{
         }
         return orderOptional.get();
     }
+    public Specification<Order> getOrderFilterSpecification(FilteringInfo filteringInfo){
+        return (root, query, criteriaBuilder) ->{
+            List<Predicate> predicates = new ArrayList<>();
+            if (filteringInfo.getCity() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("city"),filteringInfo.getCity()));
+            }
+            if (filteringInfo.getCountry() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("country"),filteringInfo.getCountry()));
+            }
+            if (filteringInfo.getStatus() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"),filteringInfo.getStatus()));
+            }
+            if (filteringInfo.getZipCode() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("zip_code"),filteringInfo.getZipCode()));
+            }
+            if (filteringInfo.getSize() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("size"),filteringInfo.getSize()));
+            }
+            if (filteringInfo.getDeliveryPriceMin() != null) {
+                predicates.add(criteriaBuilder.greaterThan(root.get("delivery_price"), filteringInfo.getDeliveryPriceMin()));
+            }
+            if (filteringInfo.getDeliveryPriceMax() != null) {
+                predicates.add(criteriaBuilder.lessThan(root.get("delivery_price"),filteringInfo.getDeliveryPriceMax()));
+            }
+            if (filteringInfo.getTotalPriceMin() != null) {
+                predicates.add(criteriaBuilder.greaterThan(root.get("total_price"), filteringInfo.getTotalPriceMin()));
+            }
+            if (filteringInfo.getTotalPriceMax() != null) {
+                predicates.add(criteriaBuilder.lessThan(root.get("total_price"), filteringInfo.getTotalPriceMax()));
+            }
+            if (filteringInfo.getWeightMin() != null) {
+                predicates.add(criteriaBuilder.greaterThan(root.get("weight"), filteringInfo.getWeightMin()));
+            }
+            if (filteringInfo.getWeightMax() != null) {
+                predicates.add(criteriaBuilder.lessThan(root.get("weight"),filteringInfo.getWeightMax()));
+            }
+            if (filteringInfo.getOrderConfirmedTimeMin() != null) {
+                predicates.add(criteriaBuilder.greaterThan(root.get("order_confirmed_time"), filteringInfo.getOrderConfirmedTimeMin()));
+            }
+            if (filteringInfo.getOrderConfirmedTimeMax() != null) {
+                predicates.add(criteriaBuilder.lessThan(root.get("order_confirmed_time"),filteringInfo.getOrderConfirmedTimeMax()));
+            }
+            if (filteringInfo.getOrderDeliveredTimeMin() != null) {
+                predicates.add(criteriaBuilder.greaterThan(root.get("order_delivered_time"), filteringInfo.getOrderDeliveredTimeMin()));
+            }
+            if (filteringInfo.getOrderDeliveredTimeMax() != null) {
+                predicates.add(criteriaBuilder.lessThan(root.get("order_delivered_time"), filteringInfo.getOrderDeliveredTimeMax()));
+            }
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+    public Page<Order> getFilteredOrders(Specification<Order> orderSpecification, @Min(0) int page, @Min(1) int size){
+        return orderRepository.findAll(orderSpecification,PageRequest.of(page, size));
+    }
     public Page<Order> getOrders(@Min(0) int page,@Min(1) int size){
         return orderRepository.findAll(PageRequest.of(page, size));
     }
@@ -197,5 +174,31 @@ public class OrderService{
     }
     public Page<Order> getOrdersByStoreId(@Min(1) long storeId, @Min(0) int page, @Min(1) int size){
         return orderRepository.findAllByStoreId(storeId,PageRequest.of(page, size));
+    }
+    public double calculateDeliveryPrice(@Valid ItemOrderInfo itemOrderInfo,@Min(1) long storeId){
+        Order.Size size = itemOrderInfo.getSize();
+        double weight = itemOrderInfo.getWeightKg();
+        String destinationCountry = itemOrderInfo.getCountry();
+        final double DELIVERY_PRICE_USD_KG = 2;
+        Store store = storeService.getStoreById(storeId);
+        List<PickupPoint> pickupPoints = store.getPickupPoints();
+        double additionalFeeUSD = 1;
+        if(!isSameCountry(pickupPoints,destinationCountry)){
+            additionalFeeUSD+=2;
+        }
+        return additionalFeeUSD+switch (size){
+            case SMALL -> weight*DELIVERY_PRICE_USD_KG*0.9;
+            case MEDIUM -> weight*DELIVERY_PRICE_USD_KG;
+            case LARGE -> weight*DELIVERY_PRICE_USD_KG*1.1;
+            case EXTRA_LARGE -> weight*DELIVERY_PRICE_USD_KG*1.2;
+        };
+    }
+    public boolean isSameCountry(List<PickupPoint> pickupPoints,String destinationCountry){
+        for (PickupPoint pickupPoint:pickupPoints) {
+            if (pickupPoint.getCountry().equalsIgnoreCase(destinationCountry)){
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -60,6 +60,7 @@ public class OrderJson {
     private Double totalPrice;
     @JsonView(Public.class)
     @Null(groups = OnCreate.class,message = "You don't need to enter status.When creating order the status is 'NEW' by default")
+    @ValidEnum(enumClass = Order.Status.class)
     private String status;
     @JsonView(Public.class)
     private LocalDateTime orderConfirmedTime;

@@ -8,14 +8,14 @@ import jakarta.validation.constraints.Positive;
 import java.time.LocalDateTime;
 
 public class FilteringInfo {
-    @ValidEnum(enumClass = Order.Status.class)
-    private String status;
     @Pattern(regexp = "^(([a-zA-Z]{2,15})\\s?)+$", message = "Not valid country")
     private String country;
     @Pattern(regexp = "^(([a-zA-Z]{2,15})\\s?)+$", message = "Not valid city")
     private String city;
     @Pattern(regexp = "^[A-Z0-9]{2,15}$", message = "Not valid zip code")
     private String zipCode;
+    @ValidEnum(enumClass = Order.Status.class)
+    private String status;
     @Positive
     private Double deliveryPriceMin;
     @Positive
@@ -35,8 +35,11 @@ public class FilteringInfo {
     private LocalDateTime orderDeliveredTimeMin;
     private LocalDateTime orderDeliveredTimeMax;
 
-    public String getStatus() {
-        return status;
+    public Order.Status getStatus() {
+        if(status==null){
+            return null;
+        }
+        return Order.Status.valueOf(status.toUpperCase());
     }
 
     public void setStatus(String status) {
@@ -115,8 +118,11 @@ public class FilteringInfo {
         this.weightMax = weightMax;
     }
 
-    public String getSize() {
-        return size;
+    public Order.Size getSize() {
+        if(size==null){
+            return null;
+        }
+        return Order.Size.valueOf(size.toUpperCase());
     }
 
     public void setSize(String size) {

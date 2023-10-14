@@ -19,6 +19,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -68,6 +69,19 @@ public class OrderRestController {
         long storeId = (long) request.getAttribute("storeId");
         double deliveryPrice = orderService.calculateDeliveryPrice(itemInfo,storeId);
         return new ResponseEntity<>(new DeliveryPriceInfo(deliveryPrice,"USD"),HttpStatus.OK);
+    }
+    @PostMapping(value = "/getFilteredOrders/page/{page}/count/{count}")
+    @Secured({"ROLE_ADMIN","ROLE_STORE_ADMIN","ROLE_COURIER"})
+    public ResponseEntity<?> getFilteredOrders(@RequestBody @Valid FilteringInfo filteringInfo,
+                                               @PathVariable @Min(0) int page,
+                                               @PathVariable @Min(1) int count){
+        Specification<Order> orderSpecification = orderService.getOrderFilterSpecification(filteringInfo);
+        Page<Order> orders = orderService.getFilteredOrders(orderSpecification,page, count);
+        if(orders.isEmpty()){
+            return new ResponseEntity<>(new Status("There is no orders"),HttpStatus.OK);
+        }
+        OrderListJson orderListJson = orderConverter.convertToListModel(orders);
+        return new ResponseEntity<>(orderListJson,HttpStatus.OK);
     }
 
     @GetMapping("/{orderId}")
