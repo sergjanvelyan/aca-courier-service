@@ -72,6 +72,7 @@ public class OrderRestController {
     }
     @PostMapping(value = "/getFilteredOrders/page/{page}/count/{count}")
     @Secured({"ROLE_ADMIN","ROLE_STORE_ADMIN","ROLE_COURIER"})
+    @JsonView(Lists.class)
     public ResponseEntity<?> getFilteredOrders(@RequestBody @Valid FilteringInfo filteringInfo,
                                                @PathVariable @Min(0) int page,
                                                @PathVariable @Min(1) int count){
