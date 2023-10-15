@@ -105,7 +105,7 @@ public class StoreService {
         store=storeConverter.convertToEntity(storeJson,store);
         storeRepository.save(store);
     }
-
+    @Transactional
     public User changeStoreAdmin(@Valid UserJson admin, @Min(1) long storeId) throws CourierServiceException {
         Store store = getStoreById(storeId);
         admin.setRole(User.Role.ROLE_STORE_ADMIN);
