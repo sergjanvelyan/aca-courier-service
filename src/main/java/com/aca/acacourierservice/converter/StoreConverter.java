@@ -8,9 +8,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class StoreConverter implements Converter<Store, StoreJson> {
     private final PickupPointConverter pickupPointConverter;
+    private final UserConverter userConverter;
     @Autowired
-    public StoreConverter(PickupPointConverter pickupPointConverter) {
+    public StoreConverter(PickupPointConverter pickupPointConverter, UserConverter userConverter) {
         this.pickupPointConverter = pickupPointConverter;
+        this.userConverter = userConverter;
     }
 
     @Override
@@ -30,7 +32,7 @@ public class StoreConverter implements Converter<Store, StoreJson> {
             entity.setPickupPoints(pickupPointConverter.convertToEntityList(model.getPickupPoints()));
         }
         entity.setStoreUrl(model.getStoreUrl());
-        entity.setAdmin(model.getAdmin());
+        entity.setAdmin(userConverter.convertToEntity(model.getAdmin()));
         return entity;
     }
 
@@ -39,7 +41,7 @@ public class StoreConverter implements Converter<Store, StoreJson> {
         StoreJson model = new StoreJson();
         model.setId(entity.getId());
         model.setName(entity.getName());
-        model.setAdmin(entity.getAdmin());
+        model.setAdmin(userConverter.convertToModel(entity.getAdmin()));
         model.setPhoneNumber(entity.getPhoneNumber());
         model.setStoreUrl(entity.getStoreUrl());
         model.setApiKey(entity.getApiKey());
