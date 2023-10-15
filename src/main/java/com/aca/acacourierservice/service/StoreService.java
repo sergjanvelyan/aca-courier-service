@@ -128,9 +128,8 @@ public class StoreService {
 
     @Transactional
     public void deleteStoreById(@Min(1) long id) throws CourierServiceException {
-        if (!storeRepository.existsById(id)) {
-            throw new CourierServiceException("There is no store");
-        }
+        Store store = getStoreById(id);
+        userService.deleteExistingUserById(store.getAdmin().getId());
         storeRepository.deleteById(id);
     }
 
