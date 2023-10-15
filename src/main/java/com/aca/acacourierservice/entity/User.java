@@ -15,11 +15,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(unique = true, nullable = false)
-    @Email(message = "The email ${validatedValue} is not valid")
     private String email;
     @Column(nullable = false)
-    @Size(min = 8, message = "Password should be at least 8 characters long")
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$", message = "Password should contain at least 1 letter and 1 number")
     private String password;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -27,10 +24,8 @@ public class User {
     @Column
     private String address;
     @Column
-    @Pattern(regexp = "^[+][0-9]{10,15}$", message = "Invalid phone number")
     private String phoneNumber;
     @Column
-    @Pattern(regexp = "^(([a-zA-Z]{2,15})\\s?)+$", message = "Name should contain letters")
     private String fullName;
     @Column
     @Temporal(TemporalType.DATE)
