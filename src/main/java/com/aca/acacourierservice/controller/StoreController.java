@@ -54,9 +54,9 @@ public class StoreController {
             StoreJson storeJson = storeConverter.convertToModel(store);
             return new ResponseEntity<>(storeJson, HttpStatus.OK);
         } catch (CourierServiceException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
