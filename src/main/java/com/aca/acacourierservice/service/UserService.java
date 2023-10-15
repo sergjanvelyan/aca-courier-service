@@ -31,37 +31,33 @@ public class UserService {
         this.userConverter = userConverter;
         this.passwordEncoder = passwordEncoder;
     }
+
     public User getUserById(@Min(1) long id) throws CourierServiceException {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
-            throw new CourierServiceException("There is no user with id="+id+":");
+            throw new CourierServiceException("There is no user with id=" + id + ":");
         }
         return userOptional.get();
     }
+
     public User getUserByEmail(@Email String email) throws CourierServiceException {
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isEmpty()) {
-            throw new CourierServiceException("There is no user with email '"+email+"':");
+            throw new CourierServiceException("There is no user with email '" + email + "':");
         }
         return userOptional.get();
     }
+
     @Transactional
-    public User saveUser(@Valid UserJson model) throws CourierServiceException{
-        if(userRepository.existsByEmail(model.getEmail())) {
+    public User saveUser(@Valid UserJson model) throws CourierServiceException {
+        if (userRepository.existsByEmail(model.getEmail())) {
             throw new CourierServiceException("This email is already in use");
         }
         User user = userConverter.convertToEntity(model);
         user.setPassword(passwordEncoder.encode(model.getPassword()));
         return userRepository.save(user);
     }
-    @Transactional
-    public void saveUser(User entity) {
-        if(userRepository.existsByEmail(entity.getEmail())) {
-            throw new CourierServiceException("This email is already in use");
-        }
-        entity.setPassword(passwordEncoder.encode(entity.getPassword()));
-        userRepository.save(entity);
-    }
+
     @Transactional
     public void updateUser(@Valid UserJson model, @Email String email) throws CourierServiceException {
         User entity = getUserByEmail(email);
@@ -69,17 +65,20 @@ public class UserService {
         entity.setPassword(passwordEncoder.encode(model.getPassword()));
         userRepository.save(entity);
     }
+
     @Transactional
     public void updateUser(@Valid UserJson model, User entity) {
         entity = userConverter.convertToEntity(model, entity);
         entity.setPassword(passwordEncoder.encode(model.getPassword()));
         userRepository.save(entity);
     }
+
     @Transactional
     public void deleteExistingUserById(@Min(1) long id) {
         userRepository.deleteById(id);
     }
-    public Page<User> getCouriers(int page,int size){
-        return userRepository.findAllByRole(User.Role.ROLE_COURIER, PageRequest.of(page,size));
+
+    public Page<User> getCouriers(int page, int size) {
+        return userRepository.findAllByRole(User.Role.ROLE_COURIER, PageRequest.of(page, size));
     }
 }

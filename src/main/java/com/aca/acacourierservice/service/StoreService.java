@@ -92,9 +92,9 @@ public class StoreService {
                 pickupPointRepository.save(pickupPoint);
             }
         }
-        User admin = storeJson.getAdmin();
-        admin.setRole(User.Role.ROLE_STORE_ADMIN);
-        userService.saveUser(admin);
+        UserJson adminJson = storeJson.getAdmin();
+        adminJson.setRole(User.Role.ROLE_STORE_ADMIN);
+        userService.saveUser(adminJson);
         storeRepository.save(store);
         return store;
     }
@@ -102,7 +102,7 @@ public class StoreService {
     @Transactional
     public void updateStore(@Min(1) long id, @Valid StoreJson storeJson) throws CourierServiceException {
         Store store = getStoreById(id);
-        store=storeConverter.convertToEntity(storeJson,store);
+        store = storeConverter.convertToEntity(storeJson, store);
         storeRepository.save(store);
     }
 

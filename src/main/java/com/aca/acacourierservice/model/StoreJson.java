@@ -1,6 +1,5 @@
 package com.aca.acacourierservice.model;
 
-import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.validation.OnCreate;
 import com.aca.acacourierservice.validation.OnUpdate;
 import com.aca.acacourierservice.view.Lists;
@@ -25,7 +24,7 @@ public class StoreJson {
     @Valid
     @Null(groups = OnUpdate.class, message = "You can't update store admin with store. For updating store admin call /admin/update endpoint")
     @JsonView(PrivateFirstLevel.class)
-    private User admin;
+    private UserJson admin;
     @Valid
     @Null(groups = OnUpdate.class, message = "You can't update pickup points with store. For updating pickup points call /pickupPoint endpoint")
     @JsonView(PrivateFirstLevel.class)
@@ -53,11 +52,11 @@ public class StoreJson {
         this.name = name;
     }
 
-    public User getAdmin() {
+    public UserJson getAdmin() {
         return admin;
     }
 
-    public void setAdmin(User admin) {
+    public void setAdmin(UserJson admin) {
         this.admin = admin;
     }
 
