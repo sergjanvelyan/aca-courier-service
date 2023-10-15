@@ -11,7 +11,7 @@ import com.aca.acacourierservice.service.StoreService;
 import com.aca.acacourierservice.validation.OnCreate;
 import com.aca.acacourierservice.validation.OnUpdate;
 import com.aca.acacourierservice.view.Lists;
-import com.aca.acacourierservice.view.Public;
+import com.aca.acacourierservice.view.PrivateSecondLevel;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -44,7 +44,7 @@ public class StoreController {
     }
 
     @Secured("ROLE_ADMIN")
-    @JsonView(Public.class)
+    @JsonView(PrivateSecondLevel.class)
     @GetMapping(value = "/{storeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getStore(@PathVariable @Min(1) long storeId) {
         Store store;

@@ -4,6 +4,7 @@ import com.aca.acacourierservice.validation.OnCreate;
 import com.aca.acacourierservice.validation.OnUpdate;
 import com.aca.acacourierservice.view.Lists;
 import com.aca.acacourierservice.view.PrivateFirstLevel;
+import com.aca.acacourierservice.view.PrivateSecondLevel;
 import com.aca.acacourierservice.view.Public;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
@@ -23,11 +24,11 @@ public class StoreJson {
     private String name;
     @Valid
     @Null(groups = OnUpdate.class, message = "You can't update store admin with store. For updating store admin call /admin/update endpoint")
-    @JsonView(PrivateFirstLevel.class)
+    @JsonView(PrivateSecondLevel.class)
     private UserJson admin;
     @Valid
     @Null(groups = OnUpdate.class, message = "You can't update pickup points with store. For updating pickup points call /pickupPoint endpoint")
-    @JsonView(PrivateFirstLevel.class)
+    @JsonView(PrivateSecondLevel.class)
     private List<PickupPointJson> pickupPoints;
     @Pattern(regexp = "^(https:\\/\\/)?[^\\s/$.?#]+\\.[^\\s]*$", message = "The url ${validatedValue} is invalid")
     @JsonView(Public.class)
@@ -37,11 +38,11 @@ public class StoreJson {
     private String phoneNumber;
     @Null(groups = OnCreate.class, message = "You don't need to enter api key because api key will be generated")
     @Null(groups = OnUpdate.class, message = "You can't update api key")
-    @JsonView(Public.class)
+    @JsonView(PrivateFirstLevel.class)
     private String apiKey;
     @Null(groups = OnCreate.class, message = "You don't need to enter api secret because api key will be generated")
     @Null(groups = OnUpdate.class, message = "You can't update api secret")
-    @JsonView(Public.class)
+    @JsonView(PrivateFirstLevel.class)
     private String apiSecret;
 
     public String getName() {
