@@ -102,7 +102,7 @@ public class StoreService {
     @Transactional
     public void updateStore(@Min(1) long id, @Valid StoreJson storeJson) throws CourierServiceException {
         Store store = getStoreById(id);
-        store = storeConverter.convertToEntity(storeJson, store);
+        store=storeConverter.convertToEntity(storeJson,store);
         storeRepository.save(store);
     }
 
@@ -128,8 +128,9 @@ public class StoreService {
 
     @Transactional
     public void deleteStoreById(@Min(1) long id) throws CourierServiceException {
-        Store store = getStoreById(id);
-        userService.deleteExistingUserById(store.getAdmin().getId());
+        if (!storeRepository.existsById(id)) {
+            throw new CourierServiceException("There is no store");
+        }
         storeRepository.deleteById(id);
     }
 
