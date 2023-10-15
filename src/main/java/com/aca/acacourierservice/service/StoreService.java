@@ -66,23 +66,12 @@ public class StoreService {
         }
         return storeOptional.get();
     }
-
-    @Transactional
-    public long addStore(@Valid StoreJson storeJson) {
-        Store store = storeConverter.convertToEntity(storeJson);
-        if (store.getPickupPoints() != null) {
-            for (PickupPoint pickupPoint : store.getPickupPoints()) {
-                pickupPoint.setStore(store);
-                pickupPointRepository.save(pickupPoint);
-            }
-        }
-        storeRepository.save(store);
-        return store.getId();
-    }
-
     @Transactional
     public Store addStoreAndAdmin(@Valid StoreJson storeJson) throws NoSuchAlgorithmException {
         Store store = storeConverter.convertToEntity(storeJson);
+        UserJson storeAdmin = storeJson.getAdmin();
+        storeAdmin.setRole(User.Role.ROLE_STORE_ADMIN);
+        store.setAdmin(userService.saveUser(storeAdmin));
         store.setApiKey(generateKey(256));
         store.setApiSecret(generateKey(256));
 
@@ -92,9 +81,6 @@ public class StoreService {
                 pickupPointRepository.save(pickupPoint);
             }
         }
-        UserJson adminJson = storeJson.getAdmin();
-        adminJson.setRole(User.Role.ROLE_STORE_ADMIN);
-        userService.saveUser(adminJson);
         storeRepository.save(store);
         return store;
     }
