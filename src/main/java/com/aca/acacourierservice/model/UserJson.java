@@ -28,7 +28,7 @@ public class UserJson {
     @Null(groups = OnUpdate.class, message = "You can't change the role")
     private User.Role role;
     @JsonView(Public.class)
-    @Pattern(regexp = "^(([a-zA-Z]{2,15}\\s?)+|[1-9][0-9]+)\\s([1-9][0-9]+[a-zA-Z]?|([1-9][0-9]+/[1-9][0-9]+))$",message = "Not valid address")
+    @Pattern(regexp = "^(([a-zA-Z]{2,15}\\s?)+|[1-9][0-9]?+)\\s([1-9][0-9]?+[a-zA-Z]?|([1-9][0-9]?+/[1-9][0-9]?+))$",message = "Not valid address")
     private String address;
     @JsonView(Public.class)
     @Pattern(regexp = "^[+][0-9]{10,15}$", message = "Invalid phone number")

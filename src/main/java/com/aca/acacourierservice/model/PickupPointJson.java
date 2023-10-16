@@ -20,7 +20,7 @@ public class PickupPointJson {
     @Pattern(regexp ="^(([a-zA-Z]{2,15})\\s?)+$",message = "Not valid country")
     private String country;
     @JsonView(PrivateSecondLevel.class)
-    @Pattern(regexp = "^(([a-zA-Z]{2,15}\\s?)+|[1-9][0-9]+)\\s([1-9][0-9]+[a-zA-Z]?|([1-9][0-9]+/[1-9][0-9]+))$",message = "Not valid address")
+    @Pattern(regexp = "^(([a-zA-Z]{2,15}\\s?)+|[1-9][0-9]?+)\\s([1-9][0-9]?+[a-zA-Z]?|([1-9][0-9]?+/[1-9][0-9]?+))$",message = "Not valid address")
     private String address;
     @JsonView(Public.class)
     @Pattern(regexp ="^[A-Z0-9]{2,15}$",message = "Not valid zip code")
@@ -29,7 +29,6 @@ public class PickupPointJson {
     @Pattern(regexp ="^[+][0-9]{10,15}$",message = "Phone number should be like +{country code}{phone number}")
     private String phoneNumber;
     @JsonView(Public.class)
-
     @Null(groups = {OnCreate.class,OnUpdate.class},message = "You don't need to enter store id")
     @Positive
     private Long storeId;
