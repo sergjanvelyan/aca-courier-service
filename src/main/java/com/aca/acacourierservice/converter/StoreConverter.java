@@ -17,9 +17,15 @@ public class StoreConverter implements Converter<Store, StoreJson> {
 
     @Override
     public Store convertToEntity(StoreJson model, Store entity) {
-        entity.setName(model.getName());
-        entity.setPhoneNumber(model.getPhoneNumber());
-        entity.setStoreUrl(model.getStoreUrl());
+        if(model.getName()!=null){
+            entity.setName(model.getName());
+        }
+        if(model.getPhoneNumber()!=null){
+            entity.setPhoneNumber(model.getPhoneNumber());
+        }
+        if(model.getStoreUrl()!=null){
+            entity.setStoreUrl(model.getStoreUrl());
+        }
         return entity;
     }
 

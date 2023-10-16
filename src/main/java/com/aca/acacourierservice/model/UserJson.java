@@ -1,43 +1,50 @@
 package com.aca.acacourierservice.model;
 
 import com.aca.acacourierservice.entity.User;
+import com.aca.acacourierservice.validation.OnCreate;
 import com.aca.acacourierservice.validation.OnUpdate;
 import com.aca.acacourierservice.view.Lists;
 import com.aca.acacourierservice.view.PrivateFirstLevel;
 import com.aca.acacourierservice.view.PrivateSecondLevel;
 import com.aca.acacourierservice.view.Public;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserJson {
     @JsonView(Lists.class)
     private long id;
     @JsonView(Public.class)
+    @NotNull(groups = OnCreate.class,  message = "Please enter email")
     @Email(message = "The email ${validatedValue} is not valid")
     @Null(groups = OnUpdate.class, message = "You can't change the email")
     private String email;
     @JsonView(PrivateFirstLevel.class)
-    @NotNull
+    @NotNull(groups = OnCreate.class,  message = "Please enter password")
     @Size(min = 8, message = "Password should be at least 8 characters long")
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$", message = "Password should contain at least 1 letter and 1 number")
     private String password;
     @JsonView(PrivateSecondLevel.class)
     @Null(groups = OnUpdate.class, message = "You can't change the role")
     private User.Role role;
-    @JsonView(Public.class)
+    @JsonView(PrivateSecondLevel.class)
+    @NotNull(groups = OnCreate.class,  message = "Please enter address")
     @Pattern(regexp = "^(([a-zA-Z]{2,15}\\s?)+|[1-9][0-9]{0,5})\\s([1-9][0-9]{0,5}[a-zA-Z]?|([1-9][0-9]{0,5}/[1-9][0-9]{0,5}))$",message = "Not valid address")
     private String address;
-    @JsonView(Public.class)
+    @JsonView(PrivateSecondLevel.class)
+    @NotNull(groups = OnCreate.class,  message = "Please enter phone number")
     @Pattern(regexp = "^[+][0-9]{10,15}$", message = "Invalid phone number")
     private String phoneNumber;
     @JsonView(Public.class)
+    @NotNull(groups = OnCreate.class,  message = "Please enter full name")
     @Pattern(regexp = "^(([a-zA-Z]{2,15})\\s?)+$", message = "Name should contain letters")
     private String fullName;
-    @JsonView(Public.class)
+    @JsonView(PrivateSecondLevel.class)
+    @NotNull(groups = OnCreate.class,  message = "Please enter your birth date")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate birthDate;

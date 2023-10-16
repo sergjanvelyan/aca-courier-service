@@ -97,8 +97,9 @@ public class StoreController {
     }
 
     @Secured("ROLE_ADMIN")
-    @PutMapping(value = "/{storeId}/admin/update", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Status> updateStoreAdmin(@RequestBody @Valid UserJson admin, @PathVariable @Min(1) long storeId) {
+    @Validated(OnCreate.class)
+    @PutMapping(value = "/{storeId}/admin/change", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Status> changeStoreAdmin(@RequestBody @Valid UserJson admin, @PathVariable @Min(1) long storeId) {
         try {
             long adminId = storeService.changeStoreAdmin(admin, storeId).getId();
             return new ResponseEntity<>(new StatusWithId("Store admin updated", adminId), HttpStatus.OK);

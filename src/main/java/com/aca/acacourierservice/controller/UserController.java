@@ -8,9 +8,11 @@ import com.aca.acacourierservice.model.StatusWithId;
 import com.aca.acacourierservice.model.UserJson;
 import com.aca.acacourierservice.model.UserListJson;
 import com.aca.acacourierservice.service.UserService;
+import com.aca.acacourierservice.validation.OnCreate;
 import com.aca.acacourierservice.validation.OnUpdate;
 import com.aca.acacourierservice.view.Lists;
-import com.aca.acacourierservice.view.Public;
+import com.aca.acacourierservice.view.PrivateFirstLevel;
+import com.aca.acacourierservice.view.PrivateSecondLevel;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -54,14 +56,13 @@ public class UserController {
     }
 
     @GetMapping(value = "/profile/get")
-    @JsonView(Public.class)
+    @JsonView(PrivateFirstLevel.class)
     @Secured({"ROLE_ADMIN", "ROLE_STORE_ADMIN", "ROLE_COURIER"})
     public ResponseEntity<?> getUserProfile() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             UserJson userJson = userConverter.convertToModel(userService.getUserByEmail(username));
-            userJson.setPassword("Password hidden");
             return new ResponseEntity<>(userJson, HttpStatus.OK);
         } catch (CourierServiceException e) {
             return new ResponseEntity<>(new Status("Not found:"), HttpStatus.NOT_FOUND);
@@ -83,6 +84,7 @@ public class UserController {
     }
 
     @PostMapping("/courier/register")
+    @Validated(OnCreate.class)
     @Secured("ROLE_ADMIN")
     public ResponseEntity<Status> register(@RequestBody @Valid UserJson userJson) {
         userJson.setRole(User.Role.ROLE_COURIER);
@@ -95,7 +97,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/courier/{courierId}")
-    @JsonView(Public.class)
+    @JsonView(PrivateSecondLevel.class)
     @Secured("ROLE_ADMIN")
     public ResponseEntity<?> getCourier(@PathVariable @Min(1) Long courierId) {
         try {

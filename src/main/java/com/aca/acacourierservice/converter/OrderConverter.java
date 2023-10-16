@@ -31,9 +31,7 @@ public class OrderConverter implements Converter<Order, OrderJson> {
         entity.setSize(model.getSize());
         entity.setDeliveryPrice(model.getDeliveryPrice());
         entity.setTotalPrice(model.getTotalPrice());
-        if(model.getStatus()!=null){
-            entity.setStatus(model.getStatus());
-        }
+        entity.setStatus(model.getStatus());
         entity.setOrderConfirmedTime(model.getOrderConfirmedTime());
         entity.setOrderDeliveredTime(model.getOrderDeliveredTime());
         return entity;

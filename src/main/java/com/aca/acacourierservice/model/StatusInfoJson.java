@@ -2,8 +2,10 @@ package com.aca.acacourierservice.model;
 
 import com.aca.acacourierservice.entity.Order;
 import com.aca.acacourierservice.validation.ValidEnum;
+import jakarta.validation.constraints.NotNull;
 
 public class StatusInfoJson {
+    @NotNull(message = "Please enter status")
     @ValidEnum(enumClass =Order.Status.class)
     private String status;
 

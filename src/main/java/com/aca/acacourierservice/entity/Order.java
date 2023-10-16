@@ -214,11 +214,11 @@ public class Order {
 
     public enum Status {
         NEW,
-        SHIPPED,
         CANCELLED,
+        SHIPPED,
         DELIVERING,
-        DELIVERED,
-        POSTPONED
+        POSTPONED,
+        DELIVERED
     }
     public enum Size {
         SMALL,

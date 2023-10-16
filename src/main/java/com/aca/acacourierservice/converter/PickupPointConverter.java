@@ -11,11 +11,21 @@ import java.util.List;
 public class PickupPointConverter implements Converter<PickupPoint, PickupPointJson> {
     @Override
     public PickupPoint convertToEntity(PickupPointJson model, PickupPoint entity) {
-        entity.setCity(model.getCity());
-        entity.setCountry(model.getCountry());
-        entity.setAddress(model.getAddress());
-        entity.setPhoneNumber(model.getPhoneNumber());
-        entity.setZipCode(model.getZipCode());
+        if(model.getCity()!=null){
+            entity.setCity(model.getCity());
+        }
+        if(model.getCountry()!=null){
+            entity.setCountry(model.getCountry());
+        }
+        if(model.getAddress()!=null){
+            entity.setAddress(model.getAddress());
+        }
+        if(model.getPhoneNumber()!=null){
+            entity.setPhoneNumber(model.getPhoneNumber());
+        }
+        if(model.getZipCode()!=null){
+            entity.setZipCode(model.getZipCode());
+        }
         return entity;
     }
     @Override

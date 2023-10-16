@@ -16,10 +16,11 @@ import java.util.List;
 public class OrderJson {
     @JsonView(Lists.class)
     private Long id;
-    @JsonView(Public.class)
+    @JsonView(PrivateSecondLevel.class)
+    @NotNull(groups = OnCreate.class,  message = "Please enter orderId")
     @NotBlank
     private String orderId;
-    @JsonView(Public.class)
+    @JsonView(PrivateSecondLevel.class)
     @Null(groups = OnCreate.class,message = "Tracking number should be generated")
     private String trackingNumber;
     @JsonView(Public.class)
@@ -27,44 +28,54 @@ public class OrderJson {
     @Positive
     private Long storeId;
     @JsonView(PrivateSecondLevel.class)
+    @NotNull(groups = OnCreate.class,  message = "Please enter full name")
     @Pattern(regexp = "^(([a-zA-Z]{2,15})\\s?)+$",message = "Not valid name")
     private String fullName;
     @JsonView(Public.class)
+    @NotNull(groups = OnCreate.class,  message = "Please enter country")
     @Pattern(regexp ="^(([a-zA-Z]{2,15})\\s?)+$",message = "Not valid country")
     private String country;
     @JsonView(Public.class)
+    @NotNull(groups = OnCreate.class,  message = "Please enter city")
     @Pattern(regexp ="^(([a-zA-Z]{2,15})\\s?)+$",message = "Not valid city")
     private String city;
     @JsonView(PrivateSecondLevel.class)
+    @NotNull(groups = OnCreate.class,  message = "Please enter address")
     @Pattern(regexp = "^(([a-zA-Z]{2,15}\\s?)+|[1-9][0-9]{0,5})\\s([1-9][0-9]{0,5}[a-zA-Z]?|([1-9][0-9]{0,5}/[1-9][0-9]{0,5}))$",message = "Not valid address")
     private String address;
     @JsonView(PrivateSecondLevel.class)
+    @NotNull(groups = OnCreate.class,  message = "Please enter phone number")
     @Pattern(regexp ="^[+][0-9]{10,15}$",message = "Phone number should be like +{country code}{phone number}")
     private String phone;
     @JsonView(Public.class)
+    @NotNull(groups = OnCreate.class,  message = "Please enter zipcode")
     @Pattern(regexp ="^[A-Z0-9]{2,15}$",message = "Not valid zip code")
     private String zipCode;
-    @JsonView(Public.class)
+    @JsonView(PrivateSecondLevel.class)
+    @NotNull(groups = OnCreate.class,  message = "Please enter weight in kgs")
     @Positive
     private Double weightKg;
-    @JsonView(Public.class)
+    @JsonView(PrivateSecondLevel.class)
+    @NotNull(groups = OnCreate.class,  message = "Please enter size")
     @ValidEnum(enumClass = Order.Size.class)
     private String size;
     @JsonView(PrivateSecondLevel.class)
-    private long courierId;
-    @JsonView(Public.class)
+    private Long courierId;
+    @JsonView(PrivateSecondLevel.class)
+    @NotNull(groups = OnCreate.class,  message = "Please enter calculated delivery price")
     @Positive
     private Double deliveryPrice;
     @JsonView(Public.class)
+    @NotNull(groups = OnCreate.class,  message = "Please enter total price")
     @Positive
     private Double totalPrice;
     @JsonView(Public.class)
     @Null(groups = OnCreate.class,message = "You don't need to enter status.When creating order the status is 'NEW' by default")
     @ValidEnum(enumClass = Order.Status.class)
     private String status;
-    @JsonView(Public.class)
+    @JsonView(PrivateSecondLevel.class)
     private LocalDateTime orderConfirmedTime;
-    @JsonView(Public.class)
+    @JsonView(PrivateSecondLevel.class)
     private LocalDateTime orderDeliveredTime;
     @JsonView(PrivateSecondLevel.class)
     private List<StatusUpdateTimeJson> statusUpdateHistory;
@@ -176,11 +187,15 @@ public class OrderJson {
         this.size = size;
     }
 
-    public long getCourierId() {
+    public void setStoreId(Long storeId) {
+        this.storeId = storeId;
+    }
+
+    public Long getCourierId() {
         return courierId;
     }
 
-    public void setCourierId(long courierId) {
+    public void setCourierId(Long courierId) {
         this.courierId = courierId;
     }
 

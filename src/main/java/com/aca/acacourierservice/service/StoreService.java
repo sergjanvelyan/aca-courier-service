@@ -95,8 +95,10 @@ public class StoreService {
     @Transactional
     public User changeStoreAdmin(@Valid UserJson admin, @Min(1) long storeId) throws CourierServiceException {
         Store store = getStoreById(storeId);
+        User previousStoreAdmin = store.getAdmin();
         admin.setRole(User.Role.ROLE_STORE_ADMIN);
         store.setAdmin(userService.saveUser(admin));
+        userService.deleteExistingUserById(previousStoreAdmin.getId());
         storeRepository.save(store);
         return store.getAdmin();
     }

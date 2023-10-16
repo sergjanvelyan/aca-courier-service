@@ -8,31 +8,32 @@ import com.aca.acacourierservice.view.PrivateSecondLevel;
 import com.aca.acacourierservice.view.Public;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Null;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 import java.util.List;
 
 public class StoreJson {
     @JsonView(Lists.class)
     private long id;
-    @NotEmpty(message = "The name field must not be empty")
+    @NotNull(groups = OnCreate.class,  message = "Please enter store name")
     @Size(min = 2, max = 30, message = "Store name length should be 2-30")
     @JsonView(Public.class)
     private String name;
     @Valid
+    @NotNull(groups = OnCreate.class,  message = "Please also register store admin ")
     @Null(groups = OnUpdate.class, message = "You can't update store admin with store. For updating store admin call /admin/update endpoint")
     @JsonView(PrivateSecondLevel.class)
     private UserJson admin;
     @Valid
+    @Size(groups = OnCreate.class, min = 1,message = "Please enter at least one pickup point")
     @Null(groups = OnUpdate.class, message = "You can't update pickup points with store. For updating pickup points call /pickupPoint endpoint")
     @JsonView(PrivateSecondLevel.class)
     private List<PickupPointJson> pickupPoints;
-    @Pattern(regexp = "^(https:\\/\\/)?[^\\s/$.?#]+\\.[^\\s]*$", message = "The url ${validatedValue} is invalid")
+    @NotNull(groups = OnCreate.class,  message = "Please enter store url")
+    @Pattern(regexp = "^(https://)?[^\\s/$.?#]+\\.\\S*$", message = "The url ${validatedValue} is invalid")
     @JsonView(Public.class)
     private String storeUrl;
+    @NotNull(groups = OnCreate.class,  message = "Please enter phone number")
     @Pattern(regexp = "^[+][0-9]{10,15}$", message = "Invalid phone number")
     @JsonView(Public.class)
     private String phoneNumber;

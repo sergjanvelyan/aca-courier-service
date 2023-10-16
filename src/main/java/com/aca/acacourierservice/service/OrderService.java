@@ -34,6 +34,14 @@ public class OrderService{
     private final StatusUpdateTimeService statusUpdateTimeService;
     private final UserService userService;
     private final StoreService storeService;
+
+    static final double DELIVERY_PRICE_USD_KG = 2;
+    static final double STANDARD_FEE_USD = 1;
+    static final double FEE_COEFFICIENT_OF_SMALL_SIZE = 0.9;
+
+    static final double FEE_COEFFICIENT_OF_MEDIUM_SIZE = 1;
+    static final double FEE_COEFFICIENT_OF_LARGE_SIZE = 1.1;
+    static final double FEE_COEFFICIENT_OF_EXTRA_LARGE_SIZE = 1.2;
     @Autowired
     public OrderService(OrderRepository orderRepository, OrderConverter orderConverter, @Lazy StatusUpdateTimeService statusUpdateTimeService, UserService userService, StoreService storeService) {
         this.orderRepository = orderRepository;
@@ -63,8 +71,13 @@ public class OrderService{
         if(order.getCourier()==null){
             throw new CourierServiceException("Can't update unassigned order status");
         }
-        if(order.getStatus()==statusInfoJson.getStatus()){
+        Order.Status previousStatus = order.getStatus();
+        Order.Status newStatus = statusInfoJson.getStatus();
+        int comparisonResult = previousStatus.compareTo(newStatus);
+        if (comparisonResult == 0) {
             throw new CourierServiceException("Can't update to same status");
+        } else if (comparisonResult > 0) {
+            throw new CourierServiceException("Can't update status "+previousStatus+" to status "+newStatus);
         }
         StatusUpdateTimeJson statusUpdateTimeJson = new StatusUpdateTimeJson();
         statusUpdateTimeJson.setOrderId(id);
@@ -179,18 +192,19 @@ public class OrderService{
         Order.Size size = itemOrderInfo.getSize();
         double weight = itemOrderInfo.getWeightKg();
         String destinationCountry = itemOrderInfo.getCountry();
-        final double DELIVERY_PRICE_USD_KG = 2;
         Store store = storeService.getStoreById(storeId);
         List<PickupPoint> pickupPoints = store.getPickupPoints();
-        double additionalFeeUSD = 1;
+        double additionalFeeUSD = 0;
         if(!isSameCountry(pickupPoints,destinationCountry)){
             additionalFeeUSD+=2;
         }
-        return additionalFeeUSD+switch (size){
-            case SMALL -> weight*DELIVERY_PRICE_USD_KG*0.9;
-            case MEDIUM -> weight*DELIVERY_PRICE_USD_KG;
-            case LARGE -> weight*DELIVERY_PRICE_USD_KG*1.1;
-            case EXTRA_LARGE -> weight*DELIVERY_PRICE_USD_KG*1.2;
+        return STANDARD_FEE_USD+
+                additionalFeeUSD+
+                switch (size){
+            case SMALL -> weight*DELIVERY_PRICE_USD_KG*FEE_COEFFICIENT_OF_SMALL_SIZE;
+            case MEDIUM -> weight*DELIVERY_PRICE_USD_KG*FEE_COEFFICIENT_OF_MEDIUM_SIZE;
+            case LARGE -> weight*DELIVERY_PRICE_USD_KG*FEE_COEFFICIENT_OF_LARGE_SIZE;
+            case EXTRA_LARGE -> weight*DELIVERY_PRICE_USD_KG*FEE_COEFFICIENT_OF_EXTRA_LARGE_SIZE;
         };
     }
     public boolean isSameCountry(List<PickupPoint> pickupPoints,String destinationCountry){
