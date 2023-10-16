@@ -6,6 +6,7 @@ import com.aca.acacourierservice.validation.ValidEnum;
 import com.aca.acacourierservice.view.Lists;
 import com.aca.acacourierservice.view.PrivateSecondLevel;
 import com.aca.acacourierservice.view.Public;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.constraints.*;
@@ -58,6 +59,7 @@ public class OrderJson {
     @JsonView(PrivateSecondLevel.class)
     @NotNull(groups = OnCreate.class,  message = "Please enter size")
     @ValidEnum(enumClass = Order.Size.class)
+    @NotEmpty(message = "Invalid enum value")
     private String size;
     @JsonView(PrivateSecondLevel.class)
     private Long courierId;
@@ -74,8 +76,10 @@ public class OrderJson {
     @ValidEnum(enumClass = Order.Status.class)
     private String status;
     @JsonView(PrivateSecondLevel.class)
+    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private LocalDateTime orderConfirmedTime;
     @JsonView(PrivateSecondLevel.class)
+    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private LocalDateTime orderDeliveredTime;
     @JsonView(PrivateSecondLevel.class)
     private List<StatusUpdateTimeJson> statusUpdateHistory;
@@ -177,7 +181,7 @@ public class OrderJson {
     }
 
     public Order.Size getSize() {
-        if(size==null){
+        if(size==null||size.isEmpty()){
             return null;
         }
         return Order.Size.valueOf(size.toUpperCase());
@@ -216,7 +220,7 @@ public class OrderJson {
     }
 
     public Order.Status getStatus() {
-        if(status==null){
+        if(status==null||status.isEmpty()){
             return null;
         }
         return Order.Status.valueOf(status.toUpperCase());

@@ -2,6 +2,7 @@ package com.aca.acacourierservice.model;
 
 import com.aca.acacourierservice.entity.Order;
 import com.aca.acacourierservice.validation.ValidEnum;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
@@ -12,6 +13,7 @@ public class ItemOrderInfo {
     private Double weightKg;
     @NotNull(message = "Please enter size")
     @ValidEnum(enumClass = Order.Size.class)
+    @NotEmpty(message = "Invalid enum value")
     private String size;
     @NotNull(message = "Please enter destination country")
     @Pattern(regexp ="^(([a-zA-Z]{2,15})\\s?)+$",message = "Not valid country")
@@ -26,7 +28,7 @@ public class ItemOrderInfo {
     }
 
     public Order.Size getSize() {
-        if(size==null){
+        if(size==null||size.isEmpty()){
             return null;
         }
         return Order.Size.valueOf(size.toUpperCase());

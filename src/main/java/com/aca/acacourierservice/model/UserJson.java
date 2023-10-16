@@ -3,17 +3,19 @@ package com.aca.acacourierservice.model;
 import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.validation.OnCreate;
 import com.aca.acacourierservice.validation.OnUpdate;
+import com.aca.acacourierservice.validation.ValidLocalDate;
 import com.aca.acacourierservice.view.Lists;
 import com.aca.acacourierservice.view.PrivateFirstLevel;
 import com.aca.acacourierservice.view.PrivateSecondLevel;
 import com.aca.acacourierservice.view.Public;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.constraints.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserJson {
     @JsonView(Lists.class)
@@ -45,9 +47,8 @@ public class UserJson {
     private String fullName;
     @JsonView(PrivateSecondLevel.class)
     @NotNull(groups = OnCreate.class,  message = "Please enter your birth date")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    @JsonFormat(pattern = "dd/MM/yyyy")
-    private LocalDate birthDate;
+    @ValidLocalDate
+    private String birthDate;
 
     public String getEmail() {
         return email;
@@ -98,10 +99,15 @@ public class UserJson {
     }
 
     public LocalDate getBirthDate() {
-        return birthDate;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        try{
+            return LocalDate.parse(birthDate, formatter);
+        }catch (DateTimeParseException e){
+            throw new IllegalArgumentException("Invalid date format: " + birthDate);
+        }
     }
 
-    public void setBirthDate(LocalDate birthDate) {
+    public void setBirthDate(String birthDate) {
         this.birthDate = birthDate;
     }
 

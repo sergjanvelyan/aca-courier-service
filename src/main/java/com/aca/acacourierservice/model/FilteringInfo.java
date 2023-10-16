@@ -2,41 +2,37 @@ package com.aca.acacourierservice.model;
 
 import com.aca.acacourierservice.entity.Order;
 import com.aca.acacourierservice.validation.ValidEnum;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Positive;
+import com.aca.acacourierservice.validation.ValidLocalDateTime;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class FilteringInfo {
-    @Pattern(regexp = "^(([a-zA-Z]{2,15})\\s?)+$", message = "Not valid country")
     private String country;
-    @Pattern(regexp = "^(([a-zA-Z]{2,15})\\s?)+$", message = "Not valid city")
     private String city;
-    @Pattern(regexp = "^[A-Z0-9]{2,15}$", message = "Not valid zip code")
     private String zipCode;
     @ValidEnum(enumClass = Order.Status.class)
     private String status;
-    @Positive
     private Double deliveryPriceMin;
-    @Positive
     private Double deliveryPriceMax;
-    @Positive
     private Double totalPriceMin;
-    @Positive
     private Double totalPriceMax;
-    @Positive
     private Double weightMin;
-    @Positive
     private Double weightMax;
     @ValidEnum(enumClass = Order.Size.class)
     private String size;
-    private LocalDateTime orderConfirmedTimeMin;
-    private LocalDateTime orderConfirmedTimeMax;
-    private LocalDateTime orderDeliveredTimeMin;
-    private LocalDateTime orderDeliveredTimeMax;
+    @ValidLocalDateTime
+    private String orderConfirmedTimeMin;
+    @ValidLocalDateTime
+    private String orderConfirmedTimeMax;
+    @ValidLocalDateTime
+    private String orderDeliveredTimeMin;
+    @ValidLocalDateTime
+    private String orderDeliveredTimeMax;
 
     public Order.Status getStatus() {
-        if(status==null){
+        if(status==null||status.isEmpty()){
             return null;
         }
         return Order.Status.valueOf(status.toUpperCase());
@@ -47,6 +43,9 @@ public class FilteringInfo {
     }
 
     public String getCountry() {
+        if(country.isEmpty()){
+            return null;
+        }
         return country;
     }
 
@@ -55,6 +54,9 @@ public class FilteringInfo {
     }
 
     public String getCity() {
+        if(city.isEmpty()){
+            return null;
+        }
         return city;
     }
 
@@ -63,6 +65,9 @@ public class FilteringInfo {
     }
 
     public String getZipCode() {
+        if(zipCode.isEmpty()){
+            return null;
+        }
         return zipCode;
     }
 
@@ -119,7 +124,7 @@ public class FilteringInfo {
     }
 
     public Order.Size getSize() {
-        if(size==null){
+        if(size==null||size.isEmpty()){
             return null;
         }
         return Order.Size.valueOf(size.toUpperCase());
@@ -130,34 +135,54 @@ public class FilteringInfo {
     }
 
     public LocalDateTime getOrderConfirmedTimeMin() {
-        return orderConfirmedTimeMin;
+        if(orderConfirmedTimeMin==null||orderConfirmedTimeMin.isEmpty()){
+            return null;
+        }
+        return localDateTimeParser(orderConfirmedTimeMin);
     }
-
-    public void setOrderConfirmedTimeMin(LocalDateTime orderConfirmedTimeMin) {
+    public void setOrderConfirmedTimeMin(String orderConfirmedTimeMin) {
         this.orderConfirmedTimeMin = orderConfirmedTimeMin;
     }
 
     public LocalDateTime getOrderConfirmedTimeMax() {
-        return orderConfirmedTimeMax;
+        if(orderConfirmedTimeMax==null||orderConfirmedTimeMax.isEmpty()){
+            return null;
+        }
+        return localDateTimeParser(orderConfirmedTimeMax);
     }
 
-    public void setOrderConfirmedTimeMax(LocalDateTime orderConfirmedTimeMax) {
+    public void setOrderConfirmedTimeMax(String orderConfirmedTimeMax) {
         this.orderConfirmedTimeMax = orderConfirmedTimeMax;
     }
 
     public LocalDateTime getOrderDeliveredTimeMin() {
-        return orderDeliveredTimeMin;
+        if(orderDeliveredTimeMin==null||orderDeliveredTimeMin.isEmpty()){
+            return null;
+        }
+        return localDateTimeParser(orderDeliveredTimeMin);
     }
 
-    public void setOrderDeliveredTimeMin(LocalDateTime orderDeliveredTimeMin) {
+    public void setOrderDeliveredTimeMin(String orderDeliveredTimeMin) {
         this.orderDeliveredTimeMin = orderDeliveredTimeMin;
     }
 
     public LocalDateTime getOrderDeliveredTimeMax() {
-        return orderDeliveredTimeMax;
+        if(orderDeliveredTimeMax==null||orderDeliveredTimeMax.isEmpty()){
+            return null;
+        }
+        return localDateTimeParser(orderDeliveredTimeMax);
     }
 
-    public void setOrderDeliveredTimeMax(LocalDateTime orderDeliveredTimeMax) {
+    public void setOrderDeliveredTimeMax(String orderDeliveredTimeMax) {
         this.orderDeliveredTimeMax = orderDeliveredTimeMax;
+    }
+
+    public LocalDateTime localDateTimeParser(String localDateTime) throws IllegalArgumentException{
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        try{
+            return LocalDateTime.parse(localDateTime,formatter);
+        }catch (DateTimeParseException e){
+            throw new IllegalArgumentException("Invalid date format: " + localDateTime);
+        }
     }
 }

@@ -141,34 +141,34 @@ public class OrderService{
                 predicates.add(criteriaBuilder.equal(root.get("size"),filteringInfo.getSize()));
             }
             if (filteringInfo.getDeliveryPriceMin() != null) {
-                predicates.add(criteriaBuilder.greaterThan(root.get("deliveryPrice"), filteringInfo.getDeliveryPriceMin()));
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("deliveryPrice"), filteringInfo.getDeliveryPriceMin()));
             }
             if (filteringInfo.getDeliveryPriceMax() != null) {
-                predicates.add(criteriaBuilder.lessThan(root.get("deliveryPrice"),filteringInfo.getDeliveryPriceMax()));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("deliveryPrice"),filteringInfo.getDeliveryPriceMax()));
             }
             if (filteringInfo.getTotalPriceMin() != null) {
                 predicates.add(criteriaBuilder.greaterThan(root.get("totalPrice"), filteringInfo.getTotalPriceMin()));
             }
             if (filteringInfo.getTotalPriceMax() != null) {
-                predicates.add(criteriaBuilder.lessThan(root.get("totalPrice"), filteringInfo.getTotalPriceMax()));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("totalPrice"), filteringInfo.getTotalPriceMax()));
             }
             if (filteringInfo.getWeightMin() != null) {
-                predicates.add(criteriaBuilder.greaterThan(root.get("weight"), filteringInfo.getWeightMin()));
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("weightKg"), filteringInfo.getWeightMin()));
             }
             if (filteringInfo.getWeightMax() != null) {
-                predicates.add(criteriaBuilder.lessThan(root.get("weight"),filteringInfo.getWeightMax()));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("weightKg"),filteringInfo.getWeightMax()));
             }
             if (filteringInfo.getOrderConfirmedTimeMin() != null) {
-                predicates.add(criteriaBuilder.greaterThan(root.get("orderConfirmedTime"), filteringInfo.getOrderConfirmedTimeMin()));
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("orderConfirmedTime"), filteringInfo.getOrderConfirmedTimeMin()));
             }
             if (filteringInfo.getOrderConfirmedTimeMax() != null) {
-                predicates.add(criteriaBuilder.lessThan(root.get("orderConfirmedTime"),filteringInfo.getOrderConfirmedTimeMax()));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("orderConfirmedTime"),filteringInfo.getOrderConfirmedTimeMax()));
             }
             if (filteringInfo.getOrderDeliveredTimeMin() != null) {
-                predicates.add(criteriaBuilder.greaterThan(root.get("orderDeliveredTime"), filteringInfo.getOrderDeliveredTimeMin()));
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("orderDeliveredTime"), filteringInfo.getOrderDeliveredTimeMin()));
             }
             if (filteringInfo.getOrderDeliveredTimeMax() != null) {
-                predicates.add(criteriaBuilder.lessThan(root.get("orderDeliveredTime"), filteringInfo.getOrderDeliveredTimeMax()));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("orderDeliveredTime"), filteringInfo.getOrderDeliveredTimeMax()));
             }
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
