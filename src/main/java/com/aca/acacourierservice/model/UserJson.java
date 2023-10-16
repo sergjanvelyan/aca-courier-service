@@ -4,6 +4,7 @@ import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.validation.OnUpdate;
 import com.aca.acacourierservice.view.Lists;
 import com.aca.acacourierservice.view.PrivateFirstLevel;
+import com.aca.acacourierservice.view.PrivateSecondLevel;
 import com.aca.acacourierservice.view.Public;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -24,7 +25,7 @@ public class UserJson {
     @Size(min = 8, message = "Password should be at least 8 characters long")
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$", message = "Password should contain at least 1 letter and 1 number")
     private String password;
-    @JsonView(PrivateFirstLevel.class)
+    @JsonView(PrivateSecondLevel.class)
     @Null(groups = OnUpdate.class, message = "You can't change the role")
     private User.Role role;
     @JsonView(Public.class)
