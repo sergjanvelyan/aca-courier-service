@@ -36,7 +36,7 @@ public class OrderJson {
     @Pattern(regexp ="^(([a-zA-Z]{2,15})\\s?)+$",message = "Not valid city")
     private String city;
     @JsonView(PrivateSecondLevel.class)
-    @Pattern(regexp = "^(([a-zA-Z]{2,15}\\s?)+|[1-9][0-9]?+)\\s([1-9][0-9]?+[a-zA-Z]?|([1-9][0-9]?+/[1-9][0-9]?+))$",message = "Not valid address")
+    @Pattern(regexp = "^(([a-zA-Z]{2,15}\\s?)+|[1-9][0-9]{0,5})\\s([1-9][0-9]{0,5}[a-zA-Z]?|([1-9][0-9]{0,5}/[1-9][0-9]{0,5}))$",message = "Not valid address")
     private String address;
     @JsonView(PrivateSecondLevel.class)
     @Pattern(regexp ="^[+][0-9]{10,15}$",message = "Phone number should be like +{country code}{phone number}")
