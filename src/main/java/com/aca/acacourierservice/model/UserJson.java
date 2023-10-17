@@ -1,9 +1,7 @@
 package com.aca.acacourierservice.model;
 
 import com.aca.acacourierservice.entity.User;
-import com.aca.acacourierservice.validation.OnCreate;
-import com.aca.acacourierservice.validation.OnUpdate;
-import com.aca.acacourierservice.validation.ValidLocalDate;
+import com.aca.acacourierservice.validation.*;
 import com.aca.acacourierservice.view.Lists;
 import com.aca.acacourierservice.view.PrivateFirstLevel;
 import com.aca.acacourierservice.view.PrivateSecondLevel;
@@ -13,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -21,18 +18,19 @@ public class UserJson {
     @JsonView(Lists.class)
     private long id;
     @JsonView(Public.class)
-    @NotNull(groups = OnCreate.class,  message = "Please enter email")
+    @NotNull(groups = {OnCreate.class, OnLogin.class},  message = "Please enter email")
     @Email(message = "The email ${validatedValue} is not valid")
     @Null(groups = OnUpdate.class, message = "You can't change the email")
     private String email;
     @JsonView(PrivateFirstLevel.class)
-    @NotNull(groups = OnCreate.class,  message = "Please enter password")
+    @NotNull(groups = {OnCreate.class, OnLogin.class},  message = "Please enter password")
     @Size(min = 8, message = "Password should be at least 8 characters long")
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$", message = "Password should contain at least 1 letter and 1 number")
     private String password;
     @JsonView(PrivateSecondLevel.class)
     @Null(groups = OnUpdate.class, message = "You can't change the role")
-    private User.Role role;
+    @ValidEnum(enumClass = User.Role.class)
+    private String role;
     @JsonView(PrivateSecondLevel.class)
     @NotNull(groups = OnCreate.class,  message = "Please enter address")
     @Pattern(regexp = "^(([a-zA-Z]{2,15}\\s?)+|[1-9][0-9]{0,5})\\s([1-9][0-9]{0,5}[a-zA-Z]?|([1-9][0-9]{0,5}/[1-9][0-9]{0,5}))$",message = "Not valid address")
@@ -47,7 +45,7 @@ public class UserJson {
     private String fullName;
     @JsonView(PrivateSecondLevel.class)
     @NotNull(groups = OnCreate.class,  message = "Please enter your birth date")
-    @ValidLocalDate
+    @ValidLocalDate(groups = {OnCreate.class, OnUpdate.class})
     private String birthDate;
 
     public String getEmail() {
@@ -67,10 +65,13 @@ public class UserJson {
     }
 
     public User.Role getRole() {
-        return role;
+        if(role==null||role.isEmpty()){
+            return null;
+        }
+        return User.Role.valueOf(role.toUpperCase());
     }
 
-    public void setRole(User.Role role) {
+    public void setRole(String role) {
         this.role = role;
     }
 
@@ -99,9 +100,11 @@ public class UserJson {
     }
 
     public LocalDate getBirthDate() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        if (birthDate==null||birthDate.isEmpty()){
+            return null;
+        }
         try{
-            return LocalDate.parse(birthDate, formatter);
+            return LocalDate.parse(birthDate);
         }catch (DateTimeParseException e){
             throw new IllegalArgumentException("Invalid date format: " + birthDate);
         }

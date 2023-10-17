@@ -185,8 +185,8 @@ public class OrderService{
     public Page<Order> getUnassignedOrders(@Min(0) int page,@Min(1) int size){
         return orderRepository.findAllByCourierIsNull(PageRequest.of(page,size));
     }
-    public Page<Order> getOrdersByStoreId(@Min(1) long storeId, @Min(0) int page, @Min(1) int size){
-        return orderRepository.findAllByStoreId(storeId,PageRequest.of(page, size));
+    public Page<Order> getOrdersByStoreAdminId(@Min(1) long storeAdminId, @Min(0) int page, @Min(1) int size){
+        return orderRepository.findAllByStore_Admin_Id(storeAdminId,PageRequest.of(page, size));
     }
     public double calculateDeliveryPrice(@Valid ItemOrderInfo itemOrderInfo,@Min(1) long storeId){
         Order.Size size = itemOrderInfo.getSize();

@@ -43,7 +43,7 @@ public class UserConverter implements Converter<User, UserJson>{
         UserJson model = new UserJson();
         model.setId(entity.getId());
         model.setEmail(entity.getEmail());
-        model.setRole(entity.getRole());
+        model.setRole(entity.getRole().toString());
         model.setAddress(entity.getAddress());
         model.setBirthDate(entity.getBirthDate().toString());
         model.setFullName(entity.getFullName());

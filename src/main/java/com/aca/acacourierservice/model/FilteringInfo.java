@@ -178,7 +178,7 @@ public class FilteringInfo {
     }
 
     public LocalDateTime localDateTimeParser(String localDateTime) throws IllegalArgumentException{
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         try{
             return LocalDateTime.parse(localDateTime,formatter);
         }catch (DateTimeParseException e){

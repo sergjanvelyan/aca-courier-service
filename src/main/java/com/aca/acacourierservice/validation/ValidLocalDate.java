@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Documented
 @ReportAsSingleViolation
 public @interface ValidLocalDate {
-    String message() default "Invalid date format (yyyy/MM/dd)";
+    String message() default "Invalid date format (yyyy-MM-dd)";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

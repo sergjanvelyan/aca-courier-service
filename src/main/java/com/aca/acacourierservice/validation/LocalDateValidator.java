@@ -13,7 +13,7 @@ public class LocalDateValidator implements ConstraintValidator<ValidLocalDate, S
             return true;
         }
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate.parse(value, formatter);
             return true;
         } catch (DateTimeParseException e) {

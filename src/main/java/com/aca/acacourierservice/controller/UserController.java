@@ -9,9 +9,9 @@ import com.aca.acacourierservice.model.UserJson;
 import com.aca.acacourierservice.model.UserListJson;
 import com.aca.acacourierservice.service.UserService;
 import com.aca.acacourierservice.validation.OnCreate;
+import com.aca.acacourierservice.validation.OnLogin;
 import com.aca.acacourierservice.validation.OnUpdate;
 import com.aca.acacourierservice.view.Lists;
-import com.aca.acacourierservice.view.PrivateFirstLevel;
 import com.aca.acacourierservice.view.PrivateSecondLevel;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
@@ -45,6 +45,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Validated(OnLogin.class)
     public ResponseEntity<Status> login(@RequestBody @Valid UserJson userJson) {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userJson.getEmail(), userJson.getPassword()));
@@ -56,7 +57,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/profile/get")
-    @JsonView(PrivateFirstLevel.class)
+    @JsonView(PrivateSecondLevel.class)
     @Secured({"ROLE_ADMIN", "ROLE_STORE_ADMIN", "ROLE_COURIER"})
     public ResponseEntity<?> getUserProfile() {
         try {
@@ -87,7 +88,7 @@ public class UserController {
     @Validated(OnCreate.class)
     @Secured("ROLE_ADMIN")
     public ResponseEntity<Status> register(@RequestBody @Valid UserJson userJson) {
-        userJson.setRole(User.Role.ROLE_COURIER);
+        userJson.setRole(User.Role.ROLE_COURIER.toString());
         try {
             long id = userService.saveUser(userJson).getId();
             return new ResponseEntity<>(new StatusWithId("Registered:", id), HttpStatus.OK);
@@ -130,7 +131,7 @@ public class UserController {
             if (!courier.getRole().equals(User.Role.ROLE_COURIER)) {
                 throw new CourierServiceException();
             }
-            courierJson.setRole(User.Role.ROLE_COURIER);
+            courierJson.setRole(User.Role.ROLE_COURIER.toString());
             userService.updateUser(courierJson, courier);
             return new ResponseEntity<>(new Status("Courier updated:"), HttpStatus.OK);
         } catch (CourierServiceException e) {

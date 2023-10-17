@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class StatusUpdateTimeJson {
-    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonView(Public.class)
     private LocalDateTime updateTime;
     @JsonView(Public.class)

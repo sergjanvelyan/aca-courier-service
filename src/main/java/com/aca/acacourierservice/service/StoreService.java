@@ -70,7 +70,7 @@ public class StoreService {
     public Store addStoreAndAdmin(@Valid StoreJson storeJson) throws NoSuchAlgorithmException {
         Store store = storeConverter.convertToEntity(storeJson);
         UserJson storeAdmin = storeJson.getAdmin();
-        storeAdmin.setRole(User.Role.ROLE_STORE_ADMIN);
+        storeAdmin.setRole(User.Role.ROLE_STORE_ADMIN.toString());
         store.setAdmin(userService.saveUser(storeAdmin));
         store.setApiKey(generateKey(256));
         store.setApiSecret(generateKey(256));
@@ -96,7 +96,7 @@ public class StoreService {
     public User changeStoreAdmin(@Valid UserJson admin, @Min(1) long storeId) throws CourierServiceException {
         Store store = getStoreById(storeId);
         User previousStoreAdmin = store.getAdmin();
-        admin.setRole(User.Role.ROLE_STORE_ADMIN);
+        admin.setRole(User.Role.ROLE_STORE_ADMIN.toString());
         store.setAdmin(userService.saveUser(admin));
         userService.deleteExistingUserById(previousStoreAdmin.getId());
         storeRepository.save(store);

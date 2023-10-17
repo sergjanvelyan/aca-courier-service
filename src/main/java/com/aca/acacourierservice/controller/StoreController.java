@@ -8,6 +8,7 @@ import com.aca.acacourierservice.exception.CourierServiceException;
 import com.aca.acacourierservice.model.*;
 import com.aca.acacourierservice.service.OrderService;
 import com.aca.acacourierservice.service.StoreService;
+import com.aca.acacourierservice.service.UserService;
 import com.aca.acacourierservice.validation.OnCreate;
 import com.aca.acacourierservice.validation.OnUpdate;
 import com.aca.acacourierservice.view.Lists;
@@ -21,6 +22,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,13 +37,15 @@ public class StoreController {
     private final StoreConverter storeConverter;
     private final OrderService orderService;
     private final OrderConverter orderConverter;
+    private final UserService userService;
 
     @Autowired
-    public StoreController(StoreService storeService, StoreConverter storeConverter, OrderService orderService, OrderConverter orderConverter) {
+    public StoreController(StoreService storeService, StoreConverter storeConverter, OrderService orderService, OrderConverter orderConverter, UserService userService) {
         this.storeService = storeService;
         this.storeConverter = storeConverter;
         this.orderService = orderService;
         this.orderConverter = orderConverter;
+        this.userService = userService;
     }
 
     @Secured("ROLE_ADMIN")
@@ -125,11 +130,14 @@ public class StoreController {
 
     @Secured("ROLE_STORE_ADMIN")
     @JsonView(Lists.class)
-    @GetMapping(value = "/{storeId}/order/list/page/{page}/count/{count}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> listOrders(@PathVariable @Min(1) long storeId, @PathVariable @Min(0) int page, @PathVariable @Min(1) int count) {
+    @GetMapping(value = "/order/list/page/{page}/count/{count}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> listOrders(@PathVariable @Min(0) int page, @PathVariable @Min(1) int count) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Long  storeAdminId = userService.getUserByEmail(username).getId();
         Page<Order> orderPage;
         try {
-            orderPage = orderService.getOrdersByStoreId(storeId, page, count);
+            orderPage = orderService.getOrdersByStoreAdminId(storeAdminId, page, count);
         } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }

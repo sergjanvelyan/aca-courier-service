@@ -1,9 +1,6 @@
 package com.aca.acacourierservice.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.util.Objects;

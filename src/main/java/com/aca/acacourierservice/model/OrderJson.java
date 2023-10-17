@@ -76,10 +76,10 @@ public class OrderJson {
     @ValidEnum(enumClass = Order.Status.class)
     private String status;
     @JsonView(PrivateSecondLevel.class)
-    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime orderConfirmedTime;
     @JsonView(PrivateSecondLevel.class)
-    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime orderDeliveredTime;
     @JsonView(PrivateSecondLevel.class)
     private List<StatusUpdateTimeJson> statusUpdateHistory;

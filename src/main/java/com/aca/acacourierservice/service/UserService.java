@@ -62,7 +62,9 @@ public class UserService {
     public void updateUser(@Valid UserJson model, @Email String email) throws CourierServiceException {
         User entity = getUserByEmail(email);
         entity = userConverter.convertToEntity(model, entity);
-        entity.setPassword(passwordEncoder.encode(model.getPassword()));
+        if(model.getPassword()!=null){
+            entity.setPassword(passwordEncoder.encode(model.getPassword()));
+        }
         userRepository.save(entity);
     }
 

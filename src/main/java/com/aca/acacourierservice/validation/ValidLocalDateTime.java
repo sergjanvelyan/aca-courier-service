@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Documented
 @ReportAsSingleViolation
 public @interface ValidLocalDateTime {
-    String message() default "Invalid date and time format (yyyy/MM/dd HH:mm:ss)";
+    String message() default "Invalid date and time format (yyyy-MM-dd HH:mm:ss)";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
