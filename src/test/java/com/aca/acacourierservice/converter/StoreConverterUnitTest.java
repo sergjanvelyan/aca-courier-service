@@ -3,6 +3,7 @@ package com.aca.acacourierservice.converter;
 import com.aca.acacourierservice.entity.Store;
 import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.model.StoreJson;
+import com.aca.acacourierservice.model.UserJson;
 import com.aca.acacourierservice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ public class StoreConverterUnitTest {
         model.setStoreUrl("test.com");
         model.setName("test store");
         model.setPhoneNumber("+123456789");
-        model.setAdmin(new User());
+        model.setAdmin(new UserJson());
         model.setApiSecret("apisecret");
         model.setApiKey("apikey");
 
@@ -60,7 +61,7 @@ public class StoreConverterUnitTest {
         model.setStoreUrl("test.com");
         model.setName("test store");
         model.setPhoneNumber("+123456789");
-        model.setAdmin(new User());
+        model.setAdmin(new UserJson());
         model.setApiSecret("apisecret");
         model.setApiKey("apikey");
 
