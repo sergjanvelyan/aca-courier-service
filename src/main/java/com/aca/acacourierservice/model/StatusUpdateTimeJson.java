@@ -21,7 +21,7 @@ public class StatusUpdateTimeJson {
     @JsonView(Public.class)
     private String additionalInfo;
     @JsonIgnore
-    private long orderId;
+    private Long orderId;
 
     public LocalDateTime getUpdateTime() {
         return updateTime;
@@ -55,11 +55,11 @@ public class StatusUpdateTimeJson {
         this.additionalInfo = additionalInfo;
     }
 
-    public long getOrderId() {
+    public Long getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(long orderId) {
+    public void setOrderId(Long orderId) {
         this.orderId = orderId;
     }
 }

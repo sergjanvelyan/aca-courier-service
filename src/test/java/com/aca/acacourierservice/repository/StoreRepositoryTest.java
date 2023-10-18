@@ -1,6 +1,7 @@
 package com.aca.acacourierservice.repository;
 
-import com.aca.acacourierservice.entity.PickupPoint;
+import
+        com.aca.acacourierservice.entity.PickupPoint;
 import com.aca.acacourierservice.entity.Store;
 import com.aca.acacourierservice.entity.User;
 import org.junit.jupiter.api.AfterEach;
@@ -8,19 +9,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 public class StoreRepositoryTest {
-
     @Autowired
     private StoreRepository storeRepository;
     @Autowired
@@ -36,55 +35,79 @@ public class StoreRepositoryTest {
     }
 
     @Test
-    public void testFindAllByPage() {
-        User firstAdmin = new User();
-        firstAdmin.setEmail("some@email.com");
-        firstAdmin.setPassword("password123$");
-        firstAdmin.setRole(User.Role.ROLE_STORE_ADMIN);
-        userRepository.save(firstAdmin);
-
-        User secondAdmin = new User();
-        secondAdmin.setEmail("some2@email.com");
-        secondAdmin.setPassword("password2123$");
-        secondAdmin.setRole(User.Role.ROLE_STORE_ADMIN);
-        userRepository.save(secondAdmin);
+    public void testFindByApiKey() {
+        User storeAdmin = new User();
+        storeAdmin.setEmail("storeAdmin@gmail.com");
+        storeAdmin.setPassword("storeAdmin12345");
+        storeAdmin.setRole(User.Role.ROLE_STORE_ADMIN);
+        storeAdmin.setId(userRepository.save(storeAdmin).getId());
 
         PickupPoint pickupPoint = new PickupPoint();
-        pickupPoint.setCity("city");
+        pickupPoint.setCity("Yerevan");
         pickupPoint.setZipCode("5004");
-        pickupPoint.setCountry("country");
-        pickupPoint.setAddress("some address");
-        pickupPoint.setPhoneNumber("+123456789");
-        pickupPointRepository.save(pickupPoint);
+        pickupPoint.setCountry("Armenia");
+        pickupPoint.setAddress("Address 12");
+        pickupPoint.setPhoneNumber("+374896523");
+        pickupPoint.setId(pickupPointRepository.save(pickupPoint).getId());
 
         List<PickupPoint> pickupPoints = new ArrayList<>();
         pickupPoints.add(pickupPoint);
 
-        Store firstStore = new Store();
-        firstStore.setName("test store");
-        firstStore.setStoreUrl("test.com");
-        firstStore.setApiKey("apikey1");
-        firstStore.setApiSecret("apisecret1");
-        firstStore.setPhoneNumber("+123456789");
-        firstStore.setAdmin(firstAdmin);
-        firstStore.setPickupPoints(pickupPoints);
-        storeRepository.save(firstStore);
+        Store store = new Store();
+        store.setName("First store");
+        store.setStoreUrl("FirstStore.com");
+        store.setApiKey("apiKey1");
+        store.setApiSecret("apiSecret1");
+        store.setPhoneNumber("+37477568923");
+        store.setAdmin(storeAdmin);
+        store.setPickupPoints(pickupPoints);
+        store.setId(storeRepository.save(store).getId());
 
-        Store secondStore = new Store();
-        secondStore.setName("test store");
-        secondStore.setStoreUrl("test.com");
-        secondStore.setApiKey("apikey2");
-        secondStore.setApiSecret("apisecret2");
-        secondStore.setPhoneNumber("+123456789");
-        secondStore.setAdmin(secondAdmin);
-        secondStore.setPickupPoints(pickupPoints);
-        storeRepository.save(secondStore);
+        Optional<Store> storeOptional = storeRepository.findByApiKey(store.getApiKey());
+        assertTrue(storeOptional.isPresent());
+        assertEquals(store,storeOptional.get());
+    }
+    @Test
+    public void testFindByInvalidApiKey() {
+        Optional<Store> storeOptional = storeRepository.findByApiKey("Invalid apiKey");
+        assertFalse(storeOptional.isPresent());
+    }
+    @Test
+    public void testFindByAdmin_Email() {
+        User storeAdmin = new User();
+        storeAdmin.setEmail("storeAdmin@gmail.com");
+        storeAdmin.setPassword("storeAdmin12345");
+        storeAdmin.setRole(User.Role.ROLE_STORE_ADMIN);
+        storeAdmin.setId(userRepository.save(storeAdmin).getId());
 
-        Page<Store> storePage = storeRepository.findAll(PageRequest.of(0, 2));
+        PickupPoint pickupPoint = new PickupPoint();
+        pickupPoint.setCity("Yerevan");
+        pickupPoint.setZipCode("5004");
+        pickupPoint.setCountry("Armenia");
+        pickupPoint.setAddress("Address 12");
+        pickupPoint.setPhoneNumber("+374896523");
+        pickupPoint.setId(pickupPointRepository.save(pickupPoint).getId());
 
-        assertEquals(storePage.getTotalElements(), 2);
-        List<Store> stores = storePage.toList();
-        assertEquals(stores.get(0), firstStore);
-        assertEquals(stores.get(1), secondStore);
+        List<PickupPoint> pickupPoints = new ArrayList<>();
+        pickupPoints.add(pickupPoint);
+
+        Store store = new Store();
+        store.setName("First store");
+        store.setStoreUrl("FirstStore.com");
+        store.setApiKey("apiKey1");
+        store.setApiSecret("apiSecret1");
+        store.setPhoneNumber("+37477568923");
+        store.setAdmin(storeAdmin);
+        store.setPickupPoints(pickupPoints);
+        store.setId(storeRepository.save(store).getId());
+
+        Optional<Store> storeOptional = storeRepository.findByAdmin_Email(store.getAdmin().getEmail());
+        assertTrue(storeOptional.isPresent());
+        assertEquals(store,storeOptional.get());
+    }
+    @Test
+    public void testFindByInvalidAdmin_Email() {
+        Optional<Store> storeOptional = storeRepository.findByAdmin_Email("Invalid admin email");
+        assertFalse(storeOptional.isPresent());
     }
 }

@@ -48,11 +48,11 @@ public class PickupPointConverter implements Converter<PickupPoint, PickupPointJ
         return model;
     }
     public List<PickupPointJson> convertToModelList(List<PickupPoint> pickupPoints){
-        List<PickupPointJson> pickupPointJson = new ArrayList<>();
+        List<PickupPointJson> pickupPointJsonList = new ArrayList<>();
         for (PickupPoint pickupPoint:pickupPoints){
-            pickupPointJson.add(convertToModel(pickupPoint));
+            pickupPointJsonList.add(convertToModel(pickupPoint));
         }
-        return pickupPointJson;
+        return pickupPointJsonList;
     }
     public List<PickupPoint> convertToEntityList(List<PickupPointJson> pickupPointJsons){
         List<PickupPoint> pickupPoints = new ArrayList<>();

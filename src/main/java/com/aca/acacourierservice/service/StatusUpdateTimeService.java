@@ -27,7 +27,7 @@ public class StatusUpdateTimeService {
         this.orderService = orderService;
     }
     @Transactional
-    public long addStatusUpdateTime(StatusUpdateTimeJson statusUpdateTimeJson){
+    public Long addStatusUpdateTime(StatusUpdateTimeJson statusUpdateTimeJson){
         StatusUpdateTime statusUpdateTime = statusUpdateTimeConverter.convertToEntity(statusUpdateTimeJson);
         statusUpdateTime.setOrder(orderService.getOrderById(statusUpdateTimeJson.getOrderId()));
         statusUpdateTimeRepository.save(statusUpdateTime);
