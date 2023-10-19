@@ -14,13 +14,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class StatusUpdateTimeConverterTest {
     @InjectMocks
     private StatusUpdateTimeConverter statusUpdateTimeConverter;
-
     @Test
     void testConvertToEntityWithEntity() {
         StatusUpdateTimeJson model = new StatusUpdateTimeJson();
@@ -74,7 +73,23 @@ class StatusUpdateTimeConverterTest {
         assertEquals(entity.getAdditionalInfo(),model.getAdditionalInfo());
         assertEquals(entity.getOrder().getId(),model.getOrderId());
     }
+    @Test
+    void convertToModelWithoutOrder() {
+        StatusUpdateTime entity = new StatusUpdateTime();
+        entity.setUpdatedTo(Order.Status.DELIVERED);
+        entity.setUpdatedFrom(Order.Status.DELIVERING);
+        entity.setUpdateTime(LocalDateTime.of(2023, Month.AUGUST,30,1,30,56));
+        entity.setAdditionalInfo("Additional info");
 
+        StatusUpdateTimeJson model = statusUpdateTimeConverter.convertToModel(entity);
+
+        assertThat(model).isNotNull();
+        assertEquals(entity.getUpdateTime(),model.getUpdateTime());
+        assertEquals(entity.getUpdatedTo(),model.getUpdatedTo());
+        assertEquals(entity.getUpdatedFrom(),model.getUpdatedFrom());
+        assertEquals(entity.getAdditionalInfo(),model.getAdditionalInfo());
+        assertNull(model.getOrderId());
+    }
     @Test
     void testConvertToListModel() {
         Order order = new Order();

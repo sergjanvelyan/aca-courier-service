@@ -34,18 +34,18 @@ public class OrderConverterTest {
     void testConvertToEntityWithEntity() {
        OrderJson model = new OrderJson();
         model.setOrderId("orderId1234");
-        model.setStatus(Order.Status.SHIPPED.toString());
+        model.setStatus("SHIPPED");
         model.setCountry("Armenia");
         model.setCity("Yerevan");
         model.setAddress("Address 7");
-        model.setPhone("+374-77-77-77-77");
+        model.setPhone("+37477777777");
         model.setZipCode("0015");
         model.setFullName("FirstName LastName");
         model.setTrackingNumber("I entered this");
         model.setDeliveryPrice(10.0);
         model.setTotalPrice(50.0);
         model.setWeightKg(5.5);
-        model.setSize(Order.Size.MEDIUM.toString());
+        model.setSize("MEDIUM");
         model.setOrderConfirmedTime(LocalDateTime.of(2023, Month.SEPTEMBER,6,14,40,26));
         model.setOrderDeliveredTime(LocalDateTime.of(2023, Month.SEPTEMBER,15,15,0));
 
@@ -73,18 +73,18 @@ public class OrderConverterTest {
     void testConvertToEntityWithoutEntity() {
         OrderJson model = new OrderJson();
         model.setOrderId("orderId1234");
-        model.setStatus(Order.Status.SHIPPED.toString());
+        model.setStatus("SHIPPED");
         model.setCountry("Armenia");
         model.setCity("Yerevan");
         model.setAddress("Address 7");
-        model.setPhone("+374-77-77-77-77");
+        model.setPhone("+37477777777");
         model.setZipCode("0015");
         model.setFullName("FirstName LastName");
         model.setTrackingNumber("I entered this");
         model.setDeliveryPrice(10.0);
         model.setTotalPrice(50.0);
         model.setWeightKg(5.5);
-        model.setSize(Order.Size.MEDIUM.toString());
+        model.setSize("MEDIUM");
         model.setOrderConfirmedTime(LocalDateTime.of(2023, Month.SEPTEMBER,6,14,40,26));
         model.setOrderDeliveredTime(LocalDateTime.of(2023, Month.SEPTEMBER,15,15,0));
 
@@ -127,7 +127,7 @@ public class OrderConverterTest {
         entity.setCountry("Armenia");
         entity.setCity("Yerevan");
         entity.setAddress("Address 7");
-        entity.setPhone("+374-77-77-77-77");
+        entity.setPhone("+37477777777");
         entity.setZipCode("0015");
         entity.setFullName("FirstName LastName");
         entity.setTrackingNumber("I entered this");
@@ -181,7 +181,7 @@ public class OrderConverterTest {
         orderOne.setCountry("Armenia");
         orderOne.setCity("Yerevan");
         orderOne.setAddress("Address 7");
-        orderOne.setPhone("+374-77-77-77-77");
+        orderOne.setPhone("+37477777777");
         orderOne.setZipCode("0015");
         orderOne.setFullName("FirstName LastName");
         orderOne.setTrackingNumber("I entered this");
@@ -201,7 +201,7 @@ public class OrderConverterTest {
         orderTwo.setCountry("Armenia");
         orderTwo.setCity("Yerevan");
         orderTwo.setAddress("Address 7");
-        orderTwo.setPhone("+374-77-77-77-77");
+        orderTwo.setPhone("+37477777777");
         orderTwo.setZipCode("0015");
         orderTwo.setFullName("FirstName LastName");
         orderTwo.setTrackingNumber("I entered this");
