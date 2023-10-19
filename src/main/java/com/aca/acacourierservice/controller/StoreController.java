@@ -1,74 +1,96 @@
 package com.aca.acacourierservice.controller;
 
+import com.aca.acacourierservice.converter.OrderConverter;
 import com.aca.acacourierservice.converter.StoreConverter;
-import com.aca.acacourierservice.converter.UserConverter;
 import com.aca.acacourierservice.entity.Order;
 import com.aca.acacourierservice.entity.Store;
-import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.exception.CourierServiceException;
 import com.aca.acacourierservice.model.*;
 import com.aca.acacourierservice.service.OrderService;
 import com.aca.acacourierservice.service.StoreService;
 import com.aca.acacourierservice.service.UserService;
+import com.aca.acacourierservice.validation.OnCreate;
+import com.aca.acacourierservice.validation.OnUpdate;
+import com.aca.acacourierservice.view.Lists;
+import com.aca.acacourierservice.view.PrivateSecondLevel;
+import com.fasterxml.jackson.annotation.JsonView;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/store")
+@Validated
 public class StoreController {
     private final StoreService storeService;
     private final StoreConverter storeConverter;
-    private final UserService userService;
-    private final UserConverter userConverter;
     private final OrderService orderService;
+    private final OrderConverter orderConverter;
+    private final UserService userService;
 
     @Autowired
-    public StoreController(StoreService storeService, StoreConverter storeConverter, UserService userService, UserConverter userConverter, OrderService orderService) {
+    public StoreController(StoreService storeService, StoreConverter storeConverter, OrderService orderService, OrderConverter orderConverter, UserService userService) {
         this.storeService = storeService;
         this.storeConverter = storeConverter;
-        this.userService = userService;
-        this.userConverter = userConverter;
         this.orderService = orderService;
+        this.orderConverter = orderConverter;
+        this.userService = userService;
     }
 
+    @Secured("ROLE_ADMIN")
+    @JsonView(PrivateSecondLevel.class)
     @GetMapping(value = "/{storeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getStore(@PathVariable long storeId) {
+    public ResponseEntity<?> getStore(@PathVariable @Min(1) long storeId) {
         Store store;
         try {
             store = storeService.getStoreById(storeId);
+            store.getAdmin().setPassword("Password hidden");
+            StoreJson storeJson = storeConverter.convertToModel(store);
+            return new ResponseEntity<>(storeJson, HttpStatus.OK);
         } catch (CourierServiceException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<>(storeConverter.convertToModel(store), HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public List<StoreJson> listStores(@RequestBody PageInfo pageInfo) {
-        return storeService.listStoresByPage(pageInfo.getPage(), pageInfo.getCount());
-    }
-
-    @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Status> registerStore(@RequestBody StoreJson storeJson) {
-        User admin = storeJson.getAdmin();
-        userService.saveUser(admin);
-        try {
-            long id = storeService.addStore(storeJson);
-            return new ResponseEntity<>(new StatusWithId("created", id), HttpStatus.CREATED);
+            return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @Secured("ROLE_ADMIN")
+    @JsonView(Lists.class)
+    @GetMapping(value = "/list/page/{page}/count/{count}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<StoreJson> listStores(@PathVariable @Min(0) int page, @PathVariable @Min(1) int count) {
+        return storeService.listStoresByPage(page, count);
+    }
+
+    @Secured("ROLE_ADMIN")
+    @Validated(OnCreate.class)
+    @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Status> registerStore(@RequestBody @Valid StoreJson storeJson) {
+        try {
+            Store store = storeService.addStoreAndAdmin(storeJson);
+            return new ResponseEntity<>(new StatusWithKeyAndSecret("Store registered", store.getId(), store.getApiKey(), store.getApiSecret()), HttpStatus.CREATED);
+        } catch (Exception e) {
+            if (e.getMessage().contains("duplicate key value violates unique constraint")) {
+                return new ResponseEntity<>(new Status("Duplicate api key or api secret"), HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Secured("ROLE_ADMIN")
+    @Validated(OnUpdate.class)
     @PutMapping(value = "/{storeId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Status> updateStore(@RequestBody StoreJson storeJson, @PathVariable long storeId) {
+    public ResponseEntity<Status> updateStore(@RequestBody @Valid StoreJson storeJson, @PathVariable @Min(1) long storeId) {
         try {
             storeService.updateStore(storeId, storeJson);
         } catch (CourierServiceException e) {
@@ -76,46 +98,50 @@ public class StoreController {
         } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(new Status("updated"), HttpStatus.OK);
+        return new ResponseEntity<>(new Status("Store updated"), HttpStatus.OK);
     }
 
-    @PutMapping(value = "/{storeId}/admin/update", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Status> updateStoreAdmin(@RequestBody UserJson admin, @PathVariable long storeId) {
-        Store store = storeService.getStoreById(storeId);
-        User adminEntity = store.getAdmin();
+    @Secured("ROLE_ADMIN")
+    @Validated(OnCreate.class)
+    @PutMapping(value = "/{storeId}/admin/change", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Status> changeStoreAdmin(@RequestBody @Valid UserJson admin, @PathVariable @Min(1) long storeId) {
         try {
-            userService.updateUser(admin, adminEntity.getId());
+            long adminId = storeService.changeStoreAdmin(admin, storeId).getId();
+            return new ResponseEntity<>(new StatusWithId("Store admin updated", adminId), HttpStatus.OK);
         } catch (CourierServiceException e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(new Status("updated"), HttpStatus.OK);
     }
 
+    @Secured("ROLE_ADMIN")
     @DeleteMapping(value = "/{storeId}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Status> deleteStore(@PathVariable long storeId) {
+    public ResponseEntity<Status> deleteStore(@PathVariable @Min(1) long storeId) {
         try {
             storeService.deleteStoreById(storeId);
         } catch (CourierServiceException e) {
-            return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new StatusWithId(e.getMessage(), storeId), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(new Status("updated"), HttpStatus.OK);
+        return new ResponseEntity<>(new Status("Store deleted"), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{storeId}/order/list", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> listOrders(@PathVariable long storeId, @RequestBody PageInfo pageInfo) {
+    @Secured("ROLE_STORE_ADMIN")
+    @JsonView(Lists.class)
+    @GetMapping(value = "/order/list/page/{page}/count/{count}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> listOrders(@PathVariable @Min(0) int page, @PathVariable @Min(1) int count) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Long  storeAdminId = userService.getUserByEmail(username).getId();
         Page<Order> orderPage;
         try {
-            orderPage = orderService.getOrdersByStoreId(storeId, pageInfo.getPage(), pageInfo.getCount());
-        } catch (CourierServiceException e) {
-            return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.BAD_REQUEST);
+            orderPage = orderService.getOrdersByStoreAdminId(storeAdminId, page, count);
         } catch (Exception e) {
             return new ResponseEntity<>(new Status(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        List<Order> orders = orderPage.toList();
+        OrderListJson orders = orderConverter.convertToListModel(orderPage);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 }

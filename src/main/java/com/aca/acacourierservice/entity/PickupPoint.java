@@ -2,6 +2,7 @@ package com.aca.acacourierservice.entity;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
 
 
 @Entity
@@ -15,7 +16,7 @@ public class PickupPoint {
     @Column(nullable = false)
     private String country;
     @Column(nullable = false)
-    private long zipCode;
+    private String zipCode;
     @Column(nullable = false)
     private String address;
     @Column(nullable = false)
@@ -48,11 +49,11 @@ public class PickupPoint {
         this.country = country;
     }
 
-    public long getZipCode() {
+    public String getZipCode() {
         return zipCode;
     }
 
-    public void setZipCode(long zipCode) {
+    public void setZipCode(String zipCode) {
         this.zipCode = zipCode;
     }
 
@@ -79,8 +80,27 @@ public class PickupPoint {
     public void setStore(Store store) {
         this.store = store;
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PickupPoint that = (PickupPoint) o;
+        return id == that.id
+                && Objects.equals(city, that.city)
+                && Objects.equals(country, that.country)
+                && Objects.equals(zipCode, that.zipCode)
+                && Objects.equals(address, that.address)
+                && Objects.equals(phoneNumber, that.phoneNumber)
+                && Objects.equals(store, that.store);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id,
+                city,
+                country,
+                zipCode,
+                address,
+                phoneNumber,
+                store);
+    }
 }
-
-
-
-

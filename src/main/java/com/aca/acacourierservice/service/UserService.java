@@ -6,66 +6,81 @@ import com.aca.acacourierservice.exception.CourierServiceException;
 import com.aca.acacourierservice.model.UserJson;
 import com.aca.acacourierservice.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 @Service
-public class UserService implements UserDetailsService {
+@Validated
+public class UserService {
     private final UserRepository userRepository;
     private final UserConverter userConverter;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserConverter userConverter) {
+    public UserService(UserRepository userRepository, UserConverter userConverter, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userConverter = userConverter;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found: " + username));
-        GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().name());
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), Arrays.asList(authority));
-    }
-
-    public User getUserById(long id) {
+    public User getUserById(@Min(1) long id) throws CourierServiceException {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
-            throw new CourierServiceException("There is no user with id" + id);
+            throw new CourierServiceException("There is no user with id=" + id + ":");
+        }
+        return userOptional.get();
+    }
+
+    public User getUserByEmail(@Email String email) throws CourierServiceException {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            throw new CourierServiceException("There is no user with email '" + email + "':");
         }
         return userOptional.get();
     }
 
     @Transactional
-    public UserJson saveUser(UserJson model) {
+    public User saveUser(@Valid UserJson model) throws CourierServiceException {
+        if (userRepository.existsByEmail(model.getEmail())) {
+            throw new CourierServiceException("This email is already in use");
+        }
         User user = userConverter.convertToEntity(model);
-        return userConverter.convertToModel(userRepository.save(user));
+        user.setPassword(passwordEncoder.encode(model.getPassword()));
+        return userRepository.save(user);
     }
 
     @Transactional
-    public UserJson saveUser(User entity) {
-        return userConverter.convertToModel(userRepository.save(entity));
-    }
-
-    @Transactional
-    public void updateUser(UserJson model, long userId) {
-        User entity = getUserById(userId);
+    public void updateUser(@Valid UserJson model, @Email String email) throws CourierServiceException {
+        User entity = getUserByEmail(email);
         entity = userConverter.convertToEntity(model, entity);
+        if(model.getPassword()!=null){
+            entity.setPassword(passwordEncoder.encode(model.getPassword()));
+        }
         userRepository.save(entity);
     }
 
     @Transactional
-    public void deleteUserById(long id) {
-        if (!userRepository.existsById(id)) {
-            throw new CourierServiceException("There is no user with id " + id);
-        }
+    public void updateUser(@Valid UserJson model, User entity) {
+        entity = userConverter.convertToEntity(model, entity);
+        entity.setPassword(passwordEncoder.encode(model.getPassword()));
+        userRepository.save(entity);
+    }
+
+    @Transactional
+    public void deleteExistingUserById(@Min(1) long id) {
         userRepository.deleteById(id);
+    }
+
+    public Page<User> getCouriers(int page, int size) {
+        return userRepository.findAllByRole(User.Role.ROLE_COURIER, PageRequest.of(page, size));
     }
 }

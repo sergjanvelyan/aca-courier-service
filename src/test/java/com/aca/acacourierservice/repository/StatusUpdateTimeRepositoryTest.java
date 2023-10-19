@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
@@ -41,12 +43,11 @@ public class StatusUpdateTimeRepositoryTest {
     public void testFindAllByOrderId(){
         User storeAdmin = new User();
         storeAdmin.setEmail("storeAdmin@gmail.com");
-        storeAdmin.setPassword("storeAdmin");
+        storeAdmin.setPassword("storeAdmin12345");
         storeAdmin.setRole(User.Role.ROLE_STORE_ADMIN);
         storeAdmin.setId(userRepository.save(storeAdmin).getId());
 
         Store store = new Store();
-        store.setId(1L);
         store.setName("Store Name");
         store.setAdmin(storeAdmin);
         store.setId(storeRepository.save(store).getId());
@@ -58,18 +59,17 @@ public class StatusUpdateTimeRepositoryTest {
         order.setCountry("Armenia");
         order.setCity("Yerevan");
         order.setAddress("Address 7");
-        order.setPhone("+374-77-77-77-77");
+        order.setPhone("+37477777777");
         order.setZipCode("0015");
         order.setFullName("FirstName LastName");
-        order.setDeliveryPrice(10);
-        order.setTotalPrice(50);
+        order.setDeliveryPrice(10.0);
+        order.setTotalPrice(50.0);
         order.setWeightKg(5.5);
         order.setSize(Order.Size.MEDIUM);
         order.setOrderConfirmedTime(LocalDateTime.of(2023, Month.AUGUST, 25, 15, 10, 3));
         order.setId(orderRepository.save(order).getId());
 
         StatusUpdateTime firstStatusUpdateTime = new StatusUpdateTime();
-        firstStatusUpdateTime.setId(1L);
         firstStatusUpdateTime.setOrder(order);
         firstStatusUpdateTime.setUpdatedTo(Order.Status.DELIVERING);
         firstStatusUpdateTime.setUpdatedFrom(Order.Status.SHIPPED);
@@ -77,7 +77,65 @@ public class StatusUpdateTimeRepositoryTest {
         firstStatusUpdateTime.setId(statusUpdateTimeRepository.save(firstStatusUpdateTime).getId());
 
         StatusUpdateTime secondStatusUpdateTime = new StatusUpdateTime();
-        secondStatusUpdateTime.setId(2L);
+        secondStatusUpdateTime.setOrder(order);
+        secondStatusUpdateTime.setUpdatedTo(Order.Status.DELIVERED);
+        secondStatusUpdateTime.setUpdatedFrom(Order.Status.DELIVERING);
+        secondStatusUpdateTime.setUpdateTime(LocalDateTime.of(2023, Month.AUGUST,28,22,23,23));
+        secondStatusUpdateTime.setAdditionalInfo("Additional info");
+        secondStatusUpdateTime.setId(statusUpdateTimeRepository.save(secondStatusUpdateTime).getId());
+
+        List<StatusUpdateTime> statusUpdateTimes = statusUpdateTimeRepository.findAllByOrderId(order.getId());
+        assertEquals(2,statusUpdateTimes.size());
+
+        StatusUpdateTime savedFirstStatusUpdateTime = statusUpdateTimes.get(0);
+        assertEquals(firstStatusUpdateTime,savedFirstStatusUpdateTime);
+
+        StatusUpdateTime savedSecondStatusUpdateTime = statusUpdateTimes.get(1);
+        assertEquals(secondStatusUpdateTime,savedSecondStatusUpdateTime);
+    }
+    @Test
+    public void testFindAllByInvalidOrderId(){
+        List<StatusUpdateTime> statusUpdateTimes = statusUpdateTimeRepository.findAllByOrderId(0);
+        Assertions.assertThat(statusUpdateTimes.size()).isEqualTo(0);
+    }
+    @Test
+    public void testFindAllByOrder_TrackingNumber(){
+        User storeAdmin = new User();
+        storeAdmin.setEmail("storeAdmin@gmail.com");
+        storeAdmin.setPassword("storeAdmin12345");
+        storeAdmin.setRole(User.Role.ROLE_STORE_ADMIN);
+        storeAdmin.setId(userRepository.save(storeAdmin).getId());
+
+        Store store = new Store();
+        store.setName("Store Name");
+        store.setAdmin(storeAdmin);
+        store.setId(storeRepository.save(store).getId());
+
+        Order order = new Order();
+        order.setOrderId("orderId1234");
+        order.setStatus(Order.Status.SHIPPED);
+        order.setStore(store);
+        order.setCountry("Armenia");
+        order.setCity("Yerevan");
+        order.setAddress("Address 7");
+        order.setPhone("+37477777777");
+        order.setZipCode("0015");
+        order.setFullName("FirstName LastName");
+        order.setDeliveryPrice(10.0);
+        order.setTotalPrice(50.0);
+        order.setWeightKg(5.5);
+        order.setSize(Order.Size.MEDIUM);
+        order.setOrderConfirmedTime(LocalDateTime.of(2023, Month.AUGUST, 25, 15, 10, 3));
+        order.setId(orderRepository.save(order).getId());
+
+        StatusUpdateTime firstStatusUpdateTime = new StatusUpdateTime();
+        firstStatusUpdateTime.setOrder(order);
+        firstStatusUpdateTime.setUpdatedTo(Order.Status.DELIVERING);
+        firstStatusUpdateTime.setUpdatedFrom(Order.Status.SHIPPED);
+        firstStatusUpdateTime.setUpdateTime(LocalDateTime.of(2023, Month.AUGUST, 28, 21, 23, 23));
+        firstStatusUpdateTime.setId(statusUpdateTimeRepository.save(firstStatusUpdateTime).getId());
+
+        StatusUpdateTime secondStatusUpdateTime = new StatusUpdateTime();
         secondStatusUpdateTime.setOrder(order);
         secondStatusUpdateTime.setUpdatedTo(Order.Status.DELIVERED);
         secondStatusUpdateTime.setUpdatedFrom(Order.Status.DELIVERING);
@@ -85,13 +143,18 @@ public class StatusUpdateTimeRepositoryTest {
         secondStatusUpdateTime.setAdditionalInfo("Ok");
         secondStatusUpdateTime.setId(statusUpdateTimeRepository.save(secondStatusUpdateTime).getId());
 
-        List<StatusUpdateTime> statusUpdateTimes = statusUpdateTimeRepository.findAllByOrderId(order.getId());
-        Assertions.assertThat(statusUpdateTimes.size()).isEqualTo(2);
-        Assertions.assertThat(statusUpdateTimes.get(1).getUpdatedFrom()).isEqualTo(statusUpdateTimes.get(0).getUpdatedTo());
+        List<StatusUpdateTime> statusUpdateTimes = statusUpdateTimeRepository.findAllByOrder_TrackingNumber(order.getTrackingNumber());
+        assertEquals(2,statusUpdateTimes.size());
+
+        StatusUpdateTime savedFirstStatusUpdateTime = statusUpdateTimes.get(0);
+        assertEquals(firstStatusUpdateTime,savedFirstStatusUpdateTime);
+
+        StatusUpdateTime savedSecondStatusUpdateTime = statusUpdateTimes.get(1);
+        assertEquals(secondStatusUpdateTime,savedSecondStatusUpdateTime);
     }
     @Test
-    public void testFindAllByInvalidOrderId(){
-        List<StatusUpdateTime> statusUpdateTimes = statusUpdateTimeRepository.findAllByOrderId(8);
-        Assertions.assertThat(statusUpdateTimes.size()).isEqualTo(0);
+    public void testFindAllByInvalidOrder_TrackingNumber(){
+        List<StatusUpdateTime> statusUpdateTimes = statusUpdateTimeRepository.findAllByOrder_TrackingNumber("Invalid tracking number");
+        assertTrue(statusUpdateTimes.isEmpty());
     }
 }

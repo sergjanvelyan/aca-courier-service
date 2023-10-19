@@ -2,21 +2,15 @@ package com.aca.acacourierservice.converter;
 
 import com.aca.acacourierservice.entity.StatusUpdateTime;
 import com.aca.acacourierservice.model.StatusUpdateTimeJson;
-import com.aca.acacourierservice.service.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class StatusUpdateTimeConverter implements Converter<StatusUpdateTime, StatusUpdateTimeJson>{
-    private final OrderService orderService;
-    @Autowired
-    public StatusUpdateTimeConverter(@Lazy OrderService orderService) {
-        this.orderService = orderService;
-    }
     @Override
     public StatusUpdateTime convertToEntity(StatusUpdateTimeJson model, StatusUpdateTime entity) {
-        entity.setOrder(orderService.getOrderById(model.getOrderId()));
         entity.setUpdatedTo(model.getUpdatedTo());
         entity.setUpdatedFrom(model.getUpdatedFrom());
         entity.setUpdateTime(model.getUpdateTime());
@@ -31,11 +25,20 @@ public class StatusUpdateTimeConverter implements Converter<StatusUpdateTime, St
     @Override
     public StatusUpdateTimeJson convertToModel(StatusUpdateTime entity) {
         StatusUpdateTimeJson model = new StatusUpdateTimeJson();
-        model.setOrderId(entity.getOrder().getId());
+        if(entity.getOrder()!=null){
+            model.setOrderId(entity.getOrder().getId());
+        }
         model.setUpdatedTo(entity.getUpdatedTo());
         model.setUpdatedFrom(entity.getUpdatedFrom());
         model.setUpdateTime(entity.getUpdateTime());
         model.setAdditionalInfo(entity.getAdditionalInfo());
         return model;
+    }
+    public List<StatusUpdateTimeJson> convertToListModel(List<StatusUpdateTime> statusUpdateTimeList){
+        List<StatusUpdateTimeJson> statusUpdateTimeJsonList = new ArrayList<>();
+        for (StatusUpdateTime statusUpdateTime:statusUpdateTimeList) {
+            statusUpdateTimeJsonList.add(convertToModel(statusUpdateTime));
+        }
+        return statusUpdateTimeJsonList;
     }
 }

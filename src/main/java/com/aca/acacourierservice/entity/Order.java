@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -38,11 +39,11 @@ public class Order {
     @Column
     private String trackingNumber;
     @Column(nullable = false)
-    private double deliveryPrice;
+    private Double deliveryPrice;
     @Column(nullable = false)
-    private double totalPrice;
+    private Double totalPrice;
     @Column(nullable = false)
-    private double weightKg;
+    private Double weightKg;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Size size;
@@ -155,27 +156,27 @@ public class Order {
         this.trackingNumber = trackingNumber;
     }
 
-    public double getDeliveryPrice() {
+    public Double getDeliveryPrice() {
         return deliveryPrice;
     }
 
-    public void setDeliveryPrice(double deliveryPrice) {
+    public void setDeliveryPrice(Double deliveryPrice) {
         this.deliveryPrice = deliveryPrice;
     }
 
-    public double getTotalPrice() {
+    public Double getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(double totalPrice) {
+    public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
     }
 
-    public double getWeightKg() {
+    public Double getWeightKg() {
         return weightKg;
     }
 
-    public void setWeightKg(double weightKg) {
+    public void setWeightKg(Double weightKg) {
         this.weightKg = weightKg;
     }
 
@@ -213,16 +214,65 @@ public class Order {
 
     public enum Status {
         NEW,
-        SHIPPED,
         CANCELLED,
+        SHIPPED,
         DELIVERING,
-        DELIVERED,
-        POSTPONED
+        POSTPONED,
+        DELIVERED
     }
     public enum Size {
         SMALL,
         MEDIUM,
         LARGE,
         EXTRA_LARGE
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Order order = (Order) o;
+        return id == order.id
+                && Double.compare(order.deliveryPrice, deliveryPrice) == 0
+                && Double.compare(order.totalPrice, totalPrice) == 0
+                && Double.compare(order.weightKg, weightKg) == 0
+                && Objects.equals(orderId, order.orderId)
+                && status == order.status
+                && Objects.equals(store, order.store)
+                && Objects.equals(courier, order.courier)
+                && Objects.equals(country, order.country)
+                && Objects.equals(city, order.city)
+                && Objects.equals(address, order.address)
+                && Objects.equals(phone, order.phone)
+                && Objects.equals(zipCode, order.zipCode)
+                && Objects.equals(fullName, order.fullName)
+                && Objects.equals(trackingNumber, order.trackingNumber)
+                && size == order.size
+                && Objects.equals(orderConfirmedTime, order.orderConfirmedTime)
+                && Objects.equals(orderDeliveredTime, order.orderDeliveredTime)
+                && Objects.equals(statusUpdateTimeList, order.statusUpdateTimeList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id,
+                orderId,
+                status,
+                store,
+                courier,
+                country,
+                city,
+                address,
+                phone,
+                zipCode,
+                fullName,
+                trackingNumber,
+                deliveryPrice,
+                totalPrice,
+                weightKg,
+                size,
+                orderConfirmedTime,
+                orderDeliveredTime,
+                statusUpdateTimeList);
     }
 }

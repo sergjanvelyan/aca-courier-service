@@ -1,6 +1,10 @@
 package com.aca.acacourierservice.model;
 
+import com.aca.acacourierservice.view.Public;
+import com.fasterxml.jackson.annotation.JsonView;
+
 import java.util.List;
+@JsonView(Public.class)
 public class OrderListJson {
     private long totalCount;
     private List<OrderJson> orderListJson;

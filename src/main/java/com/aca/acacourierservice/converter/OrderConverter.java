@@ -3,10 +3,7 @@ package com.aca.acacourierservice.converter;
 import com.aca.acacourierservice.entity.Order;
 import com.aca.acacourierservice.model.OrderJson;
 import com.aca.acacourierservice.model.OrderListJson;
-import com.aca.acacourierservice.service.StoreService;
-import com.aca.acacourierservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -15,22 +12,15 @@ import java.util.List;
 
 @Component
 public class OrderConverter implements Converter<Order, OrderJson> {
-    //TODO: remove field injections
-    private final StoreService storeService;
-    private final UserService userService;
-
+    private final StatusUpdateTimeConverter statusUpdateTimeConverter;
     @Autowired
-    public OrderConverter(@Lazy StoreService storeService, @Lazy UserService userService) {
-        this.storeService = storeService;
-        this.userService = userService;
+    public OrderConverter(StatusUpdateTimeConverter statusUpdateTimeConverter) {
+        this.statusUpdateTimeConverter = statusUpdateTimeConverter;
     }
-
     @Override
     public Order convertToEntity(OrderJson model, Order entity) {
         entity.setOrderId(model.getOrderId());
         entity.setTrackingNumber(model.getTrackingNumber());
-        //TODO: remove next line
-        entity.setStore(storeService.getStoreById(model.getStoreId()));
         entity.setFullName(model.getFullName());
         entity.setCountry(model.getCountry());
         entity.setCity(model.getCity());
@@ -39,8 +29,6 @@ public class OrderConverter implements Converter<Order, OrderJson> {
         entity.setZipCode(model.getZipCode());
         entity.setWeightKg(model.getWeightKg());
         entity.setSize(model.getSize());
-        //TODO: remove next line
-        entity.setCourier(userService.getUserById(model.getCourierId()));
         entity.setDeliveryPrice(model.getDeliveryPrice());
         entity.setTotalPrice(model.getTotalPrice());
         entity.setStatus(model.getStatus());
@@ -56,9 +44,12 @@ public class OrderConverter implements Converter<Order, OrderJson> {
     @Override
     public OrderJson convertToModel(Order entity) {
         OrderJson model = new OrderJson();
+        model.setId(entity.getId());
         model.setOrderId(entity.getOrderId());
         model.setTrackingNumber(entity.getTrackingNumber());
-        model.setStoreId(entity.getStore().getId());
+        if(entity.getStore()!=null){
+            model.setStoreId(entity.getStore().getId());
+        }
         model.setFullName(entity.getFullName());
         model.setCountry(entity.getCountry());
         model.setCity(entity.getCity());
@@ -66,13 +57,16 @@ public class OrderConverter implements Converter<Order, OrderJson> {
         model.setPhone(entity.getPhone());
         model.setZipCode(entity.getZipCode());
         model.setWeightKg(entity.getWeightKg());
-        model.setSize(entity.getSize());
-        model.setCourierId(entity.getCourier().getId());
+        model.setSize(entity.getSize().toString());
+        if(entity.getCourier()!=null){
+            model.setCourierId(entity.getCourier().getId());
+        }
         model.setDeliveryPrice(entity.getDeliveryPrice());
         model.setTotalPrice(entity.getTotalPrice());
-        model.setStatus(entity.getStatus());
+        model.setStatus(entity.getStatus().toString());
         model.setOrderConfirmedTime(entity.getOrderConfirmedTime());
         model.setOrderDeliveredTime(entity.getOrderDeliveredTime());
+        model.setStatusUpdateHistory(statusUpdateTimeConverter.convertToListModel(entity.getStatusUpdateTimeList()));
         return model;
     }
     public OrderListJson convertToListModel(Page<Order> orders){

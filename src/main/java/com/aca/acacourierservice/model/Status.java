@@ -1,5 +1,9 @@
 package com.aca.acacourierservice.model;
 
+import com.aca.acacourierservice.view.Public;
+import com.fasterxml.jackson.annotation.JsonView;
+
+@JsonView(Public.class)
 public class Status {
     private String status;
     public Status() {

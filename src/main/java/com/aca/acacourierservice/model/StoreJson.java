@@ -1,17 +1,49 @@
 package com.aca.acacourierservice.model;
 
-import com.aca.acacourierservice.entity.PickupPoint;
-import com.aca.acacourierservice.entity.User;
+import com.aca.acacourierservice.validation.OnCreate;
+import com.aca.acacourierservice.validation.OnUpdate;
+import com.aca.acacourierservice.view.Lists;
+import com.aca.acacourierservice.view.PrivateFirstLevel;
+import com.aca.acacourierservice.view.PrivateSecondLevel;
+import com.aca.acacourierservice.view.Public;
+import com.fasterxml.jackson.annotation.JsonView;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 
 import java.util.List;
 
 public class StoreJson {
+    @JsonView(Lists.class)
+    private long id;
+    @NotNull(groups = OnCreate.class,  message = "Please enter store name")
+    @Size(min = 2, max = 30, message = "Store name length should be 2-30")
+    @JsonView(Public.class)
     private String name;
-    private User admin;
-    private List<PickupPoint> pickupPoints;
+    @Valid
+    @NotNull(groups = OnCreate.class,  message = "Please also register store admin ")
+    @Null(groups = OnUpdate.class, message = "You can't update store admin with store. For updating store admin call /admin/update endpoint")
+    @JsonView(PrivateSecondLevel.class)
+    private UserJson admin;
+    @Valid
+    @Size(groups = OnCreate.class, min = 1,message = "Please enter at least one pickup point")
+    @Null(groups = OnUpdate.class, message = "You can't update pickup points with store. For updating pickup points call /pickupPoint endpoint")
+    @JsonView(PrivateSecondLevel.class)
+    private List<PickupPointJson> pickupPoints;
+    @NotNull(groups = OnCreate.class,  message = "Please enter store url")
+    @Pattern(regexp = "^(https://)?[^\\s/$.?#]+\\.\\S*$", message = "The url ${validatedValue} is invalid")
+    @JsonView(Public.class)
     private String storeUrl;
+    @NotNull(groups = OnCreate.class,  message = "Please enter phone number")
+    @Pattern(regexp = "^[+][0-9]{10,15}$", message = "Invalid phone number")
+    @JsonView(Public.class)
     private String phoneNumber;
+    @Null(groups = OnCreate.class, message = "You don't need to enter api key because api key will be generated")
+    @Null(groups = OnUpdate.class, message = "You can't update api key")
+    @JsonView(PrivateFirstLevel.class)
     private String apiKey;
+    @Null(groups = OnCreate.class, message = "You don't need to enter api secret because api key will be generated")
+    @Null(groups = OnUpdate.class, message = "You can't update api secret")
+    @JsonView(PrivateFirstLevel.class)
     private String apiSecret;
 
     public String getName() {
@@ -22,19 +54,19 @@ public class StoreJson {
         this.name = name;
     }
 
-    public User getAdmin() {
+    public UserJson getAdmin() {
         return admin;
     }
 
-    public void setAdmin(User admin) {
+    public void setAdmin(UserJson admin) {
         this.admin = admin;
     }
 
-    public List<PickupPoint> getPickupPoints() {
+    public List<PickupPointJson> getPickupPoints() {
         return pickupPoints;
     }
 
-    public void setPickupPoints(List<PickupPoint> pickupPoints) {
+    public void setPickupPoints(List<PickupPointJson> pickupPoints) {
         this.pickupPoints = pickupPoints;
     }
 
@@ -68,5 +100,13 @@ public class StoreJson {
 
     public void setApiSecret(String apiSecret) {
         this.apiSecret = apiSecret;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

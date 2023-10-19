@@ -3,45 +3,78 @@ package com.aca.acacourierservice.service;
 import com.aca.acacourierservice.converter.StoreConverter;
 import com.aca.acacourierservice.entity.PickupPoint;
 import com.aca.acacourierservice.entity.Store;
+import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.exception.CourierServiceException;
 import com.aca.acacourierservice.model.StoreJson;
+import com.aca.acacourierservice.model.UserJson;
 import com.aca.acacourierservice.repository.PickupPointRepository;
 import com.aca.acacourierservice.repository.StoreRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Validated
 public class StoreService {
     private final PickupPointRepository pickupPointRepository;
     private final StoreRepository storeRepository;
     private final StoreConverter storeConverter;
+    private final UserService userService;
 
     @Autowired
-    public StoreService(PickupPointRepository pickupPointRepository, StoreRepository storeRepository, StoreConverter storeConverter) {
+    public StoreService(PickupPointRepository pickupPointRepository, StoreRepository storeRepository, StoreConverter storeConverter, UserService userService) {
         this.pickupPointRepository = pickupPointRepository;
         this.storeRepository = storeRepository;
         this.storeConverter = storeConverter;
+        this.userService = userService;
     }
 
-    public Store getStoreById(long storeId) {
+    public Store getStoreById(@Min(1) long storeId) throws CourierServiceException {
         Optional<Store> storeOptional = storeRepository.findById(storeId);
         if (storeOptional.isEmpty()) {
-            throw new CourierServiceException("There is no store with id " + storeId);
+            throw new CourierServiceException("There is no store with id=" + storeId + ":");
         }
         return storeOptional.get();
     }
 
-    //Set ROLE_ADMIN access on this method
+    public Store getStoreByApiKey(String apiKey) throws CourierServiceException {
+        Optional<Store> storeOptional = storeRepository.findByApiKey(apiKey);
+        if (storeOptional.isEmpty()) {
+            throw new CourierServiceException("There is no store with apiKey=" + apiKey + ":");
+        }
+        return storeOptional.get();
+    }
+
+    public Store getStoreByAdminUsername(@Email String email) throws CourierServiceException {
+        Optional<Store> storeOptional = storeRepository.findByAdmin_Email(email);
+        if (storeOptional.isEmpty()) {
+            throw new CourierServiceException("There is no store with admin username=" + email + ":");
+        }
+        return storeOptional.get();
+    }
     @Transactional
-    public long addStore(StoreJson storeJson) {
+    public Store addStoreAndAdmin(@Valid StoreJson storeJson) throws NoSuchAlgorithmException {
         Store store = storeConverter.convertToEntity(storeJson);
+        UserJson storeAdmin = storeJson.getAdmin();
+        storeAdmin.setRole(User.Role.ROLE_STORE_ADMIN.toString());
+        store.setAdmin(userService.saveUser(storeAdmin));
+        store.setApiKey(generateKey(256));
+        store.setApiSecret(generateKey(256));
+
         if (store.getPickupPoints() != null) {
             for (PickupPoint pickupPoint : store.getPickupPoints()) {
                 pickupPoint.setStore(store);
@@ -49,53 +82,51 @@ public class StoreService {
             }
         }
         storeRepository.save(store);
-        return store.getId();
+        return store;
     }
 
     @Transactional
-    public void updateStore(long id, StoreJson storeJson) {
+    public void updateStore(@Min(1) long id, @Valid StoreJson storeJson) throws CourierServiceException {
         Store store = getStoreById(id);
-        if (storeJson.getName() != null) {
-            store.setName(storeJson.getName());
-        }
-        if (storeJson.getStoreUrl() != null) {
-            store.setStoreUrl(storeJson.getStoreUrl());
-        }
-        if (storeJson.getPhoneNumber() != null) {
-            store.setPhoneNumber(storeJson.getPhoneNumber());
-        }
-        if (storeJson.getAdmin() != null) {
-            store.setAdmin(storeJson.getAdmin());
-        }
-        if (storeJson.getPickupPoints() != null) {
-            store.setPickupPoints(storeJson.getPickupPoints());
-        }
+        store=storeConverter.convertToEntity(storeJson,store);
         storeRepository.save(store);
     }
 
-    //Set ROLE_STORE_ADMIN access on this method
     @Transactional
-    public void addPickupPoints(long id, List<PickupPoint> pickupPoints) {
-        Store store = getStoreById(id);
-        store.setPickupPoints(pickupPoints);
+    public User changeStoreAdmin(@Valid UserJson admin, @Min(1) long storeId) throws CourierServiceException {
+        Store store = getStoreById(storeId);
+        User previousStoreAdmin = store.getAdmin();
+        admin.setRole(User.Role.ROLE_STORE_ADMIN.toString());
+        store.setAdmin(userService.saveUser(admin));
+        userService.deleteExistingUserById(previousStoreAdmin.getId());
         storeRepository.save(store);
+        return store.getAdmin();
     }
 
-    public List<StoreJson> listStoresByPage(int page, int count) {
+    public List<StoreJson> listStoresByPage(@Min(0) int page, @Min(1) int count) {
         Page<Store> storePage = storeRepository.findAll(PageRequest.of(page, count));
         List<StoreJson> stores = new ArrayList<>();
         for (Store store : storePage) {
             StoreJson storeJson = storeConverter.convertToModel(store);
+            storeJson.getAdmin().setPassword("Password hidden");
             stores.add(storeJson);
         }
         return stores;
     }
 
     @Transactional
-    public void deleteStoreById(long id) {
+    public void deleteStoreById(@Min(1) long id) throws CourierServiceException {
         if (!storeRepository.existsById(id)) {
-            throw new CourierServiceException("There is no store with id " + id);
+            throw new CourierServiceException("There is no store");
         }
         storeRepository.deleteById(id);
+    }
+
+    public String generateKey(int length) throws NoSuchAlgorithmException {
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        keyGenerator.init(length);
+        SecretKey secretKey = keyGenerator.generateKey();
+        byte[] rawData = secretKey.getEncoded();
+        return Base64.getEncoder().encodeToString(rawData);
     }
 }

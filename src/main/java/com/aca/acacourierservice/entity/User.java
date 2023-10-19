@@ -3,6 +3,7 @@ package com.aca.acacourierservice.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
@@ -10,7 +11,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
     @Column(nullable = false)
     private String password;
@@ -25,7 +26,7 @@ public class User {
     private String fullName;
     @Column
     @Temporal(TemporalType.DATE)
-    private LocalDate birthdate;
+    private LocalDate birthDate;
 
     public Long getId() {
         return id;
@@ -83,12 +84,39 @@ public class User {
         this.fullName = fullName;
     }
 
-    public LocalDate getBirthdate() {
-        return birthdate;
+    public LocalDate getBirthDate() {
+        return this.birthDate;
     }
 
-    public void setBirthdate(LocalDate birthdate) {
-        this.birthdate = birthdate;
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id)
+                && Objects.equals(email, user.email)
+                && Objects.equals(password, user.password)
+                && role == user.role
+                && Objects.equals(address, user.address)
+                && Objects.equals(phoneNumber, user.phoneNumber)
+                && Objects.equals(fullName, user.fullName)
+                && Objects.equals(birthDate, user.birthDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id,
+                email,
+                password,
+                role,
+                address,
+                phoneNumber,
+                fullName,
+                birthDate);
     }
 
     public enum Role {
@@ -97,4 +125,3 @@ public class User {
         ROLE_COURIER
     }
 }
-
