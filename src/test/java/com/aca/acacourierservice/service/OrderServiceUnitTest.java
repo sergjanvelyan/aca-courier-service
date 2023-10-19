@@ -382,7 +382,7 @@ public class OrderServiceUnitTest {
 
         when(orderRepository.findAllByCourierIsNull(pageRequest)).thenReturn(Page.empty());
 
-        Page<Order> unassignedOrdersResultPage = orderService.getUnassignedOrders(0,5);
+        Page<Order> unassignedOrdersResultPage = orderService.getUnassignedOrders(page,size);
 
         assertTrue(unassignedOrdersResultPage.isEmpty());
         verify(orderRepository,times(1)).findAllByCourierIsNull(pageRequest);
