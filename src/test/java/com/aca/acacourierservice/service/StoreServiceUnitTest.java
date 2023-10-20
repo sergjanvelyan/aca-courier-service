@@ -13,9 +13,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -160,5 +164,115 @@ public class StoreServiceUnitTest {
         verify(pickupPointRepository,times(pickupPoints.size())).save(any(PickupPoint.class));
         verify(storeRepository,times(1)).save(store);
         assertEquals(store,returnedStore);
+    }
+    @Test
+    public void testUpdateStore() throws CourierServiceException {
+        long storeId = 1L;
+        StoreJson storeJson = new StoreJson();
+        Store store = new Store();
+        store.setId(1L);
+
+        when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+        when(storeConverter.convertToEntity(storeJson, store)).thenReturn(store);
+
+        storeService.updateStore(storeId, storeJson);
+
+        verify(storeRepository, times(1)).findById(storeId);
+        verify(storeConverter, times(1)).convertToEntity(storeJson, store);
+        verify(storeRepository, times(1)).save(store);
+    }
+
+    @Test
+    public void testUpdateStoreWithInvalidId() {
+        long invalidStoreId = 1L;
+        StoreJson storeJson = new StoreJson();
+
+        when(storeRepository.findById(invalidStoreId)).thenReturn(Optional.empty());
+
+        CourierServiceException exception = assertThrows(CourierServiceException.class, () ->
+                storeService.updateStore(invalidStoreId, storeJson));
+        assertEquals("There is no store with id=" + invalidStoreId + ":",exception.getMessage());
+        verify(storeRepository,times(1)).findById(invalidStoreId);
+        verifyNoMoreInteractions(storeConverter,storeRepository);
+    }
+    @Test
+    public void testChangeStoreAdmin() throws CourierServiceException {
+        long storeId = 1L;
+        UserJson newAdminJson = new UserJson();
+        User newAdmin = new User();
+        newAdmin.setId(2L);
+        User previousAdmin = new User();
+        previousAdmin.setId(1L);
+        Store store = new Store();
+        store.setId(storeId);
+        store.setAdmin(previousAdmin);
+
+        when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+        when(userService.saveUser(newAdminJson)).thenReturn(newAdmin);
+
+        User result = storeService.changeStoreAdmin(newAdminJson, storeId);
+
+        verify(storeRepository, times(1)).findById(storeId);
+        verify(userService, times(1)).saveUser(newAdminJson);
+        verify(userService, times(1)).deleteExistingUserById(previousAdmin.getId());
+        verify(storeRepository, times(1)).save(store);
+        assertEquals(result,newAdmin);
+    }
+
+    @Test
+    public void testChangeStoreAdminWithInvalidStoreId() {
+        long invalidStoreId = 1L;
+        UserJson adminJson = new UserJson();
+
+        when(storeRepository.findById(invalidStoreId)).thenReturn(Optional.empty());
+
+        CourierServiceException exception = assertThrows(CourierServiceException.class, () ->
+                storeService.changeStoreAdmin(adminJson, invalidStoreId));
+        assertEquals("There is no store with id=" + invalidStoreId + ":",exception.getMessage());
+        verify(storeRepository, times(1)).findById(invalidStoreId);
+        verifyNoMoreInteractions(userService,storeRepository);
+    }
+    @Test
+    public void testListStoresByPage() {
+        int page = 0;
+        int size = 10;
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Store storeOne = new Store();
+        Store storeTwo = new Store();
+        List<Store> storeList = new ArrayList<>(List.of(storeOne,storeTwo));
+        Page<Store> storePage = new PageImpl<>(storeList);
+
+        when(storeRepository.findAll(pageRequest)).thenReturn(storePage);
+
+        when(storeConverter.convertToModel(any(Store.class))).thenReturn(new StoreJson());
+
+        List<StoreJson> result = storeService.listStoresByPage(page, size);
+
+        verify(storeRepository, times(1)).findAll(pageRequest);
+        verify(storeConverter, times(storeList.size())).convertToModel(any(Store.class));
+        assertEquals(storePage.getTotalElements(),result.size());
+    }
+    @Test
+    public void testDeleteStoreById() throws CourierServiceException {
+        long storeId = 1L;
+
+        when(storeRepository.existsById(storeId)).thenReturn(true);
+
+        storeService.deleteStoreById(storeId);
+
+        verify(storeRepository, times(1)).existsById(storeId);
+        verify(storeRepository, times(1)).deleteById(storeId);
+    }
+    @Test
+    public void testDeleteStoreByInvalidId() {
+        long invalidStoreId = 1L;
+
+        when(storeRepository.existsById(invalidStoreId)).thenReturn(false);
+
+        CourierServiceException exception = assertThrows(CourierServiceException.class, () ->
+                storeService.deleteStoreById(invalidStoreId));
+        assertEquals("There is no store",exception.getMessage());
+        verify(storeRepository, times(1)).existsById(invalidStoreId);
+        verify(storeRepository, never()).deleteById(invalidStoreId);
     }
 }

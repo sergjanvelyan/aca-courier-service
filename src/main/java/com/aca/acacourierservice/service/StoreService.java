@@ -108,7 +108,6 @@ public class StoreService {
         List<StoreJson> stores = new ArrayList<>();
         for (Store store : storePage) {
             StoreJson storeJson = storeConverter.convertToModel(store);
-            storeJson.getAdmin().setPassword("Password hidden");
             stores.add(storeJson);
         }
         return stores;

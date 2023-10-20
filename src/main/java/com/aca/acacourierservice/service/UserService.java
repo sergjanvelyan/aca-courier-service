@@ -71,7 +71,9 @@ public class UserService {
     @Transactional
     public void updateUser(@Valid UserJson model, User entity) {
         entity = userConverter.convertToEntity(model, entity);
-        entity.setPassword(passwordEncoder.encode(model.getPassword()));
+        if(model.getPassword()!=null){
+            entity.setPassword(passwordEncoder.encode(model.getPassword()));
+        }
         userRepository.save(entity);
     }
 

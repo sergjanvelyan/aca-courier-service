@@ -2,9 +2,11 @@ package com.aca.acacourierservice.service;
 
 import com.aca.acacourierservice.converter.OrderConverter;
 import com.aca.acacourierservice.entity.Order;
+import com.aca.acacourierservice.entity.PickupPoint;
 import com.aca.acacourierservice.entity.Store;
 import com.aca.acacourierservice.entity.User;
 import com.aca.acacourierservice.exception.CourierServiceException;
+import com.aca.acacourierservice.model.ItemOrderInfo;
 import com.aca.acacourierservice.model.OrderJson;
 import com.aca.acacourierservice.model.StatusInfoJson;
 import com.aca.acacourierservice.model.StatusUpdateTimeJson;
@@ -21,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -431,5 +434,79 @@ public class OrderServiceUnitTest {
 
         assertTrue(storeOrdersResultPage.isEmpty());
         verify(orderRepository,times(1)).findAllByStore_Admin_Id(storeAdminId,pageRequest);
+    }
+    @Test
+    public void testCalculateDeliveryPriceWithSameCountry() {
+        String pickupPointCountry = "Armenia";
+        String destinationCountry = "Armenia";
+        ItemOrderInfo itemOrderInfo = new ItemOrderInfo();
+        itemOrderInfo.setSize("SMALL");
+        itemOrderInfo.setCountry(destinationCountry);
+        itemOrderInfo.setWeightKg(2.2);
+        long storeId = 1L;
+        PickupPoint pickupPoint = new PickupPoint();
+        pickupPoint.setCountry(pickupPointCountry);
+        List<PickupPoint> pickupPoints = List.of(pickupPoint);
+        Store store = new Store();
+        store.setPickupPoints(pickupPoints);
+
+        when(storeService.getStoreById(storeId)).thenReturn(store);
+
+        double deliveryPrice = orderService.calculateDeliveryPrice(itemOrderInfo, storeId);
+
+        double expectedPrice = OrderService.STANDARD_FEE_USD  + itemOrderInfo.getWeightKg() * OrderService.DELIVERY_PRICE_USD_KG * OrderService.FEE_COEFFICIENT_OF_SMALL_SIZE;
+        assertEquals(expectedPrice, deliveryPrice, 0.01);
+    }
+    @Test
+    public void testCalculateDeliveryPriceWithDifferentCountry() {
+        String pickupPointCountry = "Armenia";
+        String destinationCountry = "Georgia";
+        ItemOrderInfo itemOrderInfo = new ItemOrderInfo();
+        itemOrderInfo.setSize("SMALL");
+        itemOrderInfo.setCountry(destinationCountry);
+        itemOrderInfo.setWeightKg(2.2);
+        long storeId = 1L;
+        PickupPoint pickupPoint = new PickupPoint();
+        pickupPoint.setCountry(pickupPointCountry);
+        List<PickupPoint> pickupPoints = List.of(pickupPoint);
+        Store store = new Store();
+        store.setPickupPoints(pickupPoints);
+
+        when(storeService.getStoreById(storeId)).thenReturn(store);
+
+        double deliveryPrice = orderService.calculateDeliveryPrice(itemOrderInfo, storeId);
+
+        double expectedPrice = OrderService.STANDARD_FEE_USD + 2 + itemOrderInfo.getWeightKg() * OrderService.DELIVERY_PRICE_USD_KG * OrderService.FEE_COEFFICIENT_OF_SMALL_SIZE;
+        assertEquals(expectedPrice, deliveryPrice, 0.01);
+    }
+    @Test
+    public void testIsSameCountryWhenSameCountry() {
+        List<PickupPoint> pickupPoints = new ArrayList<>();
+        PickupPoint pickupPointOne = new PickupPoint();
+        pickupPointOne.setCountry("Armenia");
+        pickupPoints.add(pickupPointOne);
+        PickupPoint pickupPointTwo = new PickupPoint();
+        pickupPointTwo.setCountry("Spain");
+        pickupPoints.add(pickupPointTwo);
+        String destinationCountry = "Spain";
+
+        boolean result = orderService.isSameCountry(pickupPoints, destinationCountry);
+
+        assertTrue(result);
+    }
+    @Test
+    public void testIsSameCountryWithNonMatchingCountry() {
+        List<PickupPoint> pickupPoints = new ArrayList<>();
+        PickupPoint pickupPointOne = new PickupPoint();
+        pickupPointOne.setCountry("Canada");
+        pickupPoints.add(pickupPointOne);
+        PickupPoint pickupPointTwo = new PickupPoint();
+        pickupPointTwo.setCountry("Germany");
+        pickupPoints.add(pickupPointTwo);
+        String destinationCountry = "Armenia";
+
+        boolean result = orderService.isSameCountry(pickupPoints, destinationCountry);
+
+        assertFalse(result);
     }
 }
