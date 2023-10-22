@@ -37,20 +37,17 @@ public class StatusUpdateTimeServiceIntegrationTest {
     @Test
     public void testAddStatusUpdateTime(){
         User storeAdmin = new User();
-        storeAdmin.setId(1L);
         storeAdmin.setEmail("storeAdmin@gmail.com");
-        storeAdmin.setPassword("storeAdmin");
+        storeAdmin.setPassword("storeAdmin12345");
         storeAdmin.setRole(User.Role.ROLE_STORE_ADMIN);
-        userRepository.save(storeAdmin);
+        storeAdmin.setId(userRepository.save(storeAdmin).getId());
 
         Store store = new Store();
-        store.setId(1L);
         store.setName("Store Name");
         store.setAdmin(storeAdmin);
-        storeRepository.save(store);
+        store.setId(storeRepository.save(store).getId());
 
         Order order = new Order();
-        order.setId(1L);
         order.setOrderId("orderId1234");
         order.setStatus(Order.Status.SHIPPED);
         order.setStore(store);
@@ -65,15 +62,18 @@ public class StatusUpdateTimeServiceIntegrationTest {
         order.setWeightKg(5.5);
         order.setSize(Order.Size.MEDIUM);
         order.setOrderConfirmedTime(LocalDateTime.of(2023, Month.AUGUST, 25, 15, 10, 3));
-        orderRepository.save(order);
+        order.setId(orderRepository.save(order).getId());
 
         StatusUpdateTimeJson statusUpdateTimeJson = new StatusUpdateTimeJson();
         statusUpdateTimeJson.setUpdateTime(LocalDateTime.of(2023, Month.AUGUST,29,13,10,10));
         statusUpdateTimeJson.setUpdatedFrom(Order.Status.SHIPPED);
         statusUpdateTimeJson.setUpdatedTo(Order.Status.CANCELLED);
         statusUpdateTimeJson.setOrderId(order.getId());
+
         long id = statusUpdateTimeService.addStatusUpdateTime(statusUpdateTimeJson);
+
         StatusUpdateTime savedStatusUpdateTime= statusUpdateTimeRepository.findById(id).orElse(null);
+
         assertNotNull(savedStatusUpdateTime);
         assertEquals(statusUpdateTimeJson.getOrderId(),savedStatusUpdateTime.getOrder().getId());
         assertEquals(statusUpdateTimeJson.getUpdateTime(),savedStatusUpdateTime.getUpdateTime());

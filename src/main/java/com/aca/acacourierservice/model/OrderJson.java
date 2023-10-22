@@ -18,7 +18,6 @@ public class OrderJson {
     @JsonView(Lists.class)
     private Long id;
     @JsonView(PrivateSecondLevel.class)
-    @NotNull(groups = OnCreate.class,  message = "Please enter orderId")
     @NotBlank
     private String orderId;
     @JsonView(PrivateSecondLevel.class)
@@ -59,7 +58,6 @@ public class OrderJson {
     @JsonView(PrivateSecondLevel.class)
     @NotNull(groups = OnCreate.class,  message = "Please enter size")
     @ValidEnum(enumClass = Order.Size.class)
-    @NotEmpty(message = "Invalid enum value")
     private String size;
     @JsonView(PrivateSecondLevel.class)
     private Long courierId;
@@ -116,7 +114,7 @@ public class OrderJson {
         this.trackingNumber = trackingNumber;
     }
 
-    public long getStoreId() {
+    public Long getStoreId() {
         return storeId;
     }
 

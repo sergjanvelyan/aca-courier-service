@@ -79,7 +79,7 @@ public class PickupPointJson {
         this.phoneNumber = phoneNumber;
     }
 
-    public long getStoreId() {
+    public Long getStoreId() {
         return storeId;
     }
 

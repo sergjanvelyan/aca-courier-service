@@ -65,6 +65,10 @@ public class OrderService{
         statusUpdateTimeService.addStatusUpdateTime(statusUpdateTimeJson);
         return order.getTrackingNumber();
      }
+    /**
+     * The order of enum values in {@link Order.Status} is important
+     * and should not be changed to ensure correct behavior of this method.
+     * */
     @Transactional
     public void updateOrderStatus(@Min(1) long id,@Valid StatusInfoJson statusInfoJson) throws CourierServiceException {
         Order order = getOrderById(id);
