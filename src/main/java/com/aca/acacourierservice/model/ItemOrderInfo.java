@@ -19,7 +19,7 @@ public class ItemOrderInfo {
     @Pattern(regexp ="^(([a-zA-Z]{2,15})\\s?)+$",message = "Not valid country")
     private String country;
 
-    public double getWeightKg() {
+    public Double getWeightKg() {
         return weightKg;
     }
 

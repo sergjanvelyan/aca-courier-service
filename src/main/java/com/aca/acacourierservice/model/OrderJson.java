@@ -116,7 +116,7 @@ public class OrderJson {
         this.trackingNumber = trackingNumber;
     }
 
-    public long getStoreId() {
+    public Long getStoreId() {
         return storeId;
     }
 
