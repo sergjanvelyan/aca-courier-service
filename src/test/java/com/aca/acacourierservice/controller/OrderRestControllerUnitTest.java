@@ -9,6 +9,7 @@ import com.aca.acacourierservice.model.StatusInfoJson;
 import com.aca.acacourierservice.model.StatusUpdateTimeJson;
 import com.aca.acacourierservice.service.OrderService;
 import com.aca.acacourierservice.service.StatusUpdateTimeService;
+import com.aca.acacourierservice.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +39,8 @@ public class OrderRestControllerUnitTest {
     private MockMvc mockMvc;
     @MockBean
     private OrderService orderService;
+    @MockBean
+    private UserService userService;
     @MockBean
     private OrderConverter orderConverter;
     @MockBean
