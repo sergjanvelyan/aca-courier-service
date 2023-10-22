@@ -211,7 +211,10 @@ public class Order {
     public void setStatusUpdateTimeList(List<StatusUpdateTime> statusUpdateTimeList) {
         this.statusUpdateTimeList = statusUpdateTimeList;
     }
-
+    /**
+     * Enum representing the status of an order. The order of values is important and should not be changed.
+     * Any modifications to this enum should be carefully reviewed to avoid breaking existing functionality.
+     */
     public enum Status {
         NEW,
         CANCELLED,
